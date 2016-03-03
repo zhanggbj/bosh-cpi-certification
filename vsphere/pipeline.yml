@@ -1,0 +1,69 @@
+---
+groups:
+  - name: certify-vsphere
+    jobs:
+      - deployment-centos
+      - deployment-ubuntu
+      - bats-centos
+      - bats-ubuntu
+      - upgrade-ubuntu
+      - certification
+
+jobs:
+  - name: deployment-centos
+    plan:
+      - aggregate:
+        - {get: bosh-cpi-release, tags: [vsphere-v5.1], trigger: true}
+        - {get: bosh-release,     tags: [vsphere-v5.1], trigger: true}
+        - {get: stemcell,         tags: [vsphere-v5.1], trigger: true, resource: centos-stemcell}
+        - {get: pipelines,        tags: [vsphere-v5.1], trigger: false}
+        - {get: bosh-init,        tags: [vsphere-v5.1], trigger: false}
+
+      - {put: environment, tags: [vsphere-v5.1], params: {acquire: true}}
+
+      - task: deploy-director
+        tags: [vsphere-v5.1]
+        file: pipelines/vsphere/tasks/deploy-director.yml
+        config:
+          params:
+            BOSH_VSPHERE_VCENTER:                   {{VCENTER_IP}}
+            BOSH_VSPHERE_VCENTER_USER:              {{VCENTER_USER}}
+            BOSH_VSPHERE_VCENTER_PASSWORD:          {{VCENTER_PASSWORD}}
+            BOSH_VSPHERE_VERSION:                   {{VSPHERE_VERSION}}
+            BOSH_VSPHERE_VCENTER_DC:                {{VCENTER_DC}}
+            BOSH_VSPHERE_VCENTER_CLUSTER:           {{VCENTER_CLUSTER}}
+            BOSH_VSPHERE_VCENTER_DATASTORE_PATTERN: {{VCENTER_DATASTORE_PATTERN}}
+            BOSH_VSPHERE_VCENTER_VLAN:              {{VCENTER_VLAN}}
+            BOSH_VSPHERE_VCENTER_VM_FOLDER:         {{e2e_centos_VCENTER_VM_FOLDER}}
+            BOSH_VSPHERE_VCENTER_TEMPLATE_FOLDER:   {{e2e_centos_VCENTER_TEMPLATE_FOLDER}}
+            BOSH_VSPHERE_VCENTER_DISK_PATH:         {{e2e_centos_VCENTER_DISK_PATH}}
+            BOSH_DIRECTOR_USERNAME:                 {{BOSH_DIRECTOR_USERNAME}}
+            BOSH_DIRECTOR_PASSWORD:                 {{BOSH_DIRECTOR_PASSWORD}}
+
+      - task: deploy-release
+        tags: [vsphere-v5.1]
+        file: pipelines/vsphere/tasks/deploy-release.yml
+        config:
+          params:
+            director_username:         {{BOSH_DIRECTOR_USERNAME}}
+            director_password:         {{BOSH_DIRECTOR_PASSWORD}}
+            stemcell_name:             {{centos_STEMCELL_NAME}}
+            BOSH_VSPHERE_VCENTER_VLAN: {{VCENTER_VLAN}}
+
+      - task: teardown
+        tags: [vsphere-v5.1]
+        file: pipelines/vsphere/tasks/teardown.yml
+
+      - {put: environment, tags: [vsphere-v5.1], params: {release: environment}}
+
+  - name: deployment-ubuntu
+
+  - name: bats-centos
+
+  - name: bats-ubuntu
+
+  - name: upgrade-ubuntu
+
+  - name: certification
+
+resources:

@@ -1,0 +1,14 @@
+---
+platform: linux
+image: docker:///boshcpi/cpi-certification
+
+inputs:
+  - name: bosh-cpi-release
+  - name: bosh-release
+  - name: stemcell
+  - name: pipelines
+  - name: bosh-init
+  - name: deployment
+
+run:
+  path: pipelines/vsphere/tasks/teardown.sh
