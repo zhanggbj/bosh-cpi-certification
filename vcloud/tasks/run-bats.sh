@@ -31,7 +31,7 @@ export BAT_VCAP_PASSWORD=c1oudc0w
 export BAT_DNS_HOST=$BATS_DIRECTOR_IP
 export BAT_DIRECTOR=$BATS_DIRECTOR_IP
 export BAT_STEMCELL="${stemcell_dir}/stemcell.tgz"
-export BAT_DEPLOYMENT_SPEC="bats-config.yml"
+export BAT_DEPLOYMENT_SPEC="${PWD}/bats-config.yml"
 
 cat > ${BAT_DEPLOYMENT_SPEC} <<EOF
 ---
