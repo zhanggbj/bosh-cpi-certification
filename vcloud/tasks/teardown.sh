@@ -10,7 +10,7 @@ set -e
 : ${VCLOUD_CATALOG:?}
 
 source /etc/profile.d/chruby.sh
-chruby 2.1.2
+chruby 2.1.7
 
 # inputs
 cpi_release_dir=$(realpath bosh-cpi-release)
