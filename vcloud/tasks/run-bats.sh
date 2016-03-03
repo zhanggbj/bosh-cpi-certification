@@ -26,6 +26,7 @@ bosh version
 bosh -n target $BATS_DIRECTOR_IP
 
 export BAT_INFRASTRUCTURE=vcloud
+export BAT_NETWORKING=manual
 export BAT_VCAP_PASSWORD=c1oudc0w
 export BAT_DNS_HOST=$BATS_DIRECTOR_IP
 export BAT_DIRECTOR=$BATS_DIRECTOR_IP
