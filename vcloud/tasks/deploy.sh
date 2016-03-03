@@ -27,28 +27,28 @@ director_state_dir=$(realpath director-state)
 bosh_init=$(echo ${bosh_init_dir}/bosh-init-*)
 chmod +x $bosh_init
 
-bosh_tarball=$(echo ${bosh_release_dir}/*.tgz)
-cpi_tarball=$(echo ${cpi_release_dir}/*.tgz)
-stemcell_tarball=$(echo ${stemcell_dir}/*.tgz)
+cp ${bosh_release_dir}/.tgz ./bosh-release.tgz
+cp ${cpi_release_dir}/*.tgz ./cpi-release.tgz
+cp ${stemcell_dir}/*.tgz ./stemcell.tgz
 
 # outputs
 deployment_dir="$(realpath deployment)"
 
-cat > "${deployment_dir}/director.yml" <<EOF
+cat > "./director.yml" <<EOF
 ---
-name: bats-director
+name: certification-director
 
 releases:
   - name: bosh
-    url: file://${bosh_tarball}
+    url: file://bosh-release.tgz
   - name: bosh-vcloud-cpi
-    url: file://${cpi_tarball}
+    url: file://cpi-release.tgz
 
 resource_pools:
   - name: vms
     network: private
     stemcell:
-      url: file://${stemcell_tarball}
+      url: file://stemcell.tgz
     cloud_properties:
       cpu: 2
       ram: 4_096
@@ -116,7 +116,7 @@ jobs:
 
       director:
         address: 127.0.0.1
-        name: bats-director
+        name: certification-director
         db: *db
         cpi_job: vcloud_cpi
         max_threads: 10
@@ -160,8 +160,21 @@ cloud_provider:
 EOF
 
 echo "deleting existing BOSH Director VM..."
-cp ${director_state_dir}/director-state.json ${deployment_dir}/director-state.json
-$bosh_init delete ${deployment_dir}/director.yml
+cp ${director_state_dir}/director-state.json ./director-state.json
+$bosh_init delete ./director.yml
+
+function finish {
+  echo "Final state of director deployment:"
+  echo "=========================================="
+  cat director-state.json
+  echo "=========================================="
+
+  cp director-state.json $deployment_dir
+}
+trap finish ERR
 
 echo "deploying BOSH..."
-$bosh_init deploy ${deployment_dir}/director.yml
+$bosh_init deploy ./director.yml
+
+trap - ERR
+finish
