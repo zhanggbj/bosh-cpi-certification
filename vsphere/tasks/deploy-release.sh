@@ -8,6 +8,7 @@ set -e
 : ${stemcell_name:?}
 : ${BOSH_VSPHERE_VCENTER_VLAN:?}
 
+source pipelines/shared/utils.sh
 source /etc/profile.d/chruby.sh
 chruby 2.1.7
 
