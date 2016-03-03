@@ -7,6 +7,7 @@ ENV LC_ALL en_US.UTF-8
 
 RUN apt-get update; apt-get -y upgrade; apt-get clean
 RUN apt-get install -y git curl wget tar make; apt-get clean
+RUN apt-get install -y realpath; apt-get clean
 
 # chruby
 RUN mkdir /tmp/chruby && \

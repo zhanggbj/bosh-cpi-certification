@@ -34,7 +34,7 @@ stemcell_tarball=$(echo ${stemcell_dir}/*.tgz)
 # outputs
 deployment_dir="$(realpath deployment)"
 
-cat > "${deployment_dir}/${manifest_filename}" <<EOF
+cat > "${deployment_dir}/director.yml" <<EOF
 ---
 name: bats-director
 
