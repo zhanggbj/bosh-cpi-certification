@@ -6,7 +6,7 @@ groups:
       - setup-v5.6
       - bats-v5.5
       - bats-v5.6
-      - certify
+      - certification
       - teardown-v5.5
       - teardown-v5.6
 
@@ -27,17 +27,17 @@ jobs:
         tags: [vcloud-v5.5]
         config:
           params:
-            base_os:              ubuntu
-            network_type_to_test: manual
-            VCLOUD_HOST:          {{VCLOUD_HOST_V5_5}}
-            VCLOUD_USER:          {{VCLOUD_USER_V5_5}}
-            VCLOUD_PASSWORD:      {{VCLOUD_PASSWORD_V5_5}}
-            VCLOUD_VLAN:          {{VCLOUD_VLAN}}
-            VCLOUD_ORG:           {{VCLOUD_ORG_V5_5}}
-            VCLOUD_VDC:           {{VCLOUD_VDC_V5_5}}
-            NETWORK_CIDR:         {{NETWORK_CIDR}}
-            NETWORK_GATEWAY:      {{NETWORK_GATEWAY}}
-            BATS_DIRECTOR_IP:     {{BATS_DIRECTOR_IP_ubuntu}}
+            VCLOUD_HOST:      {{VCLOUD_V5_5_HOST}}
+            VCLOUD_USER:      {{VCLOUD_V5_5_USER}}
+            VCLOUD_PASSWORD:  {{VCLOUD_V5_5_PASSWORD}}
+            VCLOUD_VLAN:      {{VCLOUD_VLAN}}
+            VCLOUD_ORG:       {{VCLOUD_V5_5_ORG}}
+            VCLOUD_VDC:       {{VCLOUD_V5_5_VDC}}
+            VCLOUD_VAPP:      {{VCLOUD_VAPP}}
+            VCLOUD_CATALOG:   {{VCLOUD_CATALOG}}
+            NETWORK_CIDR:     {{NETWORK_CIDR}}
+            NETWORK_GATEWAY:  {{NETWORK_GATEWAY}}
+            BATS_DIRECTOR_IP: {{BATS_DIRECTOR_IP_ubuntu}}
         ensure:
           {put: director-state-v5-5, tags: [vcloud-v5.5], params: {from: deployment/director-state.json}}
 
@@ -57,17 +57,17 @@ jobs:
         tags: [vcloud-v5.6]
         config:
           params:
-            base_os:              ubuntu
-            network_type_to_test: manual
-            VCLOUD_HOST:          {{VCLOUD_HOST_V5_6}}
-            VCLOUD_USER:          {{VCLOUD_USER_V5_6}}
-            VCLOUD_PASSWORD:      {{VCLOUD_PASSWORD_V5_6}}
-            VCLOUD_VLAN:          {{VCLOUD_VLAN}}
-            VCLOUD_ORG:           {{VCLOUD_ORG_V5_6}}
-            VCLOUD_VDC:           {{VCLOUD_VDC_V5_6}}
-            NETWORK_CIDR:         {{NETWORK_CIDR}}
-            NETWORK_GATEWAY:      {{NETWORK_GATEWAY}}
-            BATS_DIRECTOR_IP:     {{BATS_DIRECTOR_IP_ubuntu}}
+            VCLOUD_HOST:      {{VCLOUD_V5_6_HOST}}
+            VCLOUD_USER:      {{VCLOUD_V5_6_USER}}
+            VCLOUD_PASSWORD:  {{VCLOUD_V5_6_PASSWORD}}
+            VCLOUD_VLAN:      {{VCLOUD_VLAN}}
+            VCLOUD_ORG:       {{VCLOUD_V5_6_ORG}}
+            VCLOUD_VDC:       {{VCLOUD_V5_6_VDC}}
+            VCLOUD_VAPP:      {{VCLOUD_VAPP}}
+            VCLOUD_CATALOG:   {{VCLOUD_CATALOG}}
+            NETWORK_CIDR:     {{NETWORK_CIDR}}
+            NETWORK_GATEWAY:  {{NETWORK_GATEWAY}}
+            BATS_DIRECTOR_IP: {{BATS_DIRECTOR_IP_ubuntu}}
         ensure:
           {put: director-state-v5-6, tags: [vcloud-v5.6], params: {from: deployment/director-state.json}}
 
@@ -86,10 +86,9 @@ jobs:
         tags: [vcloud-v5.5]
         config:
           params:
-            base_os:              ubuntu
-            BAT_NETWORKING:       manual
             BATS_STEMCELL_NAME:   bosh-vcloud-esxi-ubuntu-trusty-go_agent
             VCLOUD_VLAN:          {{VCLOUD_VLAN}}
+            VCLOUD_VAPP:          {{VCLOUD_VAPP}}
             NETWORK_CIDR:         {{NETWORK_CIDR}}
             NETWORK_GATEWAY:      {{NETWORK_GATEWAY}}
             BATS_DIRECTOR_IP:     {{BATS_DIRECTOR_IP_ubuntu}}
@@ -114,10 +113,9 @@ jobs:
         tags: [vcloud-v5.6]
         config:
           params:
-            base_os:              ubuntu
-            BAT_NETWORKING:       manual
             BATS_STEMCELL_NAME:   bosh-vcloud-esxi-ubuntu-trusty-go_agent
             VCLOUD_VLAN:          {{VCLOUD_VLAN}}
+            VCLOUD_VAPP:          {{VCLOUD_VAPP}}
             NETWORK_CIDR:         {{NETWORK_CIDR}}
             NETWORK_GATEWAY:      {{NETWORK_GATEWAY}}
             BATS_DIRECTOR_IP:     {{BATS_DIRECTOR_IP_ubuntu}}
@@ -137,34 +135,55 @@ jobs:
         - {get: pipelines,        tags: [vcloud-v5.6], trigger: false}
 
       - task: generate
-        file: pipelines/vcloud/tasks/generate-receipt.yml
+        file: pipelines/shared/tasks/generate-receipt.yml
+        tags: [vcloud-v5.6]
         config:
           params:
-            bosh_release_name: bosh
-            cpi_release_name:  bosh-vcloud-cpi
-            stemcell_name:     bosh-vcloud-esxi-ubuntu-trusty-go_agent
+            cpi_release_name: bosh-vcloud-cpi
+            stemcell_name:    bosh-vcloud-esxi-ubuntu-trusty-go_agent
 
-      - put: receipt
-        params:
-          file: certification/*-receipt.json
+      - {put: receipt, tags: [vcloud-v5.6], params: {file: certification/*-receipt.json}}
 
   - name: teardown-v5.5
     serial_groups: [group-v5.5]
     plan:
-      - {get: director-state, tags: [vcloud-v5.5], trigger: false, resource: director-state-v5-5}
+      - {get: bosh-cpi-release, tags: [vcloud-v5.5], trigger: true, passed: [bats-v5.5]}
+      - {get: bosh-init,        tags: [vcloud-v5.5], trigger: false}
+      - {get: pipelines,        tags: [vcloud-v5.5], trigger: false}
+      - {get: director-state,   tags: [vcloud-v5.5], trigger: false, resource: director-state-v5-5, passed: [setup-v5.5]}
 
       - task: teardown
         file: pipelines/vcloud/tasks/teardown.yml
+        tags: [vcloud-v5.5]
+        config:
+          params:
+            VCLOUD_HOST:      {{VCLOUD_V5_5_HOST}}
+            VCLOUD_USER:      {{VCLOUD_V5_5_USER}}
+            VCLOUD_PASSWORD:  {{VCLOUD_V5_5_PASSWORD}}
+            VCLOUD_ORG:       {{VCLOUD_V5_5_ORG}}
+            VCLOUD_VDC:       {{VCLOUD_V5_5_VDC}}
+            VCLOUD_CATALOG:   {{VCLOUD_CATALOG}}
         ensure:
           {put: director-state-v5-5, tags: [vcloud-v5.5], params: {from: deployment/director-state.json}}
 
   - name: teardown-v5.6
     serial_groups: [group-v5.6]
     plan:
-      - {get: director-state, tags: [vcloud-v5.6], trigger: false, resource: director-state-v5-6}
+      - {get: bosh-cpi-release, tags: [vcloud-v5.6], trigger: true, passed: [bats-v5.6]}
+      - {get: bosh-init,        tags: [vcloud-v5.6], trigger: false}
+      - {get: pipelines,        tags: [vcloud-v5.6], trigger: false}
+      - {get: director-state,   tags: [vcloud-v5.6], trigger: false, resource: director-state-v5-6, passed: [setup-v5.6]}
 
       - task: teardown
         file: pipelines/vcloud/tasks/teardown.yml
+        tags: [vcloud-v5.6]
+          params:
+            VCLOUD_HOST:      {{VCLOUD_V5_6_HOST}}
+            VCLOUD_USER:      {{VCLOUD_V5_6_USER}}
+            VCLOUD_PASSWORD:  {{VCLOUD_V5_6_PASSWORD}}
+            VCLOUD_ORG:       {{VCLOUD_V5_6_ORG}}
+            VCLOUD_VDC:       {{VCLOUD_V5_6_VDC}}
+            VCLOUD_CATALOG:   {{VCLOUD_CATALOG}}
         ensure:
           {put: director-state-v5-6, tags: [vcloud-v5.6], params: {from: deployment/director-state.json}}
 

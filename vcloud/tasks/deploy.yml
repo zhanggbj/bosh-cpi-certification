@@ -1,11 +1,30 @@
 ---
 platform: linux
-image: docker:///boshcpi/TODO
+image: docker:///boshcpi/cpi-certification
 
-inputs: []
-outputs: []
+inputs:
+  - name: bosh-cpi-release
+  - name: bosh-release
+  - name: stemcell
+  - name: pipelines
+  - name: bosh-init
+  - name: director-state
+
+outputs:
+  - name: deployment
 
 run:
-  path: '.'
+  path: pipelines/vcloud/tasks/deploy.sh
 
-params: {}
+params:
+  VCLOUD_HOST:      ""
+  VCLOUD_USER:      ""
+  VCLOUD_PASSWORD:  ""
+  VCLOUD_VLAN:      ""
+  VCLOUD_ORG:       ""
+  VCLOUD_VDC:       ""
+  VCLOUD_VAPP:      ""
+  VCLOUD_CATALOG:   ""
+  NETWORK_CIDR:     ""
+  NETWORK_GATEWAY:  ""
+  BATS_DIRECTOR_IP: ""

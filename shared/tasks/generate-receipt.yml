@@ -1,0 +1,18 @@
+---
+platform: linux
+image: docker:///boshcpi/cpi-certification
+
+inputs:
+  - name: bosh-cpi-release
+  - name: bosh-release
+  - name: stemcell
+  - name: pipelines
+outputs:
+  - name: certification
+
+run:
+  path: pipelines/shared/tasks/generate-receipt.sh
+
+params:
+  cpi_release_name: ""
+  stemcell_name:    ""
