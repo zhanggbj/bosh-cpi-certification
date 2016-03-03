@@ -177,6 +177,7 @@ jobs:
       - task: teardown
         file: pipelines/vcloud/tasks/teardown.yml
         tags: [vcloud-v5.6]
+        config:
           params:
             VCLOUD_HOST:      {{VCLOUD_V5_6_HOST}}
             VCLOUD_USER:      {{VCLOUD_V5_6_USER}}
