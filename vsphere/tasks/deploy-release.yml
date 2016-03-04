@@ -3,7 +3,7 @@ platform: linux
 image: docker:///boshcpi/cpi-certification
 
 inputs:
-  - name: stemcell
+  - name: stemcells
   - name: pipelines
   - name: environment
 

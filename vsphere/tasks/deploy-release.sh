@@ -13,7 +13,7 @@ source /etc/profile.d/chruby.sh
 chruby 2.1.7
 
 # inputs
-stemcell_dir=$(realpath stemcell)
+stemcells_dir=$(realpath stemcells)
 release_dir=$(realpath pipelines/vsphere/assets/certification-release)
 
 env_name=$(cat environment/name)
@@ -93,7 +93,7 @@ pushd $release_dir
   bosh -n upload release --skip-if-exists
 popd
 
-bosh -n upload stemcell stemcell/stemcell.tgz --skip-if-exists
+bosh -n upload stemcell ${stemcells_dir}/stemcell.tgz --skip-if-exists
 bosh -d deployment.yml -n deploy
 
 if [ "${delete_deployment_when_done}" = "true" ]; then
