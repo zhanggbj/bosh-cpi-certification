@@ -21,6 +21,9 @@ jobs:
 
       - {put: environment, tags: [vsphere-v5.1], params: {acquire: true}}
 
+      - task: prepare-artifacts
+        file: pipelines/vsphere/tasks/prepare-artifacts.yml
+
       - &deploy-director
         task: deploy-director
         tags: [vsphere-v5.1]

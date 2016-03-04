@@ -22,10 +22,9 @@ source /etc/profile.d/chruby.sh
 chruby 2.1.7
 
 # inputs
-bosh_release_dir=$(realpath bosh-release)
-cpi_release_dir=$(realpath bosh-cpi-release)
-stemcell_dir=$(realpath stemcell)
-bosh_init_dir=$(realpath bosh-init)
+releases_dir=$(realpath releases)
+stemcells_dir=$(realpath stemcells)
+executables_dir=$(realpath executables)
 
 env_name=$(cat environment/name)
 metadata=$(cat environment/metadata)
@@ -46,9 +45,9 @@ check_for_rogue_vm $DIRECTOR_IP
 #   bundle exec rspec spec/integration/bats_env_spec.rb
 # popd
 
-cp ${bosh_release_dir}/*.tgz ./bosh-release.tgz
-cp ${cpi_release_dir}/*.tgz ./cpi-release.tgz
-cp ${stemcell_dir}/*.tgz ./stemcell.tgz
+cp ${releases_dir}/bosh-release.tgz ./bosh-release.tgz
+cp ${releases_dir}/bosh-cpi-release.tgz ./cpi-release.tgz
+cp ${stemcells_dir}/stemcell.tgz ./stemcell.tgz
 
 # outputs
 deployment_dir="$(realpath deployment)"
@@ -189,7 +188,7 @@ function finish {
 }
 trap finish ERR
 
-bosh_init=$(echo ${bosh_init_dir}/bosh-init-*)
+bosh_init="${executables_dir}/bosh-init"
 chmod +x $bosh_init
 
 echo "using bosh-init CLI version..."
