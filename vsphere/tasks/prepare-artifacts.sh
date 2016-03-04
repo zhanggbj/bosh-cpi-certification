@@ -2,7 +2,7 @@
 
 set -e
 
-if [ "$download" == "true" ] then
+if [ "$download" == "true" ]; then
   : ${bosh_init_version:?}
   : ${bosh_init_sha1:?}
   : ${bosh_version:?}
