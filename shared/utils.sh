@@ -12,6 +12,16 @@ check_for_rogue_vm() {
   fi
 }
 
+download() {
+  wget --retry-connrefused \
+       --waitretry=1 \
+       --read-timeout=20 \
+       --timeout=15 \
+       --tries=50 \
+       --output-document="$2" \
+       "$1"
+}
+
 env_attr() {
   local json=$1
   echo $json | jq --raw-output --arg attribute $2 '.[$attribute]'
