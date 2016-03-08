@@ -48,14 +48,17 @@ name: certification-director
 releases:
   - name: bosh
     url: ${BOSH_RELEASE_URI}
+    sha1: ${BOSH_RELEASE_SHA1}
   - name: bosh-vsphere-cpi
     url: ${CPI_RELEASE_URI}
+    sha1: ${CPI_RELEASE_SHA1}
 
 resource_pools:
   - name: vms
     network: private
     stemcell:
       url: ${STEMCELL_URI}
+      sha1: ${STEMCELL_SHA1}
     cloud_properties:
       cpu: 2
       ram: 4_096
