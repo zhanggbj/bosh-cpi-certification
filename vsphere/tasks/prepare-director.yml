@@ -4,7 +4,6 @@ image: docker:///boshcpi/cpi-certification
 
 inputs:
   - name: pipelines
-  - name: bosh-init
   - name: bosh-release
   - name: cpi-release
   - name: stemcell

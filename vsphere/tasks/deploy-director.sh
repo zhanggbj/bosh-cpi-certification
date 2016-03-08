@@ -23,7 +23,7 @@ function finish {
 }
 trap finish ERR
 
-bosh_init="bosh-init/bosh-init"
+bosh_init=$(realpath bosh-init/bosh-init-*)
 chmod +x $bosh_init
 
 echo "using bosh-init CLI version..."
