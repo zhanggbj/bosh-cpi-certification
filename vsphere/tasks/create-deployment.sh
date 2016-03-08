@@ -15,7 +15,6 @@ metadata=$(cat environment/metadata)
 network1=$(env_attr "${metadata}" "network1")
 deployment_release=$(realpath pipelines/vsphere/assets/certification-release)
 
-
 log "Using environment: \'${env_name}\'"
 ${DIRECTOR_IP:=$(env_attr "${metadata}" "directorIP" )}
 

@@ -10,7 +10,7 @@ source /etc/profile.d/chruby.sh
 chruby 2.1.7
 
 # preparation
-cp ./manifest/director.yml .
+cp ./director-manifest/director.yml .
 
 function finish {
   echo "Final state of director deployment:"
