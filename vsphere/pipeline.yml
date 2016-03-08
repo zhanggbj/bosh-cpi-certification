@@ -14,6 +14,9 @@ shared-tasks:
     file: pipelines/vsphere/tasks/prepare-director.yml
     config:
       params:
+        BOSH_RELEASE_URI:                       file://bosh-release/release.tgz
+        CPI_RELEASE_URI:                        file://cpi-release/release.tgz
+        STEMCELL_URI:                           file://stemcell/stemcell.tgz
         BOSH_DIRECTOR_USERNAME:                 {{BOSH_DIRECTOR_USERNAME}}
         BOSH_DIRECTOR_PASSWORD:                 {{BOSH_DIRECTOR_PASSWORD}}
         BOSH_VSPHERE_VCENTER:                   {{VCENTER_IP}}

@@ -2,17 +2,12 @@
 
 set -e
 
-compute_sha() {
-  path=$1
-  sha1sum $path | cut -f1 -d' '
-}
-
 # manifest generation...
 
 # if the X_SHA1 variable is set, use that; else, compute from input resource.
-${BOSH_RELEASE_SHA1:=$( compute_sha ./bosh-release/release.tgz )}
-${CPI_RELEASE_SHA1:=$(  compute_sha ./cpi-release/release.tgz )}
-${STEMCELL_SHA1:=$(     compute_sha ./stemcell/stemcell.tgz )}
+: ${BOSH_RELEASE_SHA1:=$( compute_sha ./bosh-release/release.tgz )}
+: ${CPI_RELEASE_SHA1:=$(  compute_sha ./cpi-release/release.tgz )}
+: ${STEMCELL_SHA1:=$(     compute_sha ./stemcell/stemcell.tgz )}
 
 : ${BOSH_RELEASE_URI:?}
 : ${CPI_RELEASE_URI:?}
@@ -39,10 +34,10 @@ env_name=$(cat environment/name)
 metadata=$(cat environment/metadata)
 network1=$(env_attr "${metadata}" "network1")
 echo Using environment: \'${env_name}\'
-${DIRECTOR_IP:=$(                  env_attr "${METADATA}" "directorIP" )}
-${BOSH_VSPHERE_VCENTER_CIDR:=$(    env_attr "${NETWORK1}" "vCenterCIDR" )}
-${BOSH_VSPHERE_VCENTER_GATEWAY:=$( env_attr "${NETWORK1}" "vCenterGateway" )}
-${BOSH_VSPHERE_DNS:=$(             env_attr "${METADATA}" "DNS" )}
+: ${DIRECTOR_IP:=$(                  env_attr "${METADATA}" "directorIP" )}
+: ${BOSH_VSPHERE_VCENTER_CIDR:=$(    env_attr "${NETWORK1}" "vCenterCIDR" )}
+: ${BOSH_VSPHERE_VCENTER_GATEWAY:=$( env_attr "${NETWORK1}" "vCenterGateway" )}
+: ${BOSH_VSPHERE_DNS:=$(             env_attr "${METADATA}" "DNS" )}
 
 cat > "${manifest_dir}/director.yml" <<EOF
 ---

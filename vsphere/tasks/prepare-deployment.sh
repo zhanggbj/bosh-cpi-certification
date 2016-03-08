@@ -19,13 +19,14 @@ env_name=$(cat environment/name)
 metadata=$(cat environment/metadata)
 network1=$(env_attr "${metadata}" "network1")
 echo Using environment: \'${env_name}\'
-${DIRECTOR_IP:=$(                  env_attr "${metadata}" "directorIP" )}
-${BOSH_VSPHERE_VCENTER_CIDR:=$(    env_attr "${network1}" "vCenterCIDR" )}
-${BOSH_VSPHERE_VCENTER_GATEWAY:=$( env_attr "${network1}" "vCenterGateway" )}
-${BOSH_VSPHERE_DNS:=$(             env_attr "${metadata}" "DNS" )}
-${STATIC_IP:=$(                    env_attr "${network1}" "staticIP-1" )}
-${RESERVED_RANGE:=$(               env_attr "${network1}" "reservedRange" )}
-${STATIC_RANGE:=$(                 env_attr "${network1}" "staticRange" )}
+
+: ${DIRECTOR_IP:=$(                  env_attr "${metadata}" "directorIP" )}
+: ${BOSH_VSPHERE_VCENTER_CIDR:=$(    env_attr "${network1}" "vCenterCIDR" )}
+: ${BOSH_VSPHERE_VCENTER_GATEWAY:=$( env_attr "${network1}" "vCenterGateway" )}
+: ${BOSH_VSPHERE_DNS:=$(             env_attr "${metadata}" "DNS" )}
+: ${STATIC_IP:=$(                    env_attr "${network1}" "staticIP-1" )}
+: ${RESERVED_RANGE:=$(               env_attr "${network1}" "reservedRange" )}
+: ${STATIC_RANGE:=$(                 env_attr "${network1}" "staticRange" )}
 
 bosh -n target ${DIRECTOR_IP}
 bosh login ${DIRECTOR_USERNAME} ${DIRECTOR_PASSWORD}

@@ -11,9 +11,9 @@ chruby 2.1.7
 
 env_name=$(cat environment/name)
 metadata=$(cat environment/metadata)
-
 log "Using environment: \'${env_name}\'"
-${DIRECTOR_IP:=$(env_attr "${metadata}" "directorIP" )}
+
+: ${DIRECTOR_IP:=$(env_attr "${metadata}" "directorIP" )}
 
 time bosh -n target ${DIRECTOR_IP}
 time bosh login ${BOSH_DIRECTOR_USERNAME} ${BOSH_DIRECTOR_PASSWORD}
