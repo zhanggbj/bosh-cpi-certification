@@ -2,13 +2,6 @@
 
 set -e
 
-# manifest generation...
-
-# if the X_SHA1 variable is set, use that; else, compute from input resource.
-: ${BOSH_RELEASE_SHA1:=$( compute_sha ./bosh-release/release.tgz )}
-: ${CPI_RELEASE_SHA1:=$(  compute_sha ./cpi-release/release.tgz )}
-: ${STEMCELL_SHA1:=$(     compute_sha ./stemcell/stemcell.tgz )}
-
 : ${BOSH_RELEASE_URI:?}
 : ${CPI_RELEASE_URI:?}
 : ${STEMCELL_URI:?}
@@ -25,6 +18,15 @@ set -e
 : ${BOSH_VSPHERE_VCENTER_VLAN:?}
 : ${BOSH_DIRECTOR_USERNAME:?}
 : ${BOSH_DIRECTOR_PASSWORD:?}
+
+# if the X_SHA1 variable is set, use that; else, compute from input resource.
+: ${BOSH_RELEASE_SHA1:=$( compute_sha ./bosh-release/release.tgz )}
+: ${CPI_RELEASE_SHA1:=$(  compute_sha ./cpi-release/release.tgz )}
+: ${STEMCELL_SHA1:=$(     compute_sha ./stemcell/stemcell.tgz )}
+
+source pipelines/shared/utils.sh
+source /etc/profile.d/chruby.sh
+chruby 2.1.7
 
 # outputs
 manifest_dir="$(realpath director-manifest)"
