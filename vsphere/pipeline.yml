@@ -8,13 +8,6 @@ groups:
       - certification
 
 shared:
-  - &bats-resources
-    - {get: bosh-release, tags: [vsphere-v5.1], trigger: true}
-    - {get: cpi-release,  tags: [vsphere-v5.1], trigger: true}
-    - {get: pipelines,    tags: [vsphere-v5.1], trigger: false}
-    - {get: bosh-init,    tags: [vsphere-v5.1], trigger: false}
-    - {get: bats,         tags: [vsphere-v5.1], trigger: false}
-
   - &prepare-director
     task: prepare-director
     tags: [vsphere-v5.1]
@@ -70,8 +63,12 @@ jobs:
   - name: bats-centos
     plan:
       - aggregate:
-        <<: *bats-resources
-        - {get: stemcell, tags: [vsphere-v5.1], trigger: true, resource: centos-stemcell}
+        - {get: bosh-release, tags: [vsphere-v5.1], trigger: true}
+        - {get: cpi-release,  tags: [vsphere-v5.1], trigger: true}
+        - {get: stemcell,     tags: [vsphere-v5.1], trigger: true, resource: centos-stemcell}
+        - {get: pipelines,    tags: [vsphere-v5.1], trigger: false}
+        - {get: bosh-init,    tags: [vsphere-v5.1], trigger: false}
+        - {get: bats,         tags: [vsphere-v5.1], trigger: false}
 
       - {put: environment, tags: [vsphere-v5.1], params: {acquire: true}}
 
@@ -91,8 +88,12 @@ jobs:
   - name: bats-ubuntu
     plan:
       - aggregate:
-        <<: *bats-resources
-        - {get: stemcell, tags: [vsphere-v5.1], trigger: true, resource: ubuntu-stemcell}
+        - {get: bosh-release, tags: [vsphere-v5.1], trigger: true}
+        - {get: cpi-release,  tags: [vsphere-v5.1], trigger: true}
+        - {get: stemcell,     tags: [vsphere-v5.1], trigger: true, resource: ubuntu-stemcell}
+        - {get: pipelines,    tags: [vsphere-v5.1], trigger: false}
+        - {get: bosh-init,    tags: [vsphere-v5.1], trigger: false}
+        - {get: bats,         tags: [vsphere-v5.1], trigger: false}
 
       - {put: environment, tags: [vsphere-v5.1], params: {acquire: true}}
 
