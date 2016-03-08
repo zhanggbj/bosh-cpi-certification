@@ -3,8 +3,8 @@ platform: linux
 image: docker:///boshcpi/cpi-certification
 
 inputs:
-  - name: bosh-cpi-release
   - name: bosh-release
+  - name: cpi-release
   - name: stemcell
   - name: pipelines
 outputs:
@@ -14,5 +14,5 @@ run:
   path: pipelines/shared/tasks/generate-receipt.sh
 
 params:
-  cpi_release_name: ""
-  stemcell_name:    ""
+  CPI_RELEASE_NAME: ""
+  STEMCELL_NAME:    ""

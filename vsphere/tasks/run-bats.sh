@@ -3,50 +3,49 @@
 set -e
 
 : ${BAT_STEMCELL_NAME:?}
-: ${BAT_VLAN:?}
 : ${BAT_VCAP_PASSWORD:?}
-: ${BAT_SECOND_NETWORK_VLAN:?}
 
 source pipelines/shared/utils.sh
 source /etc/profile.d/chruby.sh
 chruby 2.1.7
 
 # inputs
-stemcell_dir=$(realpath stemcell)
 bats_dir=$(realpath bats)
 
 metadata=$(cat environment/metadata)
 network1=$(env_attr "${metadata}" "network1")
 network2=$(env_attr "${metadata}" "network2")
-export BAT_DIRECTOR=$(                      env_attr "${metadata}" "directorIP")
-export BAT_DNS_HOST=$(                      env_attr "${metadata}" "directorIP")
-export BAT_STATIC_IP=$(                     env_attr "${network1}" "staticIP-1")
-export BAT_SECOND_STATIC_IP=$(              env_attr "${network1}" "staticIP-2")
-export BAT_CIDR=$(                          env_attr "${network1}" "vCenterCIDR")
-export BAT_RESERVED_RANGE=$(                env_attr "${network1}" "reservedRange")
-export BAT_STATIC_RANGE=$(                  env_attr "${network1}" "staticRange")
-export BAT_GATEWAY=$(                       env_attr "${network1}" "vCenterGateway")
-export BAT_SECOND_NETWORK_STATIC_IP=$(      env_attr "${network2}" "staticIP-1")
-export BAT_SECOND_NETWORK_CIDR=$(           env_attr "${network2}" "vCenterCIDR")
-export BAT_SECOND_NETWORK_RESERVED_RANGE=$( env_attr "${network2}" "reservedRange")
-export BAT_SECOND_NETWORK_STATIC_RANGE=$(   env_attr "${network2}" "staticRange")
-export BAT_SECOND_NETWORK_GATEWAY=$(        env_attr "${network2}" "vCenterGateway")
 
-export BAT_STEMCELL="${stemcell_dir}/stemcell.tgz"
-export BAT_DEPLOYMENT_SPEC="${PWD}/bats-config.yml"
-export BAT_INFRASTRUCTURE=vsphere
-export BAT_NETWORKING=manual
+: ${BAT_DIRECTOR:=$(                      env_attr "${metadata}" "directorIP")}
+: ${BAT_DNS_HOST:=$(                      env_attr "${metadata}" "directorIP")}
+: ${BAT_VLAN:=$(                          env_attr "${network1}" "vCenterVLAN"}
+: ${BAT_STATIC_IP:=$(                     env_attr "${network1}" "staticIP-1")}
+: ${BAT_SECOND_STATIC_IP:=$(              env_attr "${network1}" "staticIP-2")}
+: ${BAT_CIDR:=$(                          env_attr "${network1}" "vCenterCIDR")}
+: ${BAT_RESERVED_RANGE:=$(                env_attr "${network1}" "reservedRange")}
+: ${BAT_STATIC_RANGE:=$(                  env_attr "${network1}" "staticRange")}
+: ${BAT_GATEWAY:=$(                       env_attr "${network1}" "vCenterGateway")}
+: ${BAT_SECOND_NETWORK_VLAN:=$(           env_attr "${network2}" "vCenterVLAN"}
+: ${BAT_SECOND_NETWORK_STATIC_IP:=$(      env_attr "${network2}" "staticIP-1")}
+: ${BAT_SECOND_NETWORK_CIDR:=$(           env_attr "${network2}" "vCenterCIDR")}
+: ${BAT_SECOND_NETWORK_RESERVED_RANGE:=$( env_attr "${network2}" "reservedRange")}
+: ${BAT_SECOND_NETWORK_STATIC_RANGE:=$(   env_attr "${network2}" "staticRange")}
+: ${BAT_SECOND_NETWORK_GATEWAY:=$(        env_attr "${network2}" "vCenterGateway")}
+
+: ${BAT_STEMCELL:=$(realpath stemcell/stemcell.tgz)}
+: ${BAT_DEPLOYMENT_SPEC:="${PWD}/bats-config.yml"}
+: ${BAT_INFRASTRUCTURE:=vsphere}
+: ${BAT_NETWORKING:=manual}
 
 # vsphere uses user/pass and the cdrom drive, not a reverse ssh tunnel
-# the SSH key is required for the` bosh ssh` command to work properly
-mkdir -p ${PWD}/keys
-bosh_ssh_key="${PWD}/keys/bats.pem"
+# the SSH key is required for the `bosh ssh` command to work properly
 eval $(ssh-agent)
-trap "ssh-agent -k" EXIT
 
-ssh-keygen -N "" -t rsa -b 4096 -f $bosh_ssh_key
-chmod go-r $bosh_ssh_key
-ssh-add $bosh_ssh_key
+mkdir -p ${PWD}/keys
+ssh_key="${PWD}/keys/bats.pem"
+ssh-keygen -N "" -t rsa -b 4096 -f $ssh_key
+chmod go-r $ssh_key
+ssh-add $ssh_key
 
 echo "using bosh CLI version..."
 bosh version
@@ -64,7 +63,6 @@ Host ${BAT_STATIC_IP}
 Host ${BAT_SECOND_STATIC_IP}
     StrictHostKeyChecking no
 EOF
-
 
 cat > "${BAT_DEPLOYMENT_SPEC}" <<EOF
 ---
@@ -98,13 +96,6 @@ EOF
 
 pushd "${bats_dir}"
   ./write_gemfile
-
-  echo "verifying no BOSH deployed VM exists at target IP: $BAT_STATIC_IP"
-  check_for_rogue_vm $BAT_STATIC_IP
-
-  echo "verifying no BOSH deployed VM exists at target IP: $BAT_SECOND_STATIC_IP"
-  check_for_rogue_vm $BAT_SECOND_STATIC_IP
-
   bundle install
   bundle exec rspec spec
 popd

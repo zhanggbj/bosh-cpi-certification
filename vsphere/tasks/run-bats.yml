@@ -12,7 +12,5 @@ run:
   path: pipelines/vsphere/tasks/run-bats.sh
 
 params:
-  BAT_STEMCELL_NAME:       ""
-  BAT_VLAN:                ""
-  BAT_VCAP_PASSWORD:       ""
-  BAT_SECOND_NETWORK_VLAN: ""
+  BAT_STEMCELL_NAME: ""
+  BAT_VCAP_PASSWORD: ""

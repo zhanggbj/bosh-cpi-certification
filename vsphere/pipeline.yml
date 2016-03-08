@@ -7,7 +7,14 @@ groups:
       - test-upgrade
       - certification
 
-shared-tasks:
+shared:
+  - &bats-resources
+    - {get: bosh-release, tags: [vsphere-v5.1], trigger: true}
+    - {get: cpi-release,  tags: [vsphere-v5.1], trigger: true}
+    - {get: pipelines,    tags: [vsphere-v5.1], trigger: false}
+    - {get: bosh-init,    tags: [vsphere-v5.1], trigger: false}
+    - {get: bats,         tags: [vsphere-v5.1], trigger: false}
+
   - &prepare-director
     task: prepare-director
     tags: [vsphere-v5.1]
@@ -42,10 +49,8 @@ shared-tasks:
     file: pipelines/vsphere/tasks/run-bats.yml
     config:
       params:
-        BAT_STEMCELL_NAME:       ""
-        BAT_VLAN:                {{VCENTER_VLAN}}
-        BAT_VCAP_PASSWORD:       {{BAT_VCAP_PASSWORD}}
-        BAT_SECOND_NETWORK_VLAN: {{VCENTER_VLAN}}
+        BAT_STEMCELL_NAME: ""
+        BAT_VCAP_PASSWORD: {{BAT_VCAP_PASSWORD}}
 
   - &teardown
     task: teardown
@@ -61,12 +66,8 @@ jobs:
   - name: bats-centos
     plan:
       - aggregate:
-        - {get: cpi-release, tags: [vsphere-v5.1], trigger: true}
-        - {get: bosh-release,     tags: [vsphere-v5.1], trigger: true}
-        - {get: stemcell,         tags: [vsphere-v5.1], trigger: true, resource: centos-stemcell}
-        - {get: pipelines,        tags: [vsphere-v5.1], trigger: false}
-        - {get: bosh-init,        tags: [vsphere-v5.1], trigger: false}
-        - {get: bats,             tags: [vsphere-v5.1], trigger: false}
+        <<: *bats-resources
+        - {get: stemcell, tags: [vsphere-v5.1], trigger: true, resource: centos-stemcell}
 
       - {put: environment, tags: [vsphere-v5.1], params: {acquire: true}}
 
@@ -86,12 +87,8 @@ jobs:
   - name: bats-ubuntu
     plan:
       - aggregate:
-        - {get: cpi-release, tags: [vsphere-v5.1], trigger: true}
-        - {get: bosh-release,     tags: [vsphere-v5.1], trigger: true}
-        - {get: stemcell,         tags: [vsphere-v5.1], trigger: true, resource: ubuntu-stemcell}
-        - {get: pipelines,        tags: [vsphere-v5.1], trigger: false}
-        - {get: bosh-init,        tags: [vsphere-v5.1], trigger: false}
-        - {get: bats,             tags: [vsphere-v5.1], trigger: false}
+        <<: *bats-resources
+        - {get: stemcell, tags: [vsphere-v5.1], trigger: true, resource: ubuntu-stemcell}
 
       - {put: environment, tags: [vsphere-v5.1], params: {acquire: true}}
 
@@ -111,11 +108,12 @@ jobs:
   - name: test-upgrade
     plan:
       - aggregate:
-        - {get: pipelines,    tags: [vsphere-v5.1], trigger: false}
-        - {get: bosh-init,    tags: [vsphere-v5.1], trigger: false}
-        - {get: bosh-release, tags: [vsphere-v5.1], trigger: true}
-        - {get: cpi-release,  tags: [vsphere-v5.1], trigger: true}
-        - {get: stemcell,     tags: [vsphere-v5.1], trigger: true, resource: ubuntu-stemcell}
+        - {get: bosh-release,    tags: [vsphere-v5.1], trigger: true}
+        - {get: cpi-release,     tags: [vsphere-v5.1], trigger: true}
+        - {get: ubuntu-stemcell, tags: [vsphere-v5.1], trigger: true}
+        - {get: centos-stemcell, tags: [vsphere-v5.1], trigger: false}
+        - {get: pipelines,       tags: [vsphere-v5.1], trigger: false}
+        - {get: bosh-init,       tags: [vsphere-v5.1], trigger: false}
 
       - {put: environment, tags: [vsphere-v5.1], params: {acquire: true}}
 
@@ -154,9 +152,9 @@ jobs:
       - <<: *prepare-director
         config:
           params:
-            BOSH_RELEASE_URI:  file://bosh-release/release.tgz
-            CPI_RELEASE_URI:   file://cpi-release/release.tgz
-            STEMCELL_URI:      file://stemcell/stemcell.tgz
+            BOSH_RELEASE_URI: file://bosh-release/release.tgz
+            CPI_RELEASE_URI:  file://cpi-release/release.tgz
+            STEMCELL_URI:     file://stemcell/stemcell.tgz
 
       - <<: *deploy-director
 
@@ -172,22 +170,39 @@ jobs:
 
       - {put: environment, tags: [vsphere-v5.1], params: {release: environment}}
 
-  - name: certification
+  - name: certify-centos
     plan:
       - aggregate:
-        - {get: cpi-release,     tags: [vsphere-v5.1], trigger: true, passed: [bats-centos, bats-ubuntu]}
-        - {get: bosh-release,    tags: [vsphere-v5.1], trigger: true, passed: [bats-centos, bats-ubuntu]}
-        - {get: centos-stemcell, tags: [vsphere-v5.1], trigger: true, passed: [bats-centos]}
-        - {get: ubuntu-stemcell, tags: [vsphere-v5.1], trigger: true, passed: [bats-ubuntu]}
-        - {get: pipelines,       tags: [vsphere-v5.1], trigger: false}
+        - {get: bosh-release, tags: [vsphere-v5.1], trigger: true, passed: [bats-centos]}
+        - {get: cpi-release,  tags: [vsphere-v5.1], trigger: true, passed: [bats-centos]}
+        - {get: stemcell,     tags: [vsphere-v5.1], trigger: true, passed: [bats-centos, test-upgrade], resource: centos-stemcell}
+        - {get: pipelines,    tags: [vsphere-v5.1], trigger: false}
 
       - task: generate
         file: pipelines/shared/tasks/generate-receipt.yml
         tags: [vsphere-v5.1]
         config:
           params:
-            cpi_release_name: bosh-vcloud-cpi
-            stemcell_name:    bosh-vcloud-esxi-ubuntu-trusty-go_agent
+            CPI_RELEASE_NAME: bosh-vcloud-cpi
+            STEMCELL_NAME:    bosh-vsphere-esxi-centos-7-go_agent
+
+      - {put: receipt, tags: [vsphere-v5.1], params: {file: certification/*-receipt.json}}
+
+  - name: certify-ubuntu
+    plan:
+      - aggregate:
+        - {get: bosh-release, tags: [vsphere-v5.1], trigger: true, passed: [bats-ubuntu]}
+        - {get: cpi-release,  tags: [vsphere-v5.1], trigger: true, passed: [bats-ubuntu]}
+        - {get: stemcell,     tags: [vsphere-v5.1], trigger: true, passed: [bats-ubuntu, test-upgrade], resource: ubuntu-stemcell}
+        - {get: pipelines,    tags: [vsphere-v5.1], trigger: false}
+
+      - task: generate
+        file: pipelines/shared/tasks/generate-receipt.yml
+        tags: [vsphere-v5.1]
+        config:
+          params:
+            CPI_RELEASE_NAME: bosh-vcloud-cpi
+            STEMCELL_NAME:    bosh-vcloud-esxi-ubuntu-trusty-go_agent
 
       - {put: receipt, tags: [vsphere-v5.1], params: {file: certification/*-receipt.json}}
 
