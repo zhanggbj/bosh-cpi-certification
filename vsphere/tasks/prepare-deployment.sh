@@ -2,42 +2,41 @@
 
 set -e
 
-: ${delete_deployment_when_done:?}
-: ${director_password:?}
-: ${director_username:?}
-: ${stemcell_name:?}
+: ${BOSH_DIRECTOR_PASSWORD:?}
+: ${BOSH_DIRECTOR_USERNAME:?}
 : ${BOSH_VSPHERE_VCENTER_VLAN:?}
+: ${RELEASE_NAME:?}
+: ${STEMCELL_NAME:?}
 
 source pipelines/shared/utils.sh
 source /etc/profile.d/chruby.sh
 chruby 2.1.7
 
-# inputs
-stemcells_dir=$(realpath stemcells)
-release_dir=$(realpath pipelines/vsphere/assets/certification-release)
+# outputs
+manifest_dir="$(realpath deployment-manifest)"
 
 env_name=$(cat environment/name)
 metadata=$(cat environment/metadata)
 network1=$(env_attr "${metadata}" "network1")
 echo Using environment: \'${env_name}\'
-export DIRECTOR_IP=$(                  env_attr "${metadata}" "directorIP")
-export BOSH_VSPHERE_VCENTER_CIDR=$(    env_attr "${network1}" "vCenterCIDR")
-export BOSH_VSPHERE_VCENTER_GATEWAY=$( env_attr "${network1}" "vCenterGateway")
-export BOSH_VSPHERE_DNS=$(             env_attr "${metadata}" "DNS")
-export STATIC_IP=$(                    env_attr "${network1}" "staticIP-1")
-export RESERVED_RANGE=$(               env_attr "${network1}" "reservedRange")
-export STATIC_RANGE=$(                 env_attr "${network1}" "staticRange")
+${DIRECTOR_IP:=$(                  env_attr "${metadata}" "directorIP" )}
+${BOSH_VSPHERE_VCENTER_CIDR:=$(    env_attr "${network1}" "vCenterCIDR" )}
+${BOSH_VSPHERE_VCENTER_GATEWAY:=$( env_attr "${network1}" "vCenterGateway" )}
+${BOSH_VSPHERE_DNS:=$(             env_attr "${metadata}" "DNS" )}
+${STATIC_IP:=$(                    env_attr "${network1}" "staticIP-1" )}
+${RESERVED_RANGE:=$(               env_attr "${network1}" "reservedRange" )}
+${STATIC_RANGE:=$(                 env_attr "${network1}" "staticRange" )}
 
 bosh -n target ${DIRECTOR_IP}
-bosh login ${director_username} ${director_password}
+bosh login ${DIRECTOR_USERNAME} ${DIRECTOR_PASSWORD}
 
-cat > deployment.yml <<EOF
+cat > "${manifest_dir}/deployment.yml" <<EOF
 ---
 name: certification
 director_uuid: $(bosh status --uuid)
 
 releases:
-  - name: certification
+  - name: ${RELEASE_NAME}
     version: latest
 
 compilation:
@@ -58,7 +57,7 @@ update:
 resource_pools:
   - name: default
     stemcell:
-      name: ${stemcell_name}
+      name: ${STEMCELL_NAME}
       version: latest
     network: private
     cloud_properties:
@@ -87,17 +86,3 @@ jobs:
         default: [dns, gateway]
         static_ips: [${STATIC_IP}]
 EOF
-
-pushd $release_dir
-  bosh -n create release --force
-  bosh -n upload release --skip-if-exists
-popd
-
-bosh -n upload stemcell ${stemcells_dir}/stemcell.tgz --skip-if-exists
-bosh -d deployment.yml -n deploy
-
-if [ "${delete_deployment_when_done}" = "true" ]; then
-  bosh -n delete deployment certification
-fi
-
-bosh -n cleanup --all

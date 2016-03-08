@@ -3,12 +3,19 @@ platform: linux
 image: docker:///boshcpi/cpi-certification
 
 inputs:
-  - name: bosh-cpi-release
-  - name: bosh-release
-  - name: stemcell
   - name: pipelines
   - name: bosh-init
-  - name: deployment
+  - name: bosh-release
+  - name: environment
+  - name: director-state
+  - name: cpi-release
+  - name: stemcell
+
+params:
+  BOSH_INIT_LOG_LEVEL:    info
+  BOSH_DIRECTOR_USERNAME: ""
+  BOSH_DIRECTOR_PASSWORD: ""
+  DEPLOYMENT_NAME:        ""
 
 run:
   path: pipelines/vsphere/tasks/teardown.sh

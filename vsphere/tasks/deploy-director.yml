@@ -3,30 +3,20 @@ platform: linux
 image: docker:///boshcpi/cpi-certification
 
 inputs:
-  - name: executables
-  - name: releases
-  - name: stemcells
   - name: pipelines
-  - name: environment
+  - name: bosh-init
+  - name: bosh-release
+  - name: cpi-release
+  - name: stemcell
+  - name: director-manifest
 
 outputs:
-  - name: deployment
+  - name: director-state
 
 run:
   path: pipelines/vsphere/tasks/deploy-director.sh
 
 params:
-  BOSH_INIT_LOG_LEVEL:                    info
-  BOSH_VSPHERE_VCENTER:                   ""
-  BOSH_VSPHERE_VCENTER_USER:              ""
-  BOSH_VSPHERE_VCENTER_PASSWORD:          ""
-  BOSH_VSPHERE_VERSION:                   ""
-  BOSH_VSPHERE_VCENTER_DC:                ""
-  BOSH_VSPHERE_VCENTER_CLUSTER:           ""
-  BOSH_VSPHERE_VCENTER_VM_FOLDER:         ""
-  BOSH_VSPHERE_VCENTER_TEMPLATE_FOLDER:   ""
-  BOSH_VSPHERE_VCENTER_DATASTORE_PATTERN: ""
-  BOSH_VSPHERE_VCENTER_DISK_PATH:         ""
-  BOSH_VSPHERE_VCENTER_VLAN:              ""
-  BOSH_DIRECTOR_USERNAME:                 ""
-  BOSH_DIRECTOR_PASSWORD:                 ""
+  BOSH_INIT_LOG_LEVEL:    info
+  BOSH_DIRECTOR_USERNAME: ""
+  BOSH_DIRECTOR_PASSWORD: ""

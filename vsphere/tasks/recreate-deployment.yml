@@ -1,0 +1,15 @@
+---
+platform: linux
+image: docker:///boshcpi/cpi-certification
+
+inputs:
+  - name: pipelines
+  - name: environment
+  - name: deployment-manifest
+
+run:
+  path: pipelines/vsphere/tasks/recreate-deployment.sh
+
+params:
+  BOSH_DIRECTOR_PASSWORD: ""
+  BOSH_DIRECTOR_USERNAME: ""
