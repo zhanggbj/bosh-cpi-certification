@@ -357,6 +357,6 @@
     "CentosStaticRange": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "CentosBATs", "StaticRange"]}},
     "CentosStaticIP1": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "CentosBATs", "Static1"]}},
     "CentosStaticIP2": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "CentosBATs", "Static2"]}},
-    "VPCID": { "Value": { "Ref": "VPC"}},
+    "VPCID": { "Value": { "Ref": "VPC"}}
   }
 }
