@@ -1,0 +1,227 @@
+---
+groups:
+  - name: bats-update
+    jobs:
+      - bats-aws
+      - promote
+
+shared:
+  - &prepare-director
+    task: prepare-director
+    config:
+      params:
+        BOSH_RELEASE_URI:       file://bosh-release/release.tgz
+        CPI_RELEASE_URI:        file://cpi-release/release.tgz
+        STEMCELL_URI:           file://stemcell/stemcell.tgz
+        BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
+        BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
+
+  - &prepare-centos
+    <<: *prepare-director
+    task: prepare-centos
+    input_mapping:
+      stemcell:    stemcell-centos
+    output_mapping:
+      director-manifest: manifest-centos
+
+  - &prepare-ubuntu
+    task: prepare-ubuntu
+    input_mapping:
+      stemcell:    stemcell-ubuntu
+    output_mapping:
+      director-manifest: manifest-ubuntu
+
+  - &deploy-director
+    task: deploy-director
+    file: pipelines/shared/tasks/deploy-director.yml
+    config:
+      params:
+        BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
+        BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
+
+  - &prepare-bats
+    task: prepare-bats
+    file: pipelines/shared/tasks/prepare-bats.yml
+    config:
+      params:
+        AWS_ACCESS_KEY:    {{aws_access_key__primary}}
+        AWS_SECRET_KEY:    {{aws_secret_key__primary}}
+        AWS_REGION_NAME:   {{aws_region__primary}}
+        AWS_STACK_NAME:    bats-promotion
+        BAT_VCAP_PASSWORD: {{BAT_VCAP_PASSWORD}}
+        PUBLIC_KEY_NAME:   {{bosh_public_key_name}}
+
+  - &run-bats
+    task: run-bats
+    file: pipelines/shared/tasks/run-bats.yml
+    config:
+      params:
+        BAT_VCAP_PASSWORD: {{BAT_VCAP_PASSWORD}}
+
+  - &teardown
+    task: teardown
+    file: pipelines/shared/tasks/teardown.yml
+    config:
+      params:
+        BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
+        BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
+
+jobs:
+  - name: bats-aws
+    plan:
+      - aggregate:
+        - {get: this,            trigger: false}
+        - {get: bats,            trigger: true, resource: bats-candidate}
+        - {get: bosh-release,    trigger: false}
+        - {get: cpi-release,     trigger: false, resource: cpi-release-aws}
+        - {get: stemcell-centos, trigger: false}
+        - {get: stemcell-ubuntu, trigger: false}
+        - {get: bosh-init,       trigger: false}
+
+      - task: prepare-infrastructure
+        file: this/aws/tasks/prepare-infrastructure.yml
+        config:
+          params:
+            AWS_ACCESS_KEY:   {{aws_access_key__primary}}
+            AWS_SECRET_KEY:   {{aws_secret_key__primary}}
+            AWS_REGION_NAME:  {{aws_region__primary}}
+            AWS_STACK_NAME:   bats-promotion # TODO: move to secrets
+
+      - aggregate:
+        - <<: *prepare-centos
+          file: pipelines/aws/tasks/prepare-director.yml
+          config:
+            params:
+              AWS_STACK_NAME:   bats-promotion
+              AWS_STACK_PREFIX: Centos
+        - <<: *prepare-ubuntu
+          file: pipelines/aws/tasks/prepare-director.yml
+          config:
+            params:
+              AWS_STACK_NAME:   bats-promotion
+              AWS_STACK_PREFIX: Ubuntu
+
+      - aggregate:
+        - <<: *deploy-director
+          task: deploy-centos
+          input_mapping:
+            director-config: manifest-centos
+            stemcell:        stemcell-centos
+          output_mapping:
+            director-state:  state-centos
+        - <<: *deploy-director
+          task: deploy-ubuntu
+          input_mapping:
+            director-config: manifest-ubuntu
+            stemcell:        stemcell-ubuntu
+          output_mapping:
+            director-state:  state-ubuntu
+
+      - aggregate:
+        - <<: *prepare-bats
+          task: prepare-bats-centos
+          file: pipelines/aws/tasks/prepare-bats.yml
+          input_mapping:
+            director-state: state-centos
+          output_mapping:
+            bats-config: bats-config-centos
+          config:
+            params:
+              AWS_STACK_PREFIX: Centos
+              STEMCELL_NAME:    bosh-aws-xen-centos-7-go_agent
+        - <<: *prepare-bats
+          task: prepare-bats-ubuntu
+          file: pipelines/aws/tasks/prepare-bats.yml
+          input_mapping:
+            director-state: state-ubuntu
+          output_mapping:
+            bats-config: bats-config-ubuntu
+          config:
+            params:
+              AWS_STACK_PREFIX: Ubuntu
+              STEMCELL_NAME:    bosh-aws-xen-ubuntu-trusty-go_agent
+
+      - aggregate:
+        - <<: *run-bats
+          task: bats-centos
+          input_mapping:
+            bats-config: bats-config-centos
+            stemcell:    stemcell-centos
+        - <<: *run-bats
+          task: bats-ubuntu
+          input_mapping:
+            bats-config: bats-config-ubuntu
+            stemcell:    stemcell-ubuntu
+
+      - <<: *teardown
+        task: teardown-centos
+        input_mapping:
+          director-state: state-centos
+
+      - <<: *teardown
+        task: teardown-ubuntu
+        input_mapping:
+          director-state: state-ubuntu
+
+      - task: teardown-infrastructure
+        file: this/aws/tasks/teardown-infrastructure.yml
+        config:
+          params:
+            AWS_ACCESS_KEY:   {{aws_access_key__primary}}
+            AWS_SECRET_KEY:   {{aws_secret_key__primary}}
+            AWS_REGION_NAME:  {{aws_region__primary}}
+            AWS_STACK_NAME:   bats-promotion
+
+  - name: promote
+    plan:
+      - aggregate:
+        - {get: this, passed: [bats-aws], trigger: false}
+        - {get: bats, passed: [bats-aws], trigger: false, resource: bats-candidate}
+
+      - {put: bats-release, params: {repository: bats}}
+
+resources:
+  - name: this
+    type: git
+    source:
+      uri: https://github.com/cloudfoundry-incubator/bosh-cpi-certification
+      branch: master
+
+  - name: bats-candidate
+    type: git
+    source:
+      uri: https://github.com/cloudfoundry/bosh-acceptance-tests.git
+      branch: {{bats-branch}}
+
+  - name: bats-release
+    type: git
+    source:
+      uri: https://github.com/cloudfoundry/bosh-acceptance-tests.git
+      branch: develop
+
+  - name: bosh-init
+    type: s3
+    source:
+      regexp: bosh-init-([0-9.]+)-linux-amd64
+      bucket: bosh-init-artifacts
+      region_name: us-east-1
+
+  - name: bosh-release
+    type: bosh-io-release
+    source:
+      repository: cloudfoundry/bosh
+
+  - name: cpi-release-aws
+    type: bosh-io-release
+    source:
+      repository: cloudfoundry-incubator/bosh-aws-cpi-release
+
+  - name: stemcell-centos
+    type: bosh-io-stemcell
+    source:
+      name: bosh-aws-xen-centos-7-go_agent
+
+  - name: stemcell-ubuntu
+    type: bosh-io-stemcell
+    source:
+      name: bosh-aws-xen-ubuntu-trusty-go_agent

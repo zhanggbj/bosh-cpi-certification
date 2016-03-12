@@ -1,0 +1,20 @@
+---
+platform: linux
+image: docker:///boshcpi/cpi-certification
+
+inputs:
+  - name: this
+  - name: director-state
+  - name: bosh-init
+  - name: bosh-release
+  - name: cpi-release
+  - name: stemcell
+
+params:
+  BOSH_INIT_LOG_LEVEL:    info
+  BOSH_DIRECTOR_USERNAME: ""
+  BOSH_DIRECTOR_PASSWORD: ""
+  DEPLOYMENT_NAME:        ""
+
+run:
+  path: this/shared/tasks/teardown.sh

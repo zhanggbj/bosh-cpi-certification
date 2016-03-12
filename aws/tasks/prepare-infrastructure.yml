@@ -1,0 +1,15 @@
+---
+platform: linux
+image: docker:///boshcpi/cpi-certification
+
+inputs:
+  - name: this
+
+run:
+  path: this/aws/tasks/prepare-infrastructure.sh
+
+params:
+  AWS_ACCESS_KEY:  ""
+  AWS_SECRET_KEY:  ""
+  AWS_REGION_NAME: ""
+  AWS_STACK_NAME:  ""

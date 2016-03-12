@@ -1,0 +1,12 @@
+---
+platform: linux
+image: docker:///boshcpi/cpi-certification
+
+inputs:
+  - name: this
+  - name: bats
+  - name: bats-config
+  - name: stemcell
+
+run:
+  path: this/shared/tasks/run-bats.sh

@@ -1,0 +1,22 @@
+---
+platform: linux
+image: docker:///boshcpi/cpi-certification
+
+inputs:
+  - name: this
+  - name: director-config
+  - name: bosh-init
+  - name: bosh-release
+  - name: cpi-release
+  - name: stemcell
+
+outputs:
+  - name: director-state
+
+run:
+  path: this/shared/tasks/deploy-director.sh
+
+params:
+  BOSH_INIT_LOG_LEVEL:    info
+  BOSH_DIRECTOR_USERNAME: ""
+  BOSH_DIRECTOR_PASSWORD: ""

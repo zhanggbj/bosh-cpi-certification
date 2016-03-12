@@ -1,0 +1,32 @@
+---
+platform: linux
+image: docker:///boshcpi/cpi-certification
+
+inputs:
+  - name: this
+  - name: bosh-release
+  - name: cpi-release
+  - name: stemcell
+
+outputs:
+  - name: director-config
+
+run:
+  path: this/aws/tasks/prepare-director.sh
+
+params:
+  BOSH_RELEASE_URI:       ""
+  BOSH_RELEASE_SHA1:      ""
+  CPI_RELEASE_URI:        ""
+  CPI_RELEASE_SHA1:       ""
+  STEMCELL_URI:           ""
+  STEMCELL_SHA1:          ""
+  BOSH_DIRECTOR_USERNAME: ""
+  BOSH_DIRECTOR_PASSWORD: ""
+  AWS_ACCESS_KEY:         ""
+  AWS_SECRET_KEY:         ""
+  AWS_REGION_NAME:        ""
+  AWS_STACK_NAME:         ""
+  AWS_STACK_PREFIX:       ""
+  PUBLIC_KEY_NAME:        ""
+  PRIVATE_KEY_DATA:       ""
