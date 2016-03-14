@@ -1,6 +1,0 @@
----
-name: simple
-templates:
-  ctl.erb: bin/simple_ctl
-
-packages: []
