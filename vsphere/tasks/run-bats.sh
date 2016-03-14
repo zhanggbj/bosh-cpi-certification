@@ -16,8 +16,7 @@ metadata=$(cat environment/metadata)
 network1=$(env_attr "${metadata}" "network1")
 network2=$(env_attr "${metadata}" "network2")
 
-: ${BAT_DIRECTOR:=$(                      env_attr "${metadata}" "directorIP")}
-: ${BAT_DNS_HOST:=$(                      env_attr "${metadata}" "directorIP")}
+
 : ${BAT_VLAN:=$(                          env_attr "${network1}" "vCenterVLAN")}
 : ${BAT_STATIC_IP:=$(                     env_attr "${network1}" "staticIP-1")}
 : ${BAT_SECOND_STATIC_IP:=$(              env_attr "${network1}" "staticIP-2")}
@@ -32,10 +31,14 @@ network2=$(env_attr "${metadata}" "network2")
 : ${BAT_SECOND_NETWORK_STATIC_RANGE:=$(   env_attr "${network2}" "staticRange")}
 : ${BAT_SECOND_NETWORK_GATEWAY:=$(        env_attr "${network2}" "vCenterGateway")}
 
-: ${BAT_STEMCELL:=$(realpath stemcell/stemcell.tgz)}
-: ${BAT_DEPLOYMENT_SPEC:="${PWD}/bats-config.yml"}
-: ${BAT_INFRASTRUCTURE:=vsphere}
-: ${BAT_NETWORKING:=manual}
+# Exported variables are required by bats
+export BAT_DIRECTOR=$(env_attr "${metadata}" "directorIP")
+export BAT_DNS_HOST=$(env_attr "${metadata}" "directorIP")
+export BAT_STEMCELL=$(realpath stemcell/stemcell.tgz)
+export BAT_DEPLOYMENT_SPEC="${PWD}/bats-config.yml"
+export BAT_INFRASTRUCTURE=vsphere
+export BAT_NETWORKING=manual
+export BAT_VCAP_PASSWORD
 
 # vsphere uses user/pass and the cdrom drive, not a reverse ssh tunnel
 # the SSH key is required for the `bosh ssh` command to work properly
