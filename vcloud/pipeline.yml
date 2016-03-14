@@ -209,7 +209,8 @@ resources:
     type: git
     source:
       uri: https://github.com/cloudfoundry/bosh-acceptance-tests.git
-      branch: master
+      # TODO: change back to master once backup and restore bug is fixed #115626313
+      branch: develop
 
   - name: stemcell
     type: bosh-io-stemcell
