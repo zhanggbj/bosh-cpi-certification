@@ -36,10 +36,10 @@ env_name=$(cat environment/name)
 metadata=$(cat environment/metadata)
 network1=$(env_attr "${metadata}" "network1")
 echo Using environment: \'${env_name}\'
-: ${DIRECTOR_IP:=$(                  env_attr "${METADATA}" "directorIP" )}
-: ${BOSH_VSPHERE_VCENTER_CIDR:=$(    env_attr "${NETWORK1}" "vCenterCIDR" )}
-: ${BOSH_VSPHERE_VCENTER_GATEWAY:=$( env_attr "${NETWORK1}" "vCenterGateway" )}
-: ${BOSH_VSPHERE_DNS:=$(             env_attr "${METADATA}" "DNS" )}
+: ${DIRECTOR_IP:=$(                  env_attr "${metadata}" "directorIP" )}
+: ${BOSH_VSPHERE_VCENTER_CIDR:=$(    env_attr "${network1}" "vCenterCIDR" )}
+: ${BOSH_VSPHERE_VCENTER_GATEWAY:=$( env_attr "${network1}" "vCenterGateway" )}
+: ${BOSH_VSPHERE_DNS:=$(             env_attr "${metadata}" "DNS" )}
 
 cat > "${manifest_dir}/director.yml" <<EOF
 ---
@@ -168,3 +168,6 @@ cloud_provider:
     blobstore: {provider: local, path: /var/vcap/micro_bosh/data/cache}
     ntp: [0.pool.ntp.org, 1.pool.ntp.org]
 EOF
+
+echo "Generated manifest:"
+cat "${manifest_dir}/director.yml"
