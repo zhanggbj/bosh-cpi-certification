@@ -18,14 +18,14 @@ network2=$(env_attr "${metadata}" "network2")
 
 : ${BAT_DIRECTOR:=$(                      env_attr "${metadata}" "directorIP")}
 : ${BAT_DNS_HOST:=$(                      env_attr "${metadata}" "directorIP")}
-: ${BAT_VLAN:=$(                          env_attr "${network1}" "vCenterVLAN"}
+: ${BAT_VLAN:=$(                          env_attr "${network1}" "vCenterVLAN")}
 : ${BAT_STATIC_IP:=$(                     env_attr "${network1}" "staticIP-1")}
 : ${BAT_SECOND_STATIC_IP:=$(              env_attr "${network1}" "staticIP-2")}
 : ${BAT_CIDR:=$(                          env_attr "${network1}" "vCenterCIDR")}
 : ${BAT_RESERVED_RANGE:=$(                env_attr "${network1}" "reservedRange")}
 : ${BAT_STATIC_RANGE:=$(                  env_attr "${network1}" "staticRange")}
 : ${BAT_GATEWAY:=$(                       env_attr "${network1}" "vCenterGateway")}
-: ${BAT_SECOND_NETWORK_VLAN:=$(           env_attr "${network2}" "vCenterVLAN"}
+: ${BAT_SECOND_NETWORK_VLAN:=$(           env_attr "${network2}" "vCenterVLAN")}
 : ${BAT_SECOND_NETWORK_STATIC_IP:=$(      env_attr "${network2}" "staticIP-1")}
 : ${BAT_SECOND_NETWORK_CIDR:=$(           env_attr "${network2}" "vCenterCIDR")}
 : ${BAT_SECOND_NETWORK_RESERVED_RANGE:=$( env_attr "${network2}" "reservedRange")}
