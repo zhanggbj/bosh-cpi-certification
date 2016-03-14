@@ -29,7 +29,7 @@ echo Using environment: \'${env_name}\'
 : ${STATIC_RANGE:=$(                 env_attr "${network1}" "staticRange" )}
 
 bosh -n target ${DIRECTOR_IP}
-bosh login ${DIRECTOR_USERNAME} ${DIRECTOR_PASSWORD}
+bosh login "${BOSH_DIRECTOR_USERNAME}" "${BOSH_DIRECTOR_PASSWORD}"
 
 cat > "${manifest_dir}/deployment.yml" <<EOF
 ---
