@@ -17,7 +17,7 @@ cp -r director-state/.bosh_init $HOME/
 
 # configuration
 source director.env
-: ${DIRECTOR_IP:=?}
+: ${DIRECTOR_IP:?}
 
 # teardown deployments against BOSH Director
 time bosh -n target ${DIRECTOR_IP}

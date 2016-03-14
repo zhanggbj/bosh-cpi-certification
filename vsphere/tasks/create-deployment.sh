@@ -15,8 +15,8 @@ metadata=$(cat environment/metadata)
 network1=$(env_attr "${metadata}" "network1")
 deployment_release=$(realpath pipelines/shared/assets/certification-release)
 
-log "Using environment: \'${env_name}\'"
-${DIRECTOR_IP:=$(env_attr "${metadata}" "directorIP" )}
+echo "Using environment: \'${env_name}\'"
+: ${DIRECTOR_IP:=$(env_attr "${metadata}" "directorIP" )}
 
 time bosh -n target ${DIRECTOR_IP}
 time bosh login ${BOSH_DIRECTOR_USERNAME} ${BOSH_DIRECTOR_PASSWORD}

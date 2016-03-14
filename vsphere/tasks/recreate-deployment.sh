@@ -11,7 +11,7 @@ chruby 2.1.7
 
 env_name=$(cat environment/name)
 metadata=$(cat environment/metadata)
-log "Using environment: \'${env_name}\'"
+echo "Using environment: \'${env_name}\'"
 
 : ${DIRECTOR_IP:=$(env_attr "${metadata}" "directorIP" )}
 
