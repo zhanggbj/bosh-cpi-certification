@@ -27,7 +27,7 @@ director_state_dir=$(realpath director-state)
 bosh_init=$(echo ${bosh_init_dir}/bosh-init-*)
 chmod +x $bosh_init
 
-cp ${bosh_release_dir}/.tgz ./bosh-release.tgz
+cp ${bosh_release_dir}/*.tgz ./bosh-release.tgz
 cp ${cpi_release_dir}/*.tgz ./cpi-release.tgz
 cp ${stemcell_dir}/*.tgz ./stemcell.tgz
 
