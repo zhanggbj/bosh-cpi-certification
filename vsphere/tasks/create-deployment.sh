@@ -13,7 +13,7 @@ chruby 2.1.7
 env_name=$(cat environment/name)
 metadata=$(cat environment/metadata)
 network1=$(env_attr "${metadata}" "network1")
-deployment_release=$(realpath pipelines/vsphere/assets/certification-release)
+deployment_release=$(realpath pipelines/shared/assets/certification-release)
 
 log "Using environment: \'${env_name}\'"
 ${DIRECTOR_IP:=$(env_attr "${metadata}" "directorIP" )}
