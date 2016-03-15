@@ -6,8 +6,18 @@ source pipelines/shared/utils.sh
 source /etc/profile.d/chruby.sh
 chruby 2.1.7
 
-# preparation
-cp -r director-state/.bosh_init $HOME/
+# inputs
+input_dir=$(realpath director-state/)
+stemcell_dir=$(realpath stemcell/)
+bosh_dir=$(realpath bosh-release/)
+cpi_dir=$(realpath cpi-release/)
+
+# deployment manifest references releases and stemcells relative to itself...make it true
+ln -s ${stemcell_dir} ${input_dir}
+ln -s ${bosh_dir} ${input_dir}
+ln -s ${cpi_dir} ${input_dir}
+
+cp -r ${input_dir}/.bosh_init $HOME/
 bosh_init=$(realpath bosh-init/bosh-init-*)
 chmod +x $bosh_init
 
@@ -17,7 +27,7 @@ bosh -v
 echo "using bosh-init CLI version..."
 $bosh_init version
 
-pushd director-state > /dev/null
+pushd ${input_dir} > /dev/null
   # configuration
   source director.env
   : ${BOSH_DIRECTOR_IP:?}
