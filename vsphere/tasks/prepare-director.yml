@@ -7,7 +7,7 @@ inputs:
   - name: environment
 
 outputs:
-  - name: director-manifest
+  - name: director-config
 
 run:
   path: pipelines/vsphere/tasks/prepare-director.sh
