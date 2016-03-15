@@ -61,10 +61,3 @@ EOF
 ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
 eval $(ssh-agent)
 ssh-add ~/.ssh/id_rsa
-
-pushd ${bats_dir}
-  ./write_gemfile
-
-  bundle install
-  bundle exec rspec spec
-popd

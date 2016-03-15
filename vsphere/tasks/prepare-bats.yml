@@ -4,12 +4,13 @@ image: docker:///boshcpi/cpi-certification
 
 inputs:
   - name: pipelines
-  - name: stemcell
-  - name: bats
   - name: environment
 
+outputs:
+  - name: bats-config
+
 run:
-  path: pipelines/vsphere/tasks/run-bats.sh
+  path: pipelines/vsphere/tasks/prepare-bats.sh
 
 params:
   BAT_STEMCELL_NAME: ""

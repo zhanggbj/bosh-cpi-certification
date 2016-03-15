@@ -36,7 +36,7 @@ chruby 2.1.7
 : ${NETWORK_STATIC_IP_2:=$(    stack_info "StaticIP2" )}
 
 # preparation
-cp ./director-state/shared.key ./bats-config
+cp ./director-state/shared.pem ./bats-config
 
 # env file generation
 cat > "./bats-config/bats.env" <<EOF
@@ -44,18 +44,15 @@ cat > "./bats-config/bats.env" <<EOF
 
 export BAT_DIRECTOR=${DIRECTOR_EIP}
 export BAT_DNS_HOST=${DIRECTOR_EIP}
-export BAT_STEMCELL="${PWD}/stemcell/stemcell.tgz"
-export BAT_DEPLOYMENT_SPEC="${PWD}/bats-config/bats.yml"
 export BAT_INFRASTRUCTURE=aws
 export BAT_NETWORKING=manual
 export BAT_VIP=${BATS_EIP}
 export BAT_SUBNET_ID=${SUBNET_ID}
 export BAT_SECURITY_GROUP_NAME=${SECURITY_GROUP}
 export BAT_VCAP_PASSWORD=${BAT_VCAP_PASSWORD}
-export BAT_VCAP_PRIVATE_KEY=shared.pem
 EOF
 
-# manifest generation
+# BATs spec generation
 cat > "./bats-config/bats.yml" <<EOF
 ---
 cpi: aws

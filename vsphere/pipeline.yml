@@ -36,10 +36,6 @@ shared:
     task: deploy-director
     tags: [vsphere-v5.1]
     file: pipelines/vsphere/tasks/deploy-director.yml
-    config:
-      params:
-        BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
-        BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
 
   - &run-bats
     task: run-bats
@@ -53,11 +49,9 @@ shared:
   - &teardown
     task: teardown
     tags: [vsphere-v5.1]
-    file: pipelines/vsphere/tasks/teardown.yml
+    file: pipelines/shared/tasks/teardown.yml
     config:
       params:
-        BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
-        BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
         DEPLOYMENT_NAME:        certification
 
 jobs:

@@ -2,20 +2,39 @@
 
 set -e
 
-source this/shared/utils.sh
+source pipelines/shared/utils.sh
 source /etc/profile.d/chruby.sh
 chruby 2.1.7
 
 # preparation
-cp ./bats-config/* .
-source bats.env
+export BAT_STEMCELL=$(realpath stemcell/*.tgz)
+export BAT_DEPLOYMENT_SPEC=$(realpath bats-config/bats.yml)
+export BAT_VCAP_PRIVATE_KEY=$(realpath bats-config/shared.pem)
+bats_dir=$(realpath bats)
 
-shared_key="shared.pem"
-chmod go-r ${shared_key}
+# disable host key checking for deployed VMs
+mkdir -p $HOME/.ssh
+cat > $HOME/.ssh/config << EOF
+Host *
+    StrictHostKeyChecking no
+EOF
+
+chmod go-r ${BAT_VCAP_PRIVATE_KEY}
 eval $(ssh-agent)
-ssh-add ${shared_key}
+ssh-add ${BAT_VCAP_PRIVATE_KEY}
 
-pushd "$(realpath bats)"
+source "$(realpath bats-config/bats.env)"
+: ${BAT_DIRECTOR:?}
+: ${BAT_DNS_HOST:?}
+: ${BAT_INFRASTRUCTURE:?}
+: ${BAT_NETWORKING:?}
+: ${BAT_VIP:?}
+: ${BAT_SUBNET_ID:?}
+: ${BAT_SECURITY_GROUP_NAME:?}
+: ${BAT_VCAP_PASSWORD:?}
+
+# TODO: use rspec tags to skip tests based on IaaS
+pushd $bats_dir
   ./write_gemfile
   bundle install
   bundle exec rspec spec

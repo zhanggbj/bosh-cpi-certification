@@ -34,6 +34,15 @@ cp ${stemcell_dir}/*.tgz ./stemcell.tgz
 # outputs
 deployment_dir="$(realpath deployment)"
 
+# env file generation
+cat > "${deployment_dir}/director.env" <<EOF
+#!/usr/bin/env bash
+
+export BOSH_DIRECTOR_IP=${BATS_DIRECTOR_IP}
+export BOSH_DIRECTOR_USERNAME=admin
+export BOSH_DIRECTOR_PASSWORD=admin
+EOF
+
 cat > "./director.yml" <<EOF
 ---
 name: certification-director

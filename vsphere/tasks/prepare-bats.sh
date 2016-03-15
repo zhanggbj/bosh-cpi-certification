@@ -9,13 +9,15 @@ source pipelines/shared/utils.sh
 source /etc/profile.d/chruby.sh
 chruby 2.1.7
 
-# inputs
-bats_dir=$(realpath bats)
+# outputs
+output_dir=$(realpath bats-config)
+bats_spec="${output_dir}/bats-config.yml"
+bats_env="${output_dir}/bats.env"
 
+# inputs
 metadata=$(cat environment/metadata)
 network1=$(env_attr "${metadata}" "network1")
 network2=$(env_attr "${metadata}" "network2")
-
 
 : ${BAT_VLAN:=$(                          env_attr "${network1}" "vCenterVLAN")}
 : ${BAT_STATIC_IP:=$(                     env_attr "${network1}" "staticIP-1")}
@@ -32,23 +34,26 @@ network2=$(env_attr "${metadata}" "network2")
 : ${BAT_SECOND_NETWORK_GATEWAY:=$(        env_attr "${network2}" "vCenterGateway")}
 
 # Exported variables are required by bats
-export BAT_DIRECTOR=$(env_attr "${metadata}" "directorIP")
-export BAT_DNS_HOST=$(env_attr "${metadata}" "directorIP")
-export BAT_STEMCELL=$(realpath stemcell/stemcell.tgz)
-export BAT_DEPLOYMENT_SPEC="${PWD}/bats-config.yml"
+director_ip=$(env_attr "${metadata}" "directorIP")
 export BAT_INFRASTRUCTURE=vsphere
 export BAT_NETWORKING=manual
 export BAT_VCAP_PASSWORD
 
+# env file generation
+cat > "${bats_env}" <<EOF
+#!/usr/bin/env bash
+
+export BAT_DIRECTOR=${director_ip}
+export BAT_DNS_HOST=${director_ip}
+export BAT_INFRASTRUCTURE=vsphere
+export BAT_NETWORKING=manual
+export BAT_VCAP_PASSWORD=${BAT_VCAP_PASSWORD}
+EOF
+
 # vsphere uses user/pass and the cdrom drive, not a reverse ssh tunnel
 # the SSH key is required for the `bosh ssh` command to work properly
-eval $(ssh-agent)
-
-mkdir -p ${PWD}/keys
-ssh_key="${PWD}/keys/bats.pem"
+ssh_key="$output_dir/shared.pem"
 ssh-keygen -N "" -t rsa -b 4096 -f $ssh_key
-chmod go-r $ssh_key
-ssh-add $ssh_key
 
 echo "using bosh CLI version..."
 bosh version
@@ -57,17 +62,7 @@ bosh -n target $BAT_DIRECTOR
 
 BOSH_UUID="$(bosh status --uuid)"
 
-# disable host key checking for deployed VMs
-mkdir -p $HOME/.ssh
-
-cat > $HOME/.ssh/config << EOF
-Host ${BAT_STATIC_IP}
-    StrictHostKeyChecking no
-Host ${BAT_SECOND_STATIC_IP}
-    StrictHostKeyChecking no
-EOF
-
-cat > "${BAT_DEPLOYMENT_SPEC}" <<EOF
+cat > "${bats_spec}" <<EOF
 ---
 cpi: vsphere
 properties:
@@ -96,9 +91,3 @@ properties:
       gateway: ${BAT_SECOND_NETWORK_GATEWAY}
       vlan: ${BAT_SECOND_NETWORK_VLAN}
 EOF
-
-pushd "${bats_dir}"
-  ./write_gemfile
-  bundle install
-  bundle exec rspec spec
-popd

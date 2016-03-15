@@ -42,6 +42,15 @@ echo Using environment: \'${env_name}\'
 : ${BOSH_VSPHERE_VCENTER_GATEWAY:=$( env_attr "${network1}" "vCenterGateway" )}
 : ${BOSH_VSPHERE_DNS:=$(             env_attr "${metadata}" "DNS" )}
 
+# env file generation
+cat > "${manifest_dir}/director.env" <<EOF
+#!/usr/bin/env bash
+
+export BOSH_DIRECTOR_IP=${DIRECTOR_IP}
+export BOSH_DIRECTOR_USERNAME=${BOSH_DIRECTOR_USERNAME}
+export BOSH_DIRECTOR_PASSWORD=${BOSH_DIRECTOR_PASSWORD}
+EOF
+
 cat > "${manifest_dir}/director.yml" <<EOF
 ---
 name: certification-director

@@ -16,6 +16,7 @@ set -e
 : ${PUBLIC_KEY_NAME:?}
 : ${PRIVATE_KEY_DATA:?}
 
+# TODO: don't compute sha
 # if the X_SHA1 variable is set, use that; else, compute from input resource.
 : ${BOSH_RELEASE_SHA1:=$( compute_sha ./bosh-release/release.tgz )}
 : ${CPI_RELEASE_SHA1:=$(  compute_sha ./cpi-release/release.tgz )}
@@ -43,7 +44,9 @@ echo "${PRIVATE_KEY_DATA}" > "./director-config/${shared_key}"
 cat > "./director-config/director.env" <<EOF
 #!/usr/bin/env bash
 
-export DIRECTOR_IP=${DIRECTOR_EIP}
+export BOSH_DIRECTOR_IP=${DIRECTOR_EIP}
+export BOSH_DIRECTOR_USERNAME=${BOSH_DIRECTOR_USERNAME}
+export BOSH_DIRECTOR_PASSWORD=${BOSH_DIRECTOR_PASSWORD}
 EOF
 
 # manifest generation
