@@ -2,9 +2,10 @@
 
 set -e
 
-: ${BOSH_RELEASE_URI:?}
-: ${CPI_RELEASE_URI:?}
-: ${STEMCELL_URI:?}
+source pipelines/shared/utils.sh
+source /etc/profile.d/chruby.sh
+chruby 2.1.7
+
 : ${BOSH_VSPHERE_VCENTER:?}
 : ${BOSH_VSPHERE_VCENTER_USER:?}
 : ${BOSH_VSPHERE_VCENTER_PASSWORD:?}
@@ -18,10 +19,9 @@ set -e
 : ${BOSH_VSPHERE_VCENTER_VLAN:?}
 : ${BOSH_DIRECTOR_USERNAME:?}
 : ${BOSH_DIRECTOR_PASSWORD:?}
-
-source pipelines/shared/utils.sh
-source /etc/profile.d/chruby.sh
-chruby 2.1.7
+: ${BOSH_RELEASE_URI:?}
+: ${CPI_RELEASE_URI:?}
+: ${STEMCELL_URI:?}
 
 # if the X_SHA1 variable is set, use that; else, default to empty
 # SHA1 is required for releases fetched from URL, not required for local files
@@ -30,7 +30,7 @@ chruby 2.1.7
 : ${STEMCELL_SHA1:=""}
 
 # outputs
-manifest_dir="$(realpath director-manifest)"
+output_dir="$(realpath director-config)"
 
 # environment
 env_name=$(cat environment/name)
@@ -42,7 +42,16 @@ echo Using environment: \'${env_name}\'
 : ${BOSH_VSPHERE_VCENTER_GATEWAY:=$( env_attr "${network1}" "vCenterGateway" )}
 : ${BOSH_VSPHERE_DNS:=$(             env_attr "${metadata}" "DNS" )}
 
-cat > "${manifest_dir}/director.yml" <<EOF
+# env file generation
+cat > "${output_dir}/director.env" <<EOF
+#!/usr/bin/env bash
+
+export BOSH_DIRECTOR_IP=${DIRECTOR_IP}
+export BOSH_DIRECTOR_USERNAME=${BOSH_DIRECTOR_USERNAME}
+export BOSH_DIRECTOR_PASSWORD=${BOSH_DIRECTOR_PASSWORD}
+EOF
+
+cat > "${output_dir}/director.yml" <<EOF
 ---
 name: certification-director
 
@@ -169,6 +178,3 @@ cloud_provider:
     blobstore: {provider: local, path: /var/vcap/micro_bosh/data/cache}
     ntp: [0.pool.ntp.org, 1.pool.ntp.org]
 EOF
-
-echo "Generated manifest:"
-cat "${manifest_dir}/director.yml"

@@ -35,29 +35,28 @@ shared:
   - &deploy-director
     task: deploy-director
     tags: [vsphere-v5.1]
-    file: pipelines/vsphere/tasks/deploy-director.yml
-    config:
-      params:
-        BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
-        BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
+    file: pipelines/shared/tasks/deploy-director.yml
 
-  - &run-bats
-    task: run-bats
+  - &prepare-bats
+    task: prepare-bats
     tags: [vsphere-v5.1]
-    file: pipelines/vsphere/tasks/run-bats.yml
+    file: pipelines/vsphere/tasks/prepare-bats.yml
     config:
       params:
         BAT_STEMCELL_NAME: ""
         BAT_VCAP_PASSWORD: {{BAT_VCAP_PASSWORD}}
 
+  - &run-bats
+    task: run-bats
+    tags: [vsphere-v5.1]
+    file: pipelines/shared/tasks/run-bats.yml
+
   - &teardown
     task: teardown
     tags: [vsphere-v5.1]
-    file: pipelines/vsphere/tasks/teardown.yml
+    file: pipelines/shared/tasks/teardown.yml
     config:
       params:
-        BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
-        BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
         DEPLOYMENT_NAME:        certification
 
 jobs:
@@ -75,16 +74,21 @@ jobs:
 
       - <<: *prepare-director
 
-      - <<: *deploy-director
+      - do:
+          - <<: *deploy-director
 
-      - <<: *run-bats
-        config:
-          params:
-            BAT_STEMCELL_NAME: bosh-vsphere-esxi-centos-7-go_agent
+          - <<: *prepare-bats
+            config:
+              params:
+                BAT_STEMCELL_NAME: bosh-vsphere-esxi-centos-7-go_agent
 
-      - <<: *teardown
+          - <<: *run-bats
 
-      - {put: environment, tags: [vsphere-v5.1], params: {release: environment}}
+        ensure:
+          do:
+            - <<: *teardown
+
+            - {put: environment, tags: [vsphere-v5.1], params: {release: environment}}
 
   - name: bats-ubuntu
     plan:
@@ -100,16 +104,21 @@ jobs:
 
       - <<: *prepare-director
 
-      - <<: *deploy-director
+      - do:
+          - <<: *deploy-director
 
-      - <<: *run-bats
-        config:
-          params:
-            BAT_STEMCELL_NAME: bosh-vsphere-esxi-ubuntu-trusty-go_agent
+          - <<: *prepare-bats
+            config:
+              params:
+                BAT_STEMCELL_NAME: bosh-vsphere-esxi-ubuntu-trusty-go_agent
 
-      - <<: *teardown
+          - <<: *run-bats
 
-      - {put: environment, tags: [vsphere-v5.1], params: {release: environment}}
+        ensure:
+          do:
+            - <<: *teardown
+
+            - {put: environment, tags: [vsphere-v5.1], params: {release: environment}}
 
   - name: test-upgrade
     plan:
@@ -133,48 +142,51 @@ jobs:
             STEMCELL_URI:      https://bosh.io/d/stemcells/bosh-vsphere-esxi-ubuntu-trusty-go_agent?v=3143
             STEMCELL_SHA1:     222a546ccccd971a418d82aa6d3799c010164e9f
 
-      - <<: *deploy-director
+      - do:
+          - <<: *deploy-director
 
-      - task: prepare-deployment
-        tags: [vsphere-v5.1]
-        file: pipelines/vsphere/tasks/prepare-deployment.yml
-        config:
-          params:
-            RELEASE_NAME:              certification #TODO pull from secrets?
-            STEMCELL_NAME:             bosh-vsphere-esxi-ubuntu-trusty-go_agent
-            BOSH_DIRECTOR_USERNAME:    {{BOSH_DIRECTOR_USERNAME}}
-            BOSH_DIRECTOR_PASSWORD:    {{BOSH_DIRECTOR_PASSWORD}}
-            BOSH_VSPHERE_VCENTER_VLAN: {{VCENTER_VLAN}}
+          - task: prepare-deployment
+            tags: [vsphere-v5.1]
+            file: pipelines/vsphere/tasks/prepare-deployment.yml
+            config:
+              params:
+                RELEASE_NAME:              certification #TODO pull from secrets?
+                STEMCELL_NAME:             bosh-vsphere-esxi-ubuntu-trusty-go_agent
+                BOSH_DIRECTOR_USERNAME:    {{BOSH_DIRECTOR_USERNAME}}
+                BOSH_DIRECTOR_PASSWORD:    {{BOSH_DIRECTOR_PASSWORD}}
+                BOSH_VSPHERE_VCENTER_VLAN: {{VCENTER_VLAN}}
 
-      - task: create-deployment
-        tags: [vsphere-v5.1]
-        file: pipelines/vsphere/tasks/create-deployment.yml
-        config:
-          params:
-            BOSH_DIRECTOR_USERNAME:    {{BOSH_DIRECTOR_USERNAME}}
-            BOSH_DIRECTOR_PASSWORD:    {{BOSH_DIRECTOR_PASSWORD}}
-            RELEASE_NAME:              certification
+          - task: create-deployment
+            tags: [vsphere-v5.1]
+            file: pipelines/vsphere/tasks/create-deployment.yml
+            config:
+              params:
+                BOSH_DIRECTOR_USERNAME:    {{BOSH_DIRECTOR_USERNAME}}
+                BOSH_DIRECTOR_PASSWORD:    {{BOSH_DIRECTOR_PASSWORD}}
+                RELEASE_NAME:              certification
 
-      - <<: *prepare-director
-        config:
-          params:
-            BOSH_RELEASE_URI: file://bosh-release/release.tgz
-            CPI_RELEASE_URI:  file://cpi-release/release.tgz
-            STEMCELL_URI:     file://stemcell/stemcell.tgz
+          - <<: *prepare-director
+            config:
+              params:
+                BOSH_RELEASE_URI: file://bosh-release/release.tgz
+                CPI_RELEASE_URI:  file://cpi-release/release.tgz
+                STEMCELL_URI:     file://stemcell/stemcell.tgz
 
-      - <<: *deploy-director
+          - <<: *deploy-director
 
-      - task: recreate-deployment
-        tags: [vsphere-v5.1]
-        file: pipelines/vsphere/tasks/recreate-deployment.yml
-        config:
-          params:
-            BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
-            BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
+          - task: recreate-deployment
+            tags: [vsphere-v5.1]
+            file: pipelines/vsphere/tasks/recreate-deployment.yml
+            config:
+              params:
+                BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
+                BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
 
-      - <<: *teardown
+        ensure:
+          do:
+            - <<: *teardown
 
-      - {put: environment, tags: [vsphere-v5.1], params: {release: environment}}
+            - {put: environment, tags: [vsphere-v5.1], params: {release: environment}}
 
   - name: certify-centos
     plan:
