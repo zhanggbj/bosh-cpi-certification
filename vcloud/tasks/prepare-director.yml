@@ -9,7 +9,7 @@ outputs:
   - name: director-config
 
 run:
-  path: pipelines/vcloud/tasks/deploy.sh
+  path: pipelines/vcloud/tasks/prepare-director.sh
 
 params:
   VCLOUD_HOST:            ""

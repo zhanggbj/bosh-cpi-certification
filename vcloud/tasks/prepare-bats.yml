@@ -9,7 +9,7 @@ outputs:
   - name: bats-config
 
 run:
-  path: pipelines/vcloud/tasks/run-bats.sh
+  path: pipelines/vcloud/tasks/prepare-bats.sh
 
 params:
   BATS_STEMCELL_NAME:   ""
