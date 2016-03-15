@@ -3,10 +3,10 @@ platform: linux
 image: docker:///boshcpi/cpi-certification
 
 inputs:
-  - name: this
+  - name: pipelines
   - name: bats
   - name: bats-config
   - name: stemcell
 
 run:
-  path: this/shared/tasks/run-bats.sh
+  path: pipelines/shared/tasks/run-bats.sh
