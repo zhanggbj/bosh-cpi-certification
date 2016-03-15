@@ -8,7 +8,7 @@ chruby 2.1.7
 
 # preparation
 export BAT_STEMCELL=$(realpath stemcell/*.tgz)
-export BAT_DEPLOYMENT_SPEC=$(realpath bats-config/bats.yml)
+export BAT_DEPLOYMENT_SPEC=$(realpath bats-config/bats-config.yml)
 export BAT_VCAP_PRIVATE_KEY=$(realpath bats-config/shared.pem)
 bats_dir=$(realpath bats)
 
@@ -28,10 +28,11 @@ source "$(realpath bats-config/bats.env)"
 : ${BAT_DNS_HOST:?}
 : ${BAT_INFRASTRUCTURE:?}
 : ${BAT_NETWORKING:?}
-: ${BAT_VIP:?}
-: ${BAT_SUBNET_ID:?}
-: ${BAT_SECURITY_GROUP_NAME:?}
 : ${BAT_VCAP_PASSWORD:?}
+
+: ${BAT_VIP:=""}
+: ${BAT_SUBNET_ID:=""}
+: ${BAT_SECURITY_GROUP_NAME:=""}
 : ${BAT_RSPEC_FLAGS:=""}
 
 pushd $bats_dir
