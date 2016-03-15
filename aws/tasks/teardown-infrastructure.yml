@@ -3,10 +3,10 @@ platform: linux
 image: docker:///boshcpi/cpi-certification
 
 inputs:
-  - name: this
+  - name: pipelines
 
 run:
-  path: this/aws/tasks/teardown-infrastructure.sh
+  path: pipelines/aws/tasks/teardown-infrastructure.sh
 
 params:
   AWS_ACCESS_KEY:  ""

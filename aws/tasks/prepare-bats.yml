@@ -3,21 +3,21 @@ platform: linux
 image: docker:///boshcpi/cpi-certification
 
 inputs:
-  - name: this
-  - name: director-state
+  - name: pipelines
+  - name: director-config
 
 outputs:
   - name: bats-config
 
 run:
-  path: pipelines/shared/tasks/prepare-director.sh
+  path: pipelines/aws/tasks/prepare-bats.sh
 
 params:
-  AWS_ACCESS_KEY:    ""
-  AWS_SECRET_KEY:    ""
-  AWS_REGION_NAME:   ""
-  AWS_STACK_NAME:    ""
-  AWS_STACK_PREFIX:  ""
-  BAT_VCAP_PASSWORD: ""
-  PUBLIC_KEY_NAME:   ""
-  STEMCELL_NAME:     ""
+  AWS_ACCESS_KEY:     ""
+  AWS_SECRET_KEY:     ""
+  AWS_REGION_NAME:    ""
+  AWS_STACK_NAME:     ""
+  AWS_STACK_PREFIX:   ""
+  BAT_VCAP_PASSWORD:  ""
+  PUBLIC_KEY_NAME:    ""
+  BATS_STEMCELL_NAME: ""

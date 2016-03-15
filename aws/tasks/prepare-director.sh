@@ -16,13 +16,17 @@ set -e
 : ${PUBLIC_KEY_NAME:?}
 : ${PRIVATE_KEY_DATA:?}
 
-# if the X_SHA1 variable is set, use that; else, compute from input resource.
-: ${BOSH_RELEASE_SHA1:=$( compute_sha ./bosh-release/release.tgz )}
-: ${CPI_RELEASE_SHA1:=$(  compute_sha ./cpi-release/release.tgz )}
-: ${STEMCELL_SHA1:=$(     compute_sha ./stemcell/stemcell.tgz )}
+# if the X_SHA1 variable is set, use that; else, default to empty
+# SHA1 is required for releases fetched from URL, not required for local files
+: ${BOSH_RELEASE_SHA1:=""}
+: ${CPI_RELEASE_SHA1:=""}
+: ${STEMCELL_SHA1:=""}
 
-source this/shared/utils.sh
-source this/aws/utils.sh
+# outputs
+output_dir="$(realpath director-config)"
+
+source pipelines/shared/utils.sh
+source pipelines/aws/utils.sh
 source /etc/profile.d/chruby.sh
 chruby 2.1.7
 
@@ -37,17 +41,19 @@ chruby 2.1.7
 
 # keys
 shared_key="shared.pem"
-echo "${PRIVATE_KEY_DATA}" > "./director-config/${shared_key}"
+echo "${PRIVATE_KEY_DATA}" > "${output_dir}/${shared_key}"
 
 # env file generation
-cat > "./director-config/director.env" <<EOF
+cat > "${output_dir}/director.env" <<EOF
 #!/usr/bin/env bash
 
-export DIRECTOR_IP=${DIRECTOR_EIP}
+export BOSH_DIRECTOR_IP=${DIRECTOR_EIP}
+export BOSH_DIRECTOR_USERNAME=${BOSH_DIRECTOR_USERNAME}
+export BOSH_DIRECTOR_PASSWORD=${BOSH_DIRECTOR_PASSWORD}
 EOF
 
 # manifest generation
-cat > "./director-config/director.yml" <<EOF
+cat > "${output_dir}/director.yml" <<EOF
 ---
 name: bats-director
 

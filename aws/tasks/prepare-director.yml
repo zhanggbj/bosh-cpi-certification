@@ -3,16 +3,13 @@ platform: linux
 image: docker:///boshcpi/cpi-certification
 
 inputs:
-  - name: this
-  - name: bosh-release
-  - name: cpi-release
-  - name: stemcell
+  - name: pipelines
 
 outputs:
   - name: director-config
 
 run:
-  path: this/aws/tasks/prepare-director.sh
+  path: pipelines/aws/tasks/prepare-director.sh
 
 params:
   BOSH_RELEASE_URI:       ""
@@ -27,6 +24,5 @@ params:
   AWS_SECRET_KEY:         ""
   AWS_REGION_NAME:        ""
   AWS_STACK_NAME:         ""
-  AWS_STACK_PREFIX:       ""
   PUBLIC_KEY_NAME:        ""
   PRIVATE_KEY_DATA:       ""

@@ -7,8 +7,8 @@ set -e
 : ${AWS_REGION_NAME:?}
 : ${AWS_STACK_NAME:?}
 
-source this/shared/utils.sh
-source this/aws/utils.sh
+source pipelines/shared/utils.sh
+source pipelines/aws/utils.sh
 source /etc/profile.d/chruby.sh
 chruby 2.1.7
 
