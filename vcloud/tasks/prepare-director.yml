@@ -1,0 +1,27 @@
+---
+platform: linux
+image: docker:///boshcpi/cpi-certification
+
+inputs:
+  - name: pipelines
+
+outputs:
+  - name: director-config
+
+run:
+  path: pipelines/vcloud/tasks/deploy.sh
+
+params:
+  VCLOUD_HOST:            ""
+  VCLOUD_USER:            ""
+  VCLOUD_PASSWORD:        ""
+  VCLOUD_VLAN:            ""
+  VCLOUD_ORG:             ""
+  VCLOUD_VDC:             ""
+  VCLOUD_VAPP:            ""
+  VCLOUD_CATALOG:         ""
+  NETWORK_CIDR:           ""
+  NETWORK_GATEWAY:        ""
+  BATS_DIRECTOR_IP:       ""
+  BOSH_DIRECTOR_USERNAME: ""
+  BOSH_DIRECTOR_PASSWORD: ""

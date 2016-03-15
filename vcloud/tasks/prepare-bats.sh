@@ -3,6 +3,7 @@
 set -e
 
 : ${BATS_STEMCELL_NAME:?}
+: ${BAT_VCAP_PASSWORD:=c1oudc0w}
 : ${VCLOUD_VLAN:?}
 : ${VCLOUD_VAPP:?}
 : ${NETWORK_CIDR:?}
@@ -17,27 +18,33 @@ set -e
 source /etc/profile.d/chruby.sh
 chruby 2.1.7
 
-# inputs
-stemcell_dir=$(realpath stemcell)
-bats_dir=$(realpath bats)
+# outputs
+output_dir=$(realpath bats-config)
+bats_spec="${output_dir}/bats-config.yml"
+bats_env="${output_dir}/bats.env"
+ssh_key="${output_dir}/shared.pem"
 
 echo "using bosh CLI version..."
 bosh version
 bosh -n target $BATS_DIRECTOR_IP
+bosh_uuid="$(bosh status --uuid)"
 
+cat > "${bats_env}" <<EOF
+#!/usr/bin/env bash
+
+export BAT_DIRECTOR=${BATS_DIRECTOR_IP}
+export BAT_DNS_HOST=${BATS_DIRECTOR_IP}
 export BAT_INFRASTRUCTURE=vcloud
 export BAT_NETWORKING=manual
-export BAT_VCAP_PASSWORD=c1oudc0w
-export BAT_DNS_HOST=$BATS_DIRECTOR_IP
-export BAT_DIRECTOR=$BATS_DIRECTOR_IP
-export BAT_STEMCELL="${stemcell_dir}/stemcell.tgz"
-export BAT_DEPLOYMENT_SPEC="${PWD}/bats-config.yml"
+export BAT_VCAP_PASSWORD=${BAT_VCAP_PASSWORD}
+export BAT_RSPEC_FLAGS="--tag ~vip_networking --tag ~dynamic_networking --tag ~root_partition --tag ~raw_ephemeral_storage"
+EOF
 
-cat > ${BAT_DEPLOYMENT_SPEC} <<EOF
+cat > ${bats_spec} <<EOF
 ---
 cpi: vcloud
 properties:
-  uuid: $(bosh status --uuid)
+  uuid: ${bosh_uuid}
   second_static_ip: ${BATS_IP2}
   pool_size: 1
   stemcell:
@@ -58,13 +65,6 @@ properties:
   vapp_name: ${VCLOUD_VAPP}
 EOF
 
-ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
-eval $(ssh-agent)
-ssh-add ~/.ssh/id_rsa
-
-pushd ${bats_dir}
-  ./write_gemfile
-
-  bundle install
-  bundle exec rspec spec
-popd
+# vcloud uses user/pass and the cdrom drive, not a reverse ssh tunnel
+# the SSH key is required for the `bosh ssh` command to work properly
+ssh-keygen -N "" -t rsa -b 4096 -f $ssh_key

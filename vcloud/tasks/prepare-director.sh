@@ -2,6 +2,9 @@
 
 set -e
 
+source /etc/profile.d/chruby.sh
+chruby 2.1.7
+
 : ${VCLOUD_VLAN:?}
 : ${VCLOUD_HOST:?}
 : ${VCLOUD_USER:?}
@@ -13,42 +16,48 @@ set -e
 : ${NETWORK_CIDR:?}
 : ${NETWORK_GATEWAY:?}
 : ${BATS_DIRECTOR_IP:?}
+: ${BOSH_DIRECTOR_USERNAME:?}
+: ${BOSH_DIRECTOR_PASSWORD:?}
+: ${BOSH_RELEASE_URI:?}
+: ${CPI_RELEASE_URI:?}
+: ${STEMCELL_URI:?}
 
-source /etc/profile.d/chruby.sh
-chruby 2.1.7
-
-# inputs
-cpi_release_dir=$(realpath bosh-cpi-release)
-bosh_release_dir=$(realpath bosh-release)
-stemcell_dir=$(realpath stemcell)
-bosh_init_dir=$(realpath bosh-init)
-director_state_dir=$(realpath director-state)
-
-bosh_init=$(echo ${bosh_init_dir}/bosh-init-*)
-chmod +x $bosh_init
-
-cp ${bosh_release_dir}/*.tgz ./bosh-release.tgz
-cp ${cpi_release_dir}/*.tgz ./cpi-release.tgz
-cp ${stemcell_dir}/*.tgz ./stemcell.tgz
+# if the X_SHA1 variable is set, use that; else, default to empty
+# SHA1 is required for releases fetched from URL, not required for local files
+: ${BOSH_RELEASE_SHA1:=""}
+: ${CPI_RELEASE_SHA1:=""}
+: ${STEMCELL_SHA1:=""}
 
 # outputs
-deployment_dir="$(realpath deployment)"
+output_dir="$(realpath director-config)"
 
-cat > "./director.yml" <<EOF
+# env file generation
+cat > "${output_dir}/director.env" <<EOF
+#!/usr/bin/env bash
+
+export BOSH_DIRECTOR_IP=${BATS_DIRECTOR_IP}
+export BOSH_DIRECTOR_USERNAME=${BOSH_DIRECTOR_USERNAME}
+export BOSH_DIRECTOR_PASSWORD=${BOSH_DIRECTOR_PASSWORD}
+EOF
+
+cat > "${output_dir}/director.yml" <<EOF
 ---
 name: certification-director
 
 releases:
   - name: bosh
-    url: file://bosh-release.tgz
+    url: ${BOSH_RELEASE_URI}
+    sha1: ${BOSH_RELEASE_SHA1}
   - name: bosh-vcloud-cpi
-    url: file://cpi-release.tgz
+    url: ${CPI_RELEASE_URI}
+    sha1: ${CPI_RELEASE_SHA1}
 
 resource_pools:
   - name: vms
     network: private
     stemcell:
-      url: file://stemcell.tgz
+      url: ${STEMCELL_URI}
+      sha1: ${STEMCELL_SHA1}
     cloud_properties:
       cpu: 2
       ram: 4_096
@@ -158,23 +167,3 @@ cloud_provider:
     blobstore: {provider: local, path: /var/vcap/micro_bosh/data/cache}
     ntp: *ntp
 EOF
-
-echo "deleting existing BOSH Director VM..."
-cp ${director_state_dir}/director-state.json ./director-state.json
-$bosh_init delete ./director.yml
-
-function finish {
-  echo "Final state of director deployment:"
-  echo "=========================================="
-  cat director-state.json
-  echo "=========================================="
-
-  cp director-state.json $deployment_dir
-}
-trap finish ERR
-
-echo "deploying BOSH..."
-$bosh_init deploy ./director.yml
-
-trap - ERR
-finish
