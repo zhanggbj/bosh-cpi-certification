@@ -7,6 +7,8 @@ groups:
       - end2end-us-ubuntu
       - certify-centos
       - certify-ubuntu
+      - prepare-infrastructure
+      - teardown-infrastructure
 
 shared:
   - &prepare-director
