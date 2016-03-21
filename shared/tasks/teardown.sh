@@ -34,14 +34,17 @@ pushd ${input_dir} > /dev/null
   : ${BOSH_DIRECTOR_USERNAME:?}
   : ${BOSH_DIRECTOR_PASSWORD:?}
 
-  # teardown deployments against BOSH Director
-  time bosh -n target ${BOSH_DIRECTOR_IP}
-  time bosh login ${BOSH_DIRECTOR_USERNAME} ${BOSH_DIRECTOR_PASSWORD}
+  # Don't exit on failure to target the BOSH director
+  set +e
+    # teardown deployments against BOSH Director
+    time bosh -n target ${BOSH_DIRECTOR_IP}
+    time bosh login ${BOSH_DIRECTOR_USERNAME} ${BOSH_DIRECTOR_PASSWORD}
 
-  if [ -n "${DEPLOYMENT_NAME}" ]; then
-    time bosh -n delete deployment ${DEPLOYMENT_NAME} --force
-  fi
-  time bosh -n cleanup --all
+    if [ -n "${DEPLOYMENT_NAME}" ]; then
+      time bosh -n delete deployment ${DEPLOYMENT_NAME} --force
+    fi
+    time bosh -n cleanup --all
+  set -e
 
   echo "deleting existing BOSH Director VM..."
   $bosh_init delete director.yml
