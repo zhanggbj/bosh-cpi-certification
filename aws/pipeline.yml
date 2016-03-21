@@ -4,6 +4,7 @@ groups:
     jobs:
       - bats-centos
       - bats-ubuntu
+      - end2end-us-ubuntu
       - certify-centos
       - certify-ubuntu
 
@@ -183,9 +184,9 @@ jobs:
   - name: certify-ubuntu
     plan:
       - aggregate:
-        - {get: bosh-release, trigger: true, passed: [bats-ubuntu]}
-        - {get: cpi-release,  trigger: true, passed: [bats-ubuntu]}
-        - {get: stemcell,     trigger: true, passed: [bats-ubuntu], resource: ubuntu-stemcell}
+        - {get: bosh-release, trigger: true, passed: [bats-ubuntu, end2end-us-ubuntu]}
+        - {get: cpi-release,  trigger: true, passed: [bats-ubuntu, end2end-us-ubuntu]}
+        - {get: stemcell,     trigger: true, passed: [bats-ubuntu, end2end-us-ubuntu], resource: ubuntu-stemcell}
         - {get: pipelines,    trigger: false}
 
       - task: generate
