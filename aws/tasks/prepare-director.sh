@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eu
+set -e
 
 # environment
 : ${BOSH_RELEASE_URI:?}
@@ -29,6 +29,9 @@ source pipelines/shared/utils.sh
 source pipelines/aws/utils.sh
 source /etc/profile.d/chruby.sh
 chruby 2.1.7
+
+# TODO: chruby does not like `set -u`, move this to the top once we remove chruby #116050783
+set -u
 
 export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY}
 export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY}
