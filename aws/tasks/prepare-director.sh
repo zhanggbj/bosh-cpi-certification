@@ -65,7 +65,7 @@ releases:
   - name: bosh
     url: ${BOSH_RELEASE_URI}
     sha1: ${BOSH_RELEASE_SHA1}
-  - name: bosh-vsphere-cpi
+  - name: bosh-aws-cpi
     url: ${CPI_RELEASE_URI}
     sha1: ${CPI_RELEASE_SHA1}
 
