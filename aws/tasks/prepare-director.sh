@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -eu
 
 # environment
 : ${BOSH_RELEASE_URI:?}
@@ -198,7 +198,7 @@ cloud_provider:
     user: vcap
     private_key: ${shared_key}
 
-  mbus: "https://mbus:mbus-password@${DIRECTOR_IP}:6868"
+  mbus: "https://mbus:mbus-password@${DIRECTOR_EIP}:6868"
 
   properties:
     aws: *aws
