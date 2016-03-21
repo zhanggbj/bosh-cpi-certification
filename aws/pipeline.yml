@@ -270,12 +270,12 @@ resources:
   - name: centos-stemcell
     type: bosh-io-stemcell
     source:
-      name: bosh-aws-xen-centos-7-go_agent
+      name: bosh-aws-xen-hvm-centos-7-go_agent
 
   - name: ubuntu-stemcell
     type: bosh-io-stemcell
     source:
-      name: bosh-aws-xen-ubuntu-trusty-go_agent
+      name: bosh-aws-xen-hvm-ubuntu-trusty-go_agent
 
   - name: bosh-init
     type: s3
