@@ -22,7 +22,6 @@ chruby 2.1.7
 output_dir=$(realpath bats-config)
 bats_spec="${output_dir}/bats-config.yml"
 bats_env="${output_dir}/bats.env"
-ssh_key="${output_dir}/shared.pem"
 
 echo "using bosh CLI version..."
 bosh version
@@ -64,7 +63,3 @@ properties:
       vlan: ${VCLOUD_VLAN}
   vapp_name: ${VCLOUD_VAPP}
 EOF
-
-# vcloud uses user/pass and the cdrom drive, not a reverse ssh tunnel
-# the SSH key is required for the `bosh ssh` command to work properly
-ssh-keygen -N "" -t rsa -b 4096 -f $ssh_key

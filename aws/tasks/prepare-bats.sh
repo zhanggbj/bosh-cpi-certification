@@ -56,6 +56,7 @@ export BAT_VIP=${BATS_EIP}
 export BAT_SUBNET_ID=${SUBNET_ID}
 export BAT_SECURITY_GROUP_NAME=${SECURITY_GROUP}
 export BAT_VCAP_PASSWORD=${BAT_VCAP_PASSWORD}
+export BAT_VCAP_PRIVATE_KEY="bats-config/shared.pem"
 export BAT_RSPEC_FLAGS="--tag ~multiple_manual_networks --tag ~root_partition"
 EOF
 

@@ -9,7 +9,6 @@ chruby 2.1.7
 # preparation
 export BAT_STEMCELL=$(realpath stemcell/*.tgz)
 export BAT_DEPLOYMENT_SPEC=$(realpath bats-config/bats-config.yml)
-export BAT_VCAP_PRIVATE_KEY=$(realpath bats-config/shared.pem)
 bats_dir=$(realpath bats)
 
 # disable host key checking for deployed VMs
@@ -19,10 +18,6 @@ Host *
     StrictHostKeyChecking no
 EOF
 
-chmod go-r ${BAT_VCAP_PRIVATE_KEY}
-eval $(ssh-agent)
-ssh-add ${BAT_VCAP_PRIVATE_KEY}
-
 source "$(realpath bats-config/bats.env)"
 : ${BAT_DIRECTOR:?}
 : ${BAT_DNS_HOST:?}
@@ -30,10 +25,18 @@ source "$(realpath bats-config/bats.env)"
 : ${BAT_NETWORKING:?}
 : ${BAT_VCAP_PASSWORD:?}
 
+: ${BAT_VCAP_PRIVATE_KEY:=""}
 : ${BAT_VIP:=""}
 : ${BAT_SUBNET_ID:=""}
 : ${BAT_SECURITY_GROUP_NAME:=""}
 : ${BAT_RSPEC_FLAGS:=""}
+
+if [ -n "${BAT_VCAP_PRIVATE_KEY}" ]; then
+  ssh_key_path="$(realpath ${BAT_VCAP_PRIVATE_KEY})"
+  chmod go-r ${ssh_key_path}
+  eval $(ssh-agent)
+  ssh-add ${ssh_key_path}
+fi
 
 pushd $bats_dir
   ./write_gemfile
