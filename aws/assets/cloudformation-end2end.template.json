@@ -5,7 +5,7 @@
     "KeyPairName" : {
       "Description" : "Name of an existing EC2 KeyPair",
       "Type" : "String",
-      "Default" : "bats",
+      "Default" : "certification",
       "MinLength": "1",
       "MaxLength": "64",
       "AllowedPattern" : "[-_ a-zA-Z0-9]*",
