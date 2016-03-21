@@ -11,7 +11,7 @@ set -e
 : ${AWS_STACK_PREFIX:?}
 : ${BAT_VCAP_PASSWORD:?}
 : ${PUBLIC_KEY_NAME:?}
-: ${BATS_STEMCELL_NAME:?}
+: ${STEMCELL_NAME:?}
 
 : ${AWS_ACCESS_KEY_ID:=${AWS_ACCESS_KEY}}
 : ${AWS_SECRET_ACCESS_KEY:=${AWS_SECRET_KEY}}
@@ -74,7 +74,7 @@ properties:
   uuid: ${BOSH_UUID}
   pool_size: 1
   stemcell:
-    name: ${BATS_STEMCELL_NAME}
+    name: ${STEMCELL_NAME}
     version: latest
   instances: 1
   key_name:  ${PUBLIC_KEY_NAME}

@@ -2,7 +2,7 @@
 
 set -e
 
-: ${BATS_STEMCELL_NAME:?}
+: ${STEMCELL_NAME:?}
 : ${BAT_VCAP_PASSWORD:=c1oudc0w}
 : ${VCLOUD_VLAN:?}
 : ${VCLOUD_VAPP:?}
@@ -48,7 +48,7 @@ properties:
   second_static_ip: ${BATS_IP2}
   pool_size: 1
   stemcell:
-    name: ${BATS_STEMCELL_NAME}
+    name: ${STEMCELL_NAME}
     version: latest
   instances: 1
   networks:

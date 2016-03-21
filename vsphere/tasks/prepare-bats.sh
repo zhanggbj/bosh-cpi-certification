@@ -2,7 +2,7 @@
 
 set -e
 
-: ${BAT_STEMCELL_NAME:?}
+: ${STEMCELL_NAME:?}
 : ${BAT_VCAP_PASSWORD:?}
 
 source pipelines/shared/utils.sh
@@ -61,7 +61,7 @@ properties:
   instances: 1
   second_static_ip: ${BAT_SECOND_STATIC_IP}
   stemcell:
-    name: ${BAT_STEMCELL_NAME}
+    name: ${STEMCELL_NAME}
     version: latest
   networks:
     - name: static

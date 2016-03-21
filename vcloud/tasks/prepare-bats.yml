@@ -12,7 +12,7 @@ run:
   path: pipelines/vcloud/tasks/prepare-bats.sh
 
 params:
-  BATS_STEMCELL_NAME:   ""
+  STEMCELL_NAME:        ""
   VCLOUD_VLAN:          ""
   VCLOUD_VAPP:          ""
   NETWORK_CIDR:         ""

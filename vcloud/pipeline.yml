@@ -50,7 +50,7 @@ jobs:
           file: pipelines/vcloud/tasks/prepare-bats.yml
           config:
             params:
-              BATS_STEMCELL_NAME:   bosh-vcloud-esxi-ubuntu-trusty-go_agent
+              STEMCELL_NAME:        bosh-vcloud-esxi-ubuntu-trusty-go_agent
               VCLOUD_VLAN:          {{VCLOUD_VLAN}}
               VCLOUD_VAPP:          {{VCLOUD_VAPP}}
               NETWORK_CIDR:         {{NETWORK_CIDR}}
@@ -114,7 +114,7 @@ jobs:
           file: pipelines/vcloud/tasks/prepare-bats.yml
           config:
             params:
-              BATS_STEMCELL_NAME:   bosh-vcloud-esxi-ubuntu-trusty-go_agent
+              STEMCELL_NAME:        bosh-vcloud-esxi-ubuntu-trusty-go_agent
               VCLOUD_VLAN:          {{VCLOUD_VLAN}}
               VCLOUD_VAPP:          {{VCLOUD_VAPP}}
               NETWORK_CIDR:         {{NETWORK_CIDR}}

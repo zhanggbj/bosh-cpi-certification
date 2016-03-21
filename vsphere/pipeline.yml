@@ -43,7 +43,7 @@ shared:
     file: pipelines/vsphere/tasks/prepare-bats.yml
     config:
       params:
-        BAT_STEMCELL_NAME: ""
+        STEMCELL_NAME:     ""
         BAT_VCAP_PASSWORD: {{BAT_VCAP_PASSWORD}}
 
   - &run-bats
@@ -80,7 +80,7 @@ jobs:
           - <<: *prepare-bats
             config:
               params:
-                BAT_STEMCELL_NAME: bosh-vsphere-esxi-centos-7-go_agent
+                STEMCELL_NAME: bosh-vsphere-esxi-centos-7-go_agent
 
           - <<: *run-bats
 
@@ -110,7 +110,7 @@ jobs:
           - <<: *prepare-bats
             config:
               params:
-                BAT_STEMCELL_NAME: bosh-vsphere-esxi-ubuntu-trusty-go_agent
+                STEMCELL_NAME: bosh-vsphere-esxi-ubuntu-trusty-go_agent
 
           - <<: *run-bats
 
