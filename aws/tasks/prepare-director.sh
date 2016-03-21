@@ -35,7 +35,7 @@ export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY}
 export AWS_DEFAULT_REGION=${AWS_REGION_NAME}
 
 # configuration
-: ${SECURITY_GROUP:=$(      aws ec2 describe-security-groups --group-ids $(stack_info "SecurityGroupID") | jq -r '.SecurityGroups[] .GroupName' ) }
+: ${SECURITY_GROUP:=$(      aws ec2 describe-security-groups --group-ids $(stack_info "SecurityGroupID") | jq -r '.SecurityGroups[] .GroupName' )}
 : ${DIRECTOR_EIP:=$(        stack_info "DirectorEIP" )}
 : ${SUBNET_ID:=$(           stack_info "SubnetID" )}
 : ${AVAILABILITY_ZONE:=$(   stack_info "AvailabilityZone" )}
@@ -187,7 +187,7 @@ jobs:
         secret_access_key: ${AWS_SECRET_KEY}
         default_key_name: ${PUBLIC_KEY_NAME}
         default_security_groups: ["${SECURITY_GROUP}"]
-        region: "${AWS_REGION}"
+        region: "${AWS_REGION_NAME}"
 
 cloud_provider:
   template: {name: aws_cpi, release: bosh-aws-cpi}
