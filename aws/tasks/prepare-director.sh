@@ -204,7 +204,7 @@ cloud_provider:
     aws: *aws
 
     # Tells CPI how agent should listen for requests
-    agent: {mbus: "https://mbus-user:mbus-password@0.0.0.0:6868"}
+    agent: {mbus: "https://mbus:mbus-password@0.0.0.0:6868"}
 
     blobstore:
       provider: local
