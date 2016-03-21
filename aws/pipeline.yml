@@ -16,7 +16,6 @@ shared:
           BOSH_RELEASE_URI:       file://bosh-release/release.tgz
           CPI_RELEASE_URI:        file://cpi-release/release.tgz
           STEMCELL_URI:           file://stemcell/stemcell.tgz
-          AWS_STACK_NAME:         {{AWS_STACK_NAME}}
           BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
           BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
           AWS_ACCESS_KEY:         {{AWS_ACCESS_KEY}}
@@ -24,6 +23,7 @@ shared:
           AWS_REGION_NAME:        {{AWS_REGION_NAME}}
           PUBLIC_KEY_NAME:        {{PUBLIC_KEY_NAME}}
           PRIVATE_KEY_DATA:       {{PRIVATE_KEY_DATA}}
+          AWS_STACK_NAME:         ""
           AWS_STACK_PREFIX:       ""
 
   - &deploy-director
@@ -42,15 +42,28 @@ shared:
         AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
         AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
         AWS_REGION_NAME:    {{AWS_REGION_NAME}}
-        AWS_STACK_NAME:     {{AWS_STACK_NAME}}
+        AWS_STACK_NAME:     {{AWS_BATS_STACK_NAME}}
         BAT_VCAP_PASSWORD:  {{BAT_VCAP_PASSWORD}}
         PUBLIC_KEY_NAME:    {{PUBLIC_KEY_NAME}}
-        BATS_STEMCELL_NAME: ""
+        STEMCELL_NAME:      ""
         AWS_STACK_PREFIX:   ""
 
   - &run-bats
     task: run-bats
     file: pipelines/shared/tasks/run-bats.yml
+
+  - &run-e2e
+    task: run-e2e
+    file: pipelines/aws/tasks/run-e2e.yml
+    params:
+      AWS_ACCESS_KEY:         {{AWS_ACCESS_KEY}}
+      AWS_SECRET_KEY:         {{AWS_SECRET_KEY}}
+      AWS_REGION_NAME:        {{AWS_REGION_NAME}}
+      BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
+      BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
+      AWS_STACK_NAME:         {{AWS_E2E_STACK_NAME}}
+      AWS_STACK_PREFIX:       ""
+      STEMCELL_NAME:          ""
 
   - &teardown
     task: teardown
@@ -62,6 +75,35 @@ shared:
         DEPLOYMENT_NAME:        certification
 
 jobs:
+  - name: end2end-us-ubuntu
+    plan:
+      - aggregate:
+        - {get: bosh-release, trigger: true}
+        - {get: cpi-release,  trigger: true}
+        - {get: stemcell,     trigger: true, resource: ubuntu-stemcell}
+        - {get: pipelines,    trigger: false}
+        - {get: bosh-init,    trigger: false}
+
+      - <<: *prepare-director
+        config:
+          params:
+            AWS_STACK_NAME:   {{AWS_E2E_STACK_NAME}}
+            AWS_STACK_PREFIX: Ubuntu
+
+      - do:
+          - <<: *deploy-director
+
+          - <<: *run-e2e
+            params:
+              STEMCELL_NAME:    bosh-aws-xen-ubuntu-trusty-go_agent
+              AWS_STACK_PREFIX: Ubuntu
+
+        ensure:
+          <<: *teardown
+          config:
+            params:
+              DEPLOYMENT_NAME: e2e-test
+
   - name: bats-centos
     plan:
       - aggregate:
@@ -75,6 +117,7 @@ jobs:
       - <<: *prepare-director
         config:
           params:
+            AWS_STACK_NAME:   {{AWS_BATS_STACK_NAME}}
             AWS_STACK_PREFIX: Centos
 
       - do:
@@ -83,7 +126,7 @@ jobs:
           - <<: *prepare-bats
             config:
               params:
-                BAT_STEMCELL_NAME: bosh-aws-xen-centos-7-go_agent
+                STEMCELL_NAME:    bosh-aws-xen-centos-7-go_agent
                 AWS_STACK_PREFIX: Centos
 
           - <<: *run-bats
@@ -104,6 +147,7 @@ jobs:
       - <<: *prepare-director
         config:
           params:
+            AWS_STACK_NAME:   {{AWS_BATS_STACK_NAME}}
             AWS_STACK_PREFIX: Ubuntu
 
       - do:
@@ -112,7 +156,7 @@ jobs:
           - <<: *prepare-bats
             config:
               params:
-                BAT_STEMCELL_NAME: bosh-aws-xen-ubuntu-trusty-go_agent
+                STEMCELL_NAME:    bosh-aws-xen-ubuntu-trusty-go_agent
                 AWS_STACK_PREFIX: Ubuntu
 
           - <<: *run-bats
@@ -156,27 +200,46 @@ jobs:
   - name: prepare-infrastructure
     plan:
       - {get: pipelines, trigger: false}
-      - task: prepare-infrastructure
-        file: pipelines/aws/tasks/prepare-infrastructure.yml
-        config:
-          params:
-            AWS_STACK_TEMPLATE: bats-promotion
-            AWS_STACK_NAME:     {{AWS_STACK_NAME}}
-            AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
-            AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
-            AWS_REGION_NAME:    {{AWS_REGION_NAME}}
+      - aggregate:
+        - task: prepare-bats-infrastructure
+          file: pipelines/aws/tasks/prepare-infrastructure.yml
+          config:
+            params:
+              AWS_STACK_TEMPLATE: bats-promotion
+              AWS_STACK_NAME:     {{AWS_BATS_STACK_NAME}}
+              AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
+              AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
+              AWS_REGION_NAME:    {{AWS_REGION_NAME}}
+        - task: prepare-e2e-infrastructure
+          file: pipelines/aws/tasks/prepare-infrastructure.yml
+          config:
+            params:
+              AWS_STACK_TEMPLATE: end2end
+              AWS_STACK_NAME:     {{AWS_E2E_STACK_NAME}}
+              AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
+              AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
+              AWS_REGION_NAME:    {{AWS_REGION_NAME}}
 
   - name: teardown-infrastructure
     plan:
       - {get: pipelines, trigger: false}
-      - task: teardown-infrastructure
-        file: pipelines/aws/tasks/teardown-infrastructure.yml
-        config:
-          params:
-            AWS_ACCESS_KEY:  {{AWS_ACCESS_KEY}}
-            AWS_SECRET_KEY:  {{AWS_SECRET_KEY}}
-            AWS_REGION_NAME: {{AWS_REGION_NAME}}
-            AWS_STACK_NAME:  {{AWS_STACK_NAME}}
+      - aggregate:
+        - task: teardown-bats-infrastructure
+          file: pipelines/aws/tasks/teardown-infrastructure.yml
+          config:
+            params:
+              AWS_ACCESS_KEY:  {{AWS_ACCESS_KEY}}
+              AWS_SECRET_KEY:  {{AWS_SECRET_KEY}}
+              AWS_REGION_NAME: {{AWS_REGION_NAME}}
+              AWS_STACK_NAME:  {{AWS_BATS_STACK_NAME}}
+        - task: teardown-e2e-infrastructure
+          file: pipelines/aws/tasks/teardown-infrastructure.yml
+          config:
+            params:
+              AWS_ACCESS_KEY:  {{AWS_ACCESS_KEY}}
+              AWS_SECRET_KEY:  {{AWS_SECRET_KEY}}
+              AWS_REGION_NAME: {{AWS_REGION_NAME}}
+              AWS_STACK_NAME:  {{AWS_E2E_STACK_NAME}}
 
 resources:
   - name: pipelines

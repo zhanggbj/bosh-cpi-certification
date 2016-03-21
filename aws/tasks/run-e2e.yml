@@ -1,0 +1,21 @@
+---
+platform: linux
+
+image: docker:///boshcpi/aws-cpi-release
+
+inputs:
+  - name: stemcell
+  - name: pipelines
+
+run:
+  path: pipelines/aws/tasks/run-e2e.sh
+
+params:
+  AWS_ACCESS_KEY:         ""
+  AWS_SECRET_KEY:         ""
+  AWS_REGION_NAME:        ""
+  BOSH_DIRECTOR_USERNAME: ""
+  BOSH_DIRECTOR_PASSWORD: ""
+  AWS_STACK_NAME:         ""
+  AWS_STACK_PREFIX:       ""
+  STEMCELL_NAME:          ""
