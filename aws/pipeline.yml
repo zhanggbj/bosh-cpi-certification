@@ -5,10 +5,13 @@ groups:
       - bats-centos
       - bats-ubuntu
       - end2end-us
+      - end2end-cn
       - certify-centos
       - certify-ubuntu
-      - prepare-infrastructure
-      - teardown-infrastructure
+      - prepare-infrastructure-us
+      - teardown-infrastructure-us
+      - prepare-infrastructure-cn
+      - teardown-infrastructure-cn
 
 shared:
   - &prepare-director
