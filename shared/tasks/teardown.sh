@@ -13,9 +13,9 @@ bosh_dir=$(realpath bosh-release/)
 cpi_dir=$(realpath cpi-release/)
 
 # deployment manifest references releases and stemcells relative to itself...make it true
-ln -s ${stemcell_dir} ${input_dir}
-ln -s ${bosh_dir} ${input_dir}
-ln -s ${cpi_dir} ${input_dir}
+ln -sf ${stemcell_dir} ${input_dir}
+ln -sf ${bosh_dir} ${input_dir}
+ln -sf ${cpi_dir} ${input_dir}
 
 cp -r ${input_dir}/.bosh_init $HOME/
 bosh_init=$(realpath bosh-init/bosh-init-*)
