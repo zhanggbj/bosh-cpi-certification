@@ -70,7 +70,7 @@ bosh -n target ${DIRECTOR_EIP}
 BOSH_UUID="$(bosh status --uuid)"
 
 # BATs spec generation
-cat > "./bats-config/bats.yml" <<EOF
+cat > "${bats_spec}" <<EOF
 ---
 cpi: aws
 properties:
