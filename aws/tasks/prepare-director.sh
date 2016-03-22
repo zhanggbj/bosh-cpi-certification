@@ -48,8 +48,11 @@ export AWS_DEFAULT_REGION=${AWS_REGION_NAME}
 : ${DIRECTOR_STATIC_IP:=$(  stack_info "DirectorStaticIP" )}
 : ${BLOBSTORE_BUCKET_NAME:=$(stack_info "BlobstoreBucketName")}
 
+: ${yaml_iam_instance_profile:=""}
+
 if [ "${USE_IAM}" = true ]; then
-: ${IAM_INSTANCE_PROFILE:=$(stack_info "IAMInstanceProfile")}
+  : ${IAM_INSTANCE_PROFILE:=$(stack_info "IAMInstanceProfile")}
+  yaml_iam_instance_profile="iam_instance_profile: ${IAM_INSTANCE_PROFILE}"
 fi
 
 # keys
@@ -87,6 +90,7 @@ resource_pools:
       url: ${STEMCELL_URI}
       sha1: ${STEMCELL_SHA1}
     cloud_properties:
+      ${yaml_iam_instance_profile}
       instance_type: m3.medium
       availability_zone: ${AVAILABILITY_ZONE}
       ephemeral_disk:
