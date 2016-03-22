@@ -98,7 +98,7 @@ jobs:
 
           - <<: *run-e2e
             params:
-              STEMCELL_NAME:    bosh-aws-xen-ubuntu-trusty-go_agent
+              STEMCELL_NAME:    *ubuntu-stemcell
               AWS_STACK_PREFIX: Ubuntu
 
         ensure:
@@ -129,7 +129,7 @@ jobs:
           - <<: *prepare-manual-bats
             config:
               params:
-                STEMCELL_NAME:    bosh-aws-xen-centos-7-go_agent
+                STEMCELL_NAME:    *centos-stemcell
                 AWS_STACK_PREFIX: Centos
 
           - <<: *run-bats
@@ -159,7 +159,7 @@ jobs:
           - <<: *prepare-manual-bats
             config:
               params:
-                STEMCELL_NAME:    bosh-aws-xen-ubuntu-trusty-go_agent
+                STEMCELL_NAME:    *ubuntu-stemcell
                 AWS_STACK_PREFIX: Ubuntu
 
           - <<: *run-bats
@@ -179,7 +179,7 @@ jobs:
         config:
           params:
             CPI_RELEASE_NAME: bosh-aws-cpi
-            STEMCELL_NAME:    bosh-aws-xen-centos-7-go_agent
+            STEMCELL_NAME:    *centos-stemcell
 
       - {put: receipt, params: {file: certification/*-receipt.json}}
 
@@ -196,7 +196,7 @@ jobs:
         config:
           params:
             CPI_RELEASE_NAME: bosh-aws-cpi
-            STEMCELL_NAME:    bosh-aws-xen-ubuntu-trusty-go_agent
+            STEMCELL_NAME:    *ubuntu-stemcell
 
       - {put: receipt, params: {file: certification/*-receipt.json}}
 
@@ -270,12 +270,12 @@ resources:
   - name: centos-stemcell
     type: bosh-io-stemcell
     source:
-      name: bosh-aws-xen-hvm-centos-7-go_agent
+      name: &centos-stemcell bosh-aws-xen-hvm-centos-7-go_agent
 
   - name: ubuntu-stemcell
     type: bosh-io-stemcell
     source:
-      name: bosh-aws-xen-hvm-ubuntu-trusty-go_agent
+      name: &ubuntu-stemcell bosh-aws-xen-hvm-ubuntu-trusty-go_agent
 
   - name: bosh-init
     type: s3
