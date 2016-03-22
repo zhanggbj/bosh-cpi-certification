@@ -13,5 +13,7 @@ run:
   path: pipelines/vsphere/tasks/prepare-bats.sh
 
 params:
-  STEMCELL_NAME:     ""
-  BAT_VCAP_PASSWORD: ""
+  STEMCELL_NAME:          ""
+  BAT_VCAP_PASSWORD:      ""
+  BOSH_DIRECTOR_USER:     ""
+  BOSH_DIRECTOR_PASSWORD: ""

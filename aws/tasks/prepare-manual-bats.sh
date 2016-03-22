@@ -10,6 +10,8 @@ set -e
 : ${AWS_STACK_NAME:?}
 : ${AWS_STACK_PREFIX:?}
 : ${BAT_VCAP_PASSWORD:?}
+: ${BOSH_DIRECTOR_USERNAME:?}
+: ${BOSH_DIRECTOR_PASSWORD:?}
 : ${PUBLIC_KEY_NAME:?}
 : ${STEMCELL_NAME:?}
 
@@ -62,6 +64,8 @@ export BAT_SECURITY_GROUP_NAME=${SECURITY_GROUP}
 export BAT_VCAP_PASSWORD=${BAT_VCAP_PASSWORD}
 export BAT_VCAP_PRIVATE_KEY="bats-config/shared.pem"
 export BAT_RSPEC_FLAGS="--tag ~multiple_manual_networks --tag ~root_partition"
+export BAT_DIRECTOR_USER="${BOSH_DIRECTOR_USERNAME}"
+export BAT_DIRECTOR_PASSWORD="${BOSH_DIRECTOR_PASSWORD}"
 EOF
 
 echo "using bosh CLI version..."

@@ -43,8 +43,10 @@ shared:
     file: pipelines/vsphere/tasks/prepare-bats.yml
     config:
       params:
-        STEMCELL_NAME:     ""
-        BAT_VCAP_PASSWORD: {{BAT_VCAP_PASSWORD}}
+        BAT_VCAP_PASSWORD:      {{BAT_VCAP_PASSWORD}}
+        BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
+        BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
+        STEMCELL_NAME:          ""
 
   - &run-bats
     task: run-bats

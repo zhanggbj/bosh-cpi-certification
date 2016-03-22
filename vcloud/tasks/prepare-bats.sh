@@ -4,6 +4,8 @@ set -e
 
 : ${STEMCELL_NAME:?}
 : ${BAT_VCAP_PASSWORD:=c1oudc0w}
+: ${BOSH_DIRECTOR_USERNAME:?}
+: ${BOSH_DIRECTOR_PASSWORD:?}
 : ${VCLOUD_VLAN:?}
 : ${VCLOUD_VAPP:?}
 : ${NETWORK_CIDR:?}
@@ -37,6 +39,8 @@ export BAT_INFRASTRUCTURE=vcloud
 export BAT_NETWORKING=manual
 export BAT_VCAP_PASSWORD=${BAT_VCAP_PASSWORD}
 export BAT_RSPEC_FLAGS="--tag ~vip_networking --tag ~dynamic_networking --tag ~root_partition --tag ~raw_ephemeral_storage"
+export BAT_DIRECTOR_USER="${BOSH_DIRECTOR_USERNAME}"
+export BAT_DIRECTOR_PASSWORD="${BOSH_DIRECTOR_PASSWORD}"
 EOF
 
 cat > ${bats_spec} <<EOF
