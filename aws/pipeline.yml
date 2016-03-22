@@ -93,6 +93,7 @@ jobs:
           params:
             AWS_STACK_NAME:   {{AWS_E2E_STACK_NAME}}
             AWS_STACK_PREFIX: Ubuntu
+            USE_IAM:          true
 
       - do:
           - <<: *deploy-director

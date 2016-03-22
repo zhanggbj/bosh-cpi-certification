@@ -187,6 +187,19 @@
         ]
       }
     },
+    "BATsS3Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "AccessControl": "Private",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "bats-blobstore-bucket"
+          }
+        ]
+      }
+    },
     "UbuntuSubnet": {
       "DependsOn": [
         "VPC"
@@ -345,6 +358,7 @@
     "UbuntuStaticRange": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "UbuntuBATs", "StaticRange"]}},
     "UbuntuStaticIP1": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "UbuntuBATs", "Static1"]}},
     "UbuntuStaticIP2": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "UbuntuBATs", "Static2"]}},
+    "UbuntuBlobstoreBucketName": { "Value": { "Ref": "BATsS3Bucket"}},
     "CentosSecurityGroupID": { "Value": { "Ref": "CISecurityGroup"}},
     "CentosDirectorEIP": { "Value": { "Ref": "CentosDirectorIPAddress"}},
     "CentosBATsEIP": { "Value": { "Ref": "CentosBATSIPAddress"}},
@@ -357,6 +371,7 @@
     "CentosStaticRange": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "CentosBATs", "StaticRange"]}},
     "CentosStaticIP1": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "CentosBATs", "Static1"]}},
     "CentosStaticIP2": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "CentosBATs", "Static2"]}},
+    "CentosBlobstoreBucketName": { "Value": { "Ref": "BATsS3Bucket"}},
     "VPCID": { "Value": { "Ref": "VPC"}}
   }
 }

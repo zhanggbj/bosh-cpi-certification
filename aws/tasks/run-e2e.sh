@@ -37,7 +37,6 @@ bosh_uuid="$(bosh status --uuid)"
 e2e_deployment_name=e2e-test
 e2e_release_version=1.0.0
 pushd ${e2e_release}
-  # TODO: fetch tarball from S3 instead?
   time bosh -n create release --force --name ${e2e_deployment_name} --version ${e2e_release_version}
   time bosh -n upload release --skip-if-exists
 popd

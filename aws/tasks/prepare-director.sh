@@ -16,6 +16,10 @@ set -e
 : ${PUBLIC_KEY_NAME:?}
 : ${PRIVATE_KEY_DATA:?}
 
+# optional
+
+: ${USE_IAM:=false}
+
 # if the X_SHA1 variable is set, use that; else, default to empty
 # SHA1 is required for releases fetched from URL, not required for local files
 : ${BOSH_RELEASE_SHA1:=""}
@@ -42,6 +46,11 @@ export AWS_DEFAULT_REGION=${AWS_REGION_NAME}
 : ${AWS_NETWORK_CIDR:=$(    stack_info "CIDR" )}
 : ${AWS_NETWORK_GATEWAY:=$( stack_info "Gateway" )}
 : ${DIRECTOR_STATIC_IP:=$(  stack_info "DirectorStaticIP" )}
+: ${BLOBSTORE_BUCKET_NAME:=$(stack_info "BlobstoreBucketName")}
+
+if [ "${USE_IAM}" = true ]; then
+: ${IAM_INSTANCE_PROFILE:=$(stack_info "IAMInstanceProfile")}
+fi
 
 # keys
 shared_key="shared.pem"
@@ -56,8 +65,10 @@ export BOSH_DIRECTOR_USERNAME=${BOSH_DIRECTOR_USERNAME}
 export BOSH_DIRECTOR_PASSWORD=${BOSH_DIRECTOR_PASSWORD}
 EOF
 
+manifest_filename="${output_dir}/director.yml"
+
 # manifest generation
-cat > "${output_dir}/director.yml" <<EOF
+cat > "${manifest_filename}" <<EOF
 ---
 name: bats-director
 
@@ -151,12 +162,24 @@ jobs:
         port: 25777
 
       blobstore:
-        provider: dav
-        port: 25250
-        address: ${DIRECTOR_STATIC_IP}
         director: {user: director, password: director-password}
         agent: {user: agent, password: agent-password}
-
+        provider: s3
+        s3_region: ${AWS_REGION_NAME}
+        bucket_name: ${BLOBSTORE_BUCKET_NAME}
+        s3_signature_version: '4'
+EOF
+if [ "${USE_IAM}" = true ]; then
+  cat >> "${manifest_filename}" <<EOF
+        credentials_source: env_or_profile
+EOF
+else
+  cat >> "${manifest_filename}" <<EOF
+        access_key_id: ${AWS_ACCESS_KEY}
+        secret_access_key: ${AWS_SECRET_KEY}
+EOF
+fi
+cat >> "${manifest_filename}" <<EOF
       director:
         address: 127.0.0.1
         name: bats-director
@@ -182,13 +205,24 @@ jobs:
         - 0.north-america.pool.ntp.org
         - 1.north-america.pool.ntp.org
 
-      aws: &aws
-        access_key_id: ${AWS_ACCESS_KEY}
-        secret_access_key: ${AWS_SECRET_KEY}
+      aws:
         default_key_name: ${PUBLIC_KEY_NAME}
         default_security_groups: ["${SECURITY_GROUP}"]
         region: "${AWS_REGION_NAME}"
+EOF
+if [ "${USE_IAM}" = true ]; then
+  cat >> "${manifest_filename}" <<EOF
+        credentials_source: 'env_or_profile'
+        default_iam_instance_profile: ${IAM_INSTANCE_PROFILE}
+EOF
+else
+  cat >> "${manifest_filename}" <<EOF
+        access_key_id: ${AWS_ACCESS_KEY}
+        secret_access_key: ${AWS_SECRET_KEY}
+EOF
+fi
 
+cat >> "${manifest_filename}" <<EOF
 cloud_provider:
   template: {name: aws_cpi, release: bosh-aws-cpi}
 
@@ -201,7 +235,12 @@ cloud_provider:
   mbus: "https://mbus:mbus-password@${DIRECTOR_EIP}:6868"
 
   properties:
-    aws: *aws
+    aws:
+      access_key_id: ${AWS_ACCESS_KEY}
+      secret_access_key: ${AWS_SECRET_KEY}
+      default_key_name: ${PUBLIC_KEY_NAME}
+      default_security_groups: ["${SECURITY_GROUP}"]
+      region: "${AWS_REGION_NAME}"
 
     # Tells CPI how agent should listen for requests
     agent: {mbus: "https://mbus:mbus-password@0.0.0.0:6868"}
