@@ -95,4 +95,4 @@ properties:
       security_groups: [${SECURITY_GROUP}]
 EOF
 
-cp ${director-config}/shared.pem ${ssh_key}
+cp ${director_config}/shared.pem ${ssh_key}
