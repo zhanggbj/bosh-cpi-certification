@@ -37,9 +37,9 @@ shared:
         BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
         BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
 
-  - &prepare-bats
-    task: prepare-bats
-    file: pipelines/aws/tasks/prepare-bats.yml
+  - &prepare-manual-bats
+    task: prepare-manual-bats
+    file: pipelines/aws/tasks/prepare-manual-bats.yml
     config:
       params:
         AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
@@ -126,7 +126,7 @@ jobs:
       - do:
           - <<: *deploy-director
 
-          - <<: *prepare-bats
+          - <<: *prepare-manual-bats
             config:
               params:
                 STEMCELL_NAME:    bosh-aws-xen-centos-7-go_agent
@@ -156,7 +156,7 @@ jobs:
       - do:
           - <<: *deploy-director
 
-          - <<: *prepare-bats
+          - <<: *prepare-manual-bats
             config:
               params:
                 STEMCELL_NAME:    bosh-aws-xen-ubuntu-trusty-go_agent

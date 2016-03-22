@@ -10,7 +10,7 @@ outputs:
   - name: bats-config
 
 run:
-  path: pipelines/aws/tasks/prepare-bats.sh
+  path: pipelines/aws/tasks/prepare-manual-bats.sh
 
 params:
   AWS_ACCESS_KEY:     ""
