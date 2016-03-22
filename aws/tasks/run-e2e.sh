@@ -2,7 +2,7 @@
 
 set -e
 
-source pipelines/ci/tasks/utils.sh
+source pipelines/aws/utils.sh
 
 : ${AWS_ACCESS_KEY:?}
 : ${AWS_SECRET_KEY:?}
