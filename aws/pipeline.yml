@@ -4,7 +4,7 @@ groups:
     jobs:
       - bats-centos
       - bats-ubuntu
-      - end2end-us-ubuntu
+      - end2end-us
       - certify-centos
       - certify-ubuntu
       - prepare-infrastructure
