@@ -83,10 +83,9 @@ jobs:
       - task: generate
         file: pipelines/shared/tasks/generate-receipt.yml
         tags: [vcloud-v5.5]
-        config:
-          params:
-            cpi_release_name: bosh-vcloud-cpi
-            stemcell_name:    bosh-vcloud-esxi-ubuntu-trusty-go_agent
+        params:
+          CPI_RELEASE_NAME: bosh-vcloud-cpi
+          STEMCELL_NAME:    bosh-vcloud-esxi-ubuntu-trusty-go_agent
 
       - {put: receipt, tags: [vcloud-v5.5], params: {file: certification/*-receipt.json}}
 

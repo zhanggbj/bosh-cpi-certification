@@ -16,4 +16,4 @@ certify-artifacts                                   \
   --release bosh/$BOSH_RELEASE_VERSION              \
   --release $CPI_RELEASE_NAME/$CPI_RELEASE_VERSION  \
   --stemcell $STEMCELL_NAME/$STEMCELL_VERSION       \
-  > certification-receipt/${timestamp}-${contents_hash}-receipt.json
+  > certification/${timestamp}-${contents_hash}-receipt.json
