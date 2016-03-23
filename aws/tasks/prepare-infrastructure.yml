@@ -13,4 +13,3 @@ params:
   AWS_SECRET_KEY:     ""
   AWS_REGION_NAME:    ""
   AWS_STACK_NAME:     ""
-  AWS_STACK_TEMPLATE: ""

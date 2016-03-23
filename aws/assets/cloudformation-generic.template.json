@@ -2,6 +2,15 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "Template for creating BOSH AWS infrastructure for concourse ci.",
   "Parameters" : {
+    "KeyPairName" : {
+      "Description" : "Name of an existing EC2 KeyPair used for NAT instance",
+      "Type" : "String",
+      "Default" : "certification",
+      "MinLength": "1",
+      "MaxLength": "64",
+      "AllowedPattern" : "[-_ a-zA-Z0-9]*",
+      "ConstraintDescription" : "can contain only alphanumeric characters, spaces, dashes and underscores."
+    },
     "TagName" : {
       "Description" : "All created resources will be tagged with this name",
       "Type" : "String",
@@ -20,15 +29,42 @@
       "Public": {
         "CIDR": "10.0.0.0/24",
         "DirectorPrivate": "10.0.0.6",
-        "Gateway": "10.0.0.1"
+        "Gateway": "10.0.0.1",
+        "NAT": "10.0.0.7"
       },
       "Private": {
         "CIDR": "10.0.1.0/24",
+        "Gateway": "10.0.1.1",
         "ReservedRange": "10.0.1.2-10.0.1.9",
         "StaticRange": "10.0.1.10-10.0.1.30",
         "Static1": "10.0.1.29",
         "Static2": "10.0.1.30"
       }
+    },
+    "NatRegionMap" : {
+      "us-east-1"      : { "AMI" : "ami-311a1a5b" },
+      "us-west-2"      : { "AMI" : "ami-7a2bc21a" },
+      "us-west-1"      : { "AMI" : "ami-0d087a6d" },
+      "eu-west-1"      : { "AMI" : "ami-d03288a3" },
+      "eu-central-1"   : { "AMI" : "ami-42db3c2d" },
+      "ap-southeast-1" : { "AMI" : "ami-920cc7f1" },
+      "ap-northeast-2" : { "AMI" : "ami-0199506f" },
+      "ap-northeast-1" : { "AMI" : "ami-bb010ad5" },
+      "ap-southeast-2" : { "AMI" : "ami-162c0c75" },
+      "sa-east-1"      : { "AMI" : "ami-22169b4e" },
+      "cn-north-1"     : { "AMI" : "ami-53ed263e" }
+    },
+    "Region2Principal": {
+      "us-east-1": { "EC2Principal": "ec2.amazonaws.com" },
+      "us-west-2": { "EC2Principal": "ec2.amazonaws.com" },
+      "us-west-1": { "EC2Principal": "ec2.amazonaws.com" },
+      "eu-west-1": { "EC2Principal": "ec2.amazonaws.com" },
+      "ap-southeast-1": { "EC2Principal": "ec2.amazonaws.com" },
+      "ap-northeast-1": { "EC2Principal": "ec2.amazonaws.com" },
+      "ap-southeast-2": { "EC2Principal": "ec2.amazonaws.com" },
+      "sa-east-1": { "EC2Principal": "ec2.amazonaws.com" },
+      "cn-north-1": { "EC2Principal": "ec2.amazonaws.com.cn" },
+      "eu-central-1": { "EC2Principal": "ec2.amazonaws.com" }
     }
   },
   "Resources": {
@@ -118,6 +154,22 @@
         "Tags": [ { "Key": "Name", "Value": { "Ref" : "TagName" } } ]
       }
     },
+    "ELB": {
+      "DependsOn": [ "PrivateSubnet", "CISecurityGroup" ],
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Properties": {
+        "Listeners": [
+          {
+            "InstancePort": 80,
+            "LoadBalancerPort": 80,
+            "Protocol": "HTTP"
+          }
+        ],
+        "SecurityGroups": [ { "Ref": "CISecurityGroup" } ],
+        "Subnets": [ { "Ref": "PrivateSubnet" } ],
+        "Tags": [ { "Key": "Name", "Value": { "Ref" : "TagName" } } ]
+      }
+    },
     "DirectorEIP": {
       "DependsOn": [ "AttachGateway" ],
       "Type": "AWS::EC2::EIP",
@@ -175,11 +227,32 @@
       }
     },
     "NAT" : {
-      "DependsOn" : "AttachGateway",
-      "Type" : "AWS::EC2::NatGateway",
+      "DependsOn" : [ "PublicSubnet", "CISecurityGroup" ],
+      "Type" : "AWS::EC2::Instance",
       "Properties" : {
-        "AllocationId" : { "Fn::GetAtt" : ["NATEIP", "AllocationId"]},
-        "SubnetId" : { "Ref" : "PublicSubnet" }
+        "InstanceType" : "t2.micro",
+        "KeyName"  : { "Ref" : "KeyPairName" },
+        "SourceDestCheck" : "false",
+        "ImageId" : { "Fn::FindInMap" : [ "NatRegionMap", { "Ref" : "AWS::Region" }, "AMI" ]},
+        "NetworkInterfaces" : [{
+          "GroupSet"                 : [{ "Ref" : "CISecurityGroup" }],
+          "AssociatePublicIpAddress" : "true",
+          "PrivateIpAddress"         : { "Fn::FindInMap" : [ "IPConfigurations", "Public", "NAT" ]},
+          "DeviceIndex"              : "0",
+          "DeleteOnTermination"      : "true",
+          "SubnetId"                 : { "Ref" : "PublicSubnet" }
+        }],
+        "Tags": [ { "Key": "Name", "Value": {
+          "Fn::Join": [ "-", [ "NAT", { "Ref" : "TagName" } ] ]
+        } } ]
+      }
+    },
+    "NATIPAssignment" : {
+      "DependsOn": [ "NATEIP", "NAT" ],
+      "Type": "AWS::EC2::EIPAssociation",
+      "Properties": {
+        "EIP": { "Ref": "NATEIP" },
+        "InstanceId": { "Ref": "NAT" }
       }
     },
     "NATEIP" : {
@@ -231,7 +304,66 @@
       "Properties": {
         "RouteTableId": { "Ref": "PrivateRouteTable" },
         "DestinationCidrBlock": "0.0.0.0/0",
-        "NatGatewayId": { "Ref": "NAT" }
+        "InstanceId": { "Ref": "NAT" }
+      }
+    },
+    "RootRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": { "Fn::FindInMap": [ "Region2Principal", { "Ref": "AWS::Region" }, "EC2Principal"]}
+              },
+              "Action": [ "sts:AssumeRole" ]
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "EC2Policy",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                { "Action": "ec2:*", "Effect": "Allow", "Resource": "*" },
+                { "Effect": "Allow", "Action": "elasticloadbalancing:*", "Resource": "*" }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "S3Policy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "S3Policy",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [ { "Effect": "Allow", "Action": [ "s3:*" ], "Resource": "*" } ]
+        },
+        "Roles": [ { "Ref": "RootRole" } ]
+      }
+    },
+    "IAMPolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "IAMPolicy",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [ { "Effect": "Allow", "Action": [ "iam:PassRole" ], "Resource": "*" } ]
+        },
+        "Roles": [ { "Ref": "RootRole" } ]
+      }
+    },
+    "InstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [ { "Ref": "RootRole" } ]
       }
     }
   },
@@ -244,13 +376,16 @@
     "AvailabilityZone": { "Value": { "Fn::GetAtt": [ "PublicSubnet", "AvailabilityZone"]}},
     "PublicSubnetID": { "Value": { "Ref": "PublicSubnet"}},
     "PublicCIDR": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Public", "CIDR"]}},
-    "Gateway": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Public", "Gateway"]}},
+    "PublicGateway": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Public", "Gateway"]}},
+    "PrivateGateway": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Private", "Gateway"]}},
     "PrivateSubnetID": { "Value": { "Ref": "PrivateSubnet"}},
     "PrivateCIDR": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Private", "CIDR"]}},
     "ReservedRange": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Private", "ReservedRange"]}},
     "StaticRange": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Private", "StaticRange"]}},
     "StaticIP1": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Private", "Static1"]}},
     "StaticIP2": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Private", "Static2"]}},
-    "BlobstoreBucketName": { "Value": { "Ref": "S3Bucket"}}
+    "BlobstoreBucketName": { "Value": { "Ref": "S3Bucket"}},
+    "ELB": { "Value": { "Ref": "ELB" }},
+    "IAMInstanceProfile": { "Value": { "Ref": "InstanceProfile" }}
   }
 }

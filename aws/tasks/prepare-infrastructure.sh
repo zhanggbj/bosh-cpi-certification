@@ -6,7 +6,6 @@ set -e
 : ${AWS_SECRET_KEY:?}
 : ${AWS_REGION_NAME:?}
 : ${AWS_STACK_NAME:?}
-: ${AWS_STACK_TEMPLATE:?}
 
 source pipelines/shared/utils.sh
 source pipelines/aws/utils.sh
@@ -20,7 +19,7 @@ export AWS_DEFAULT_REGION=${AWS_REGION_NAME}
 cmd="aws cloudformation create-stack \
     --stack-name      ${AWS_STACK_NAME} \
     --parameters      ParameterKey=TagName,ParameterValue=${AWS_STACK_NAME} \
-    --template-body   file:///${PWD}/pipelines/aws/assets/cloudformation-${AWS_STACK_TEMPLATE}.template.json \
+    --template-body   file:///${PWD}/pipelines/aws/assets/cloudformation-generic.template.json \
     --capabilities    CAPABILITY_IAM"
 
 echo "Running: ${cmd}"; ${cmd}

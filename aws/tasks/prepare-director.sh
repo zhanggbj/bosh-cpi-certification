@@ -41,7 +41,7 @@ export AWS_DEFAULT_REGION=${AWS_REGION_NAME}
 : ${SUBNET_ID:=$(            stack_info "PublicSubnetID" )}
 : ${AVAILABILITY_ZONE:=$(    stack_info "AvailabilityZone" )}
 : ${AWS_NETWORK_CIDR:=$(     stack_info "PublicCIDR" )}
-: ${AWS_NETWORK_GATEWAY:=$(  stack_info "Gateway" )}
+: ${AWS_NETWORK_GATEWAY:=$(  stack_info "PublicGateway" )}
 : ${DIRECTOR_STATIC_IP:=$(   stack_info "DirectorStaticIP" )}
 : ${BLOBSTORE_BUCKET_NAME:=$(stack_info "BlobstoreBucketName")}
 

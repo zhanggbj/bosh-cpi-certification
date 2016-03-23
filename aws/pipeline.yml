@@ -244,7 +244,6 @@ jobs:
           file: pipelines/aws/tasks/prepare-infrastructure.yml
           config:
             params:
-              AWS_STACK_TEMPLATE: bats-promotion
               AWS_STACK_NAME:     ubuntu-manual-bats
               AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
               AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
@@ -253,7 +252,6 @@ jobs:
           file: pipelines/aws/tasks/prepare-infrastructure.yml
           config:
             params:
-              AWS_STACK_TEMPLATE: bats-promotion
               AWS_STACK_NAME:     centos-manual-bats
               AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
               AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
@@ -262,7 +260,6 @@ jobs:
           file: pipelines/aws/tasks/prepare-infrastructure.yml
           config:
             params:
-              AWS_STACK_TEMPLATE: end2end
               AWS_STACK_NAME:     {{AWS_E2E_STACK_NAME}}
               AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
               AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
@@ -305,7 +302,6 @@ jobs:
           file: pipelines/aws/tasks/prepare-infrastructure.yml
           config:
             params:
-              AWS_STACK_TEMPLATE: end2end
               AWS_STACK_NAME:     {{AWS_E2E_STACK_NAME}}
               AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY__CN}}
               AWS_SECRET_KEY:     {{AWS_SECRET_KEY__CN}}
