@@ -30,7 +30,6 @@ shared:
           PUBLIC_KEY_NAME:        {{PUBLIC_KEY_NAME}}
           PRIVATE_KEY_DATA:       {{PRIVATE_KEY_DATA}}
           AWS_STACK_NAME:         ""
-          AWS_STACK_PREFIX:       ""
 
   - &deploy-director
     task: deploy-director
@@ -48,13 +47,12 @@ shared:
         AWS_ACCESS_KEY:         {{AWS_ACCESS_KEY}}
         AWS_SECRET_KEY:         {{AWS_SECRET_KEY}}
         AWS_REGION_NAME:        {{AWS_REGION_NAME}}
-        AWS_STACK_NAME:         {{AWS_BATS_STACK_NAME}}
         BAT_VCAP_PASSWORD:      {{BAT_VCAP_PASSWORD}}
         PUBLIC_KEY_NAME:        {{PUBLIC_KEY_NAME}}
         BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
         BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
         STEMCELL_NAME:          ""
-        AWS_STACK_PREFIX:       ""
+        AWS_STACK_NAME:         ""
 
   - &run-bats
     task: run-bats
@@ -70,7 +68,6 @@ shared:
       BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
       BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
       AWS_STACK_NAME:         {{AWS_E2E_STACK_NAME}}
-      AWS_STACK_PREFIX:       ""
       STEMCELL_NAME:          ""
 
   - &teardown
@@ -97,7 +94,6 @@ jobs:
         config:
           params:
             AWS_STACK_NAME:   {{AWS_E2E_STACK_NAME}}
-            AWS_STACK_PREFIX: Ubuntu
             USE_IAM:          true
 
       - do:
@@ -106,7 +102,7 @@ jobs:
           - <<: *run-e2e
             params:
               STEMCELL_NAME:    *ubuntu-stemcell
-              AWS_STACK_PREFIX: Ubuntu
+              AWS_STACK_NAME:   {{AWS_E2E_STACK_NAME}}
 
         ensure:
           <<: *teardown
@@ -131,9 +127,7 @@ jobs:
             AWS_ACCESS_KEY:   {{AWS_ACCESS_KEY__CN}}
             AWS_SECRET_KEY:   {{AWS_SECRET_KEY__CN}}
             AWS_REGION_NAME:  cn-north-1
-            AWS_STACK_PREFIX: Ubuntu
             USE_IAM:          true
-
 
       - do:
           - <<: *deploy-director
@@ -144,7 +138,6 @@ jobs:
               AWS_SECRET_KEY:   {{AWS_SECRET_KEY__CN}}
               AWS_REGION_NAME:  cn-north-1
               STEMCELL_NAME:    *ubuntu-stemcell
-              AWS_STACK_PREFIX: Ubuntu
 
         ensure:
           <<: *teardown
@@ -165,8 +158,7 @@ jobs:
       - <<: *prepare-director
         config:
           params:
-            AWS_STACK_NAME:   {{AWS_BATS_STACK_NAME}}
-            AWS_STACK_PREFIX: Centos
+            AWS_STACK_NAME: centos-manual-bats
 
       - do:
           - <<: *deploy-director
@@ -174,8 +166,8 @@ jobs:
           - <<: *prepare-manual-bats
             config:
               params:
-                STEMCELL_NAME:    *centos-stemcell
-                AWS_STACK_PREFIX: Centos
+                STEMCELL_NAME:  *centos-stemcell
+                AWS_STACK_NAME: centos-manual-bats
 
           - <<: *run-bats
 
@@ -195,8 +187,7 @@ jobs:
       - <<: *prepare-director
         config:
           params:
-            AWS_STACK_NAME:   {{AWS_BATS_STACK_NAME}}
-            AWS_STACK_PREFIX: Ubuntu
+            AWS_STACK_NAME: ubuntu-manual-bats
 
       - do:
           - <<: *deploy-director
@@ -204,8 +195,8 @@ jobs:
           - <<: *prepare-manual-bats
             config:
               params:
-                STEMCELL_NAME:    *ubuntu-stemcell
-                AWS_STACK_PREFIX: Ubuntu
+                STEMCELL_NAME:  *ubuntu-stemcell
+                AWS_STACK_NAME: ubuntu-manual-bats
 
           - <<: *run-bats
         ensure:
@@ -249,12 +240,21 @@ jobs:
     plan:
       - {get: pipelines, trigger: false}
       - aggregate:
-        - task: prepare-bats-infrastructure
+        - task: prepare-ubuntu-manual-bats-infrastructure
           file: pipelines/aws/tasks/prepare-infrastructure.yml
           config:
             params:
               AWS_STACK_TEMPLATE: bats-promotion
-              AWS_STACK_NAME:     {{AWS_BATS_STACK_NAME}}
+              AWS_STACK_NAME:     ubuntu-manual-bats
+              AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
+              AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
+              AWS_REGION_NAME:    {{AWS_REGION_NAME}}
+        - task: prepare-centos-manual-bats-infrastructure
+          file: pipelines/aws/tasks/prepare-infrastructure.yml
+          config:
+            params:
+              AWS_STACK_TEMPLATE: bats-promotion
+              AWS_STACK_NAME:     centos-manual-bats
               AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
               AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
               AWS_REGION_NAME:    {{AWS_REGION_NAME}}
@@ -272,14 +272,22 @@ jobs:
     plan:
       - {get: pipelines, trigger: false}
       - aggregate:
-        - task: teardown-bats-infrastructure
+        - task: teardown-ubuntu-manual-bats-infrastructure
           file: pipelines/aws/tasks/teardown-infrastructure.yml
           config:
             params:
               AWS_ACCESS_KEY:  {{AWS_ACCESS_KEY}}
               AWS_SECRET_KEY:  {{AWS_SECRET_KEY}}
               AWS_REGION_NAME: {{AWS_REGION_NAME}}
-              AWS_STACK_NAME:  {{AWS_BATS_STACK_NAME}}
+              AWS_STACK_NAME:  ubuntu-manual-bats
+        - task: teardown-centos-manual-bats-infrastructure
+          file: pipelines/aws/tasks/teardown-infrastructure.yml
+          config:
+            params:
+              AWS_ACCESS_KEY:  {{AWS_ACCESS_KEY}}
+              AWS_SECRET_KEY:  {{AWS_SECRET_KEY}}
+              AWS_REGION_NAME: {{AWS_REGION_NAME}}
+              AWS_STACK_NAME:  centos-manual-bats
         - task: teardown-e2e-infrastructure
           file: pipelines/aws/tasks/teardown-infrastructure.yml
           config:

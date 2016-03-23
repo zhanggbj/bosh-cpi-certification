@@ -10,7 +10,6 @@ source pipelines/aws/utils.sh
 : ${BOSH_DIRECTOR_USERNAME:?}
 : ${BOSH_DIRECTOR_PASSWORD:?}
 : ${AWS_STACK_NAME:?}
-: ${AWS_STACK_PREFIX:?}
 : ${STEMCELL_NAME:?}
 
 source /etc/profile.d/chruby.sh

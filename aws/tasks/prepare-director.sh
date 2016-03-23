@@ -12,7 +12,6 @@ set -e
 : ${AWS_SECRET_KEY:?}
 : ${AWS_REGION_NAME:?}
 : ${AWS_STACK_NAME:?}
-: ${AWS_STACK_PREFIX:?}
 : ${PUBLIC_KEY_NAME:?}
 : ${PRIVATE_KEY_DATA:?}
 
@@ -37,13 +36,13 @@ export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY}
 export AWS_DEFAULT_REGION=${AWS_REGION_NAME}
 
 # configuration
-: ${SECURITY_GROUP:=$(      aws ec2 describe-security-groups --group-ids $(stack_info "SecurityGroupID") | jq -r '.SecurityGroups[] .GroupName' )}
-: ${DIRECTOR_EIP:=$(        stack_info "DirectorEIP" )}
-: ${SUBNET_ID:=$(           stack_info "SubnetID" )}
-: ${AVAILABILITY_ZONE:=$(   stack_info "AvailabilityZone" )}
-: ${AWS_NETWORK_CIDR:=$(    stack_info "CIDR" )}
-: ${AWS_NETWORK_GATEWAY:=$( stack_info "Gateway" )}
-: ${DIRECTOR_STATIC_IP:=$(  stack_info "DirectorStaticIP" )}
+: ${SECURITY_GROUP:=$(       aws ec2 describe-security-groups --group-ids $(stack_info "SecurityGroupID") | jq -r '.SecurityGroups[] .GroupName' )}
+: ${DIRECTOR_EIP:=$(         stack_info "DirectorEIP" )}
+: ${SUBNET_ID:=$(            stack_info "PublicSubnetID" )}
+: ${AVAILABILITY_ZONE:=$(    stack_info "AvailabilityZone" )}
+: ${AWS_NETWORK_CIDR:=$(     stack_info "PublicCIDR" )}
+: ${AWS_NETWORK_GATEWAY:=$(  stack_info "Gateway" )}
+: ${DIRECTOR_STATIC_IP:=$(   stack_info "DirectorStaticIP" )}
 : ${BLOBSTORE_BUCKET_NAME:=$(stack_info "BlobstoreBucketName")}
 
 : ${yaml_iam_instance_profile:=""}

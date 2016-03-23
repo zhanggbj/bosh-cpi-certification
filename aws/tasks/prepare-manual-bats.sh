@@ -8,7 +8,6 @@ set -e
 : ${AWS_SECRET_KEY:?}
 : ${AWS_REGION_NAME:?}
 : ${AWS_STACK_NAME:?}
-: ${AWS_STACK_PREFIX:?}
 : ${BAT_VCAP_PASSWORD:?}
 : ${BOSH_DIRECTOR_USERNAME:?}
 : ${BOSH_DIRECTOR_PASSWORD:?}
@@ -31,10 +30,10 @@ export AWS_DEFAULT_REGION=${AWS_REGION_NAME}
 # configuration
 : ${SECURITY_GROUP:=$(         aws ec2 describe-security-groups --group-ids $(stack_info "SecurityGroupID") | jq -r '.SecurityGroups[] .GroupName' ) }
 : ${DIRECTOR_EIP:=$(           stack_info "DirectorEIP" )}
-: ${BATS_EIP:=$(               stack_info "BATsEIP" )}
-: ${SUBNET_ID:=$(              stack_info "SubnetID" )}
+: ${BATS_EIP:=$(               stack_info "DeploymentEIP" )}
+: ${SUBNET_ID:=$(              stack_info "PrivateSubnetID" )}
 : ${AVAILABILITY_ZONE:=$(      stack_info "AvailabilityZone" )}
-: ${NETWORK_CIDR:=$(           stack_info "CIDR" )}
+: ${NETWORK_CIDR:=$(           stack_info "PrivateCIDR" )}
 : ${NETWORK_GATEWAY:=$(        stack_info "Gateway" )}
 : ${NETWORK_RESERVED_RANGE:=$( stack_info "ReservedRange" )}
 : ${NETWORK_STATIC_RANGE:=$(   stack_info "StaticRange" )}

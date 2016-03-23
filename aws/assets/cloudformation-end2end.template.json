@@ -586,16 +586,16 @@
   },
   "Outputs": {
     "VPCID": { "Value": { "Ref": "VPC"}},
-    "UbuntuSecurityGroupID": { "Value": { "Ref": "CISecurityGroup"}},
-    "UbuntuELB": { "Value": { "Ref": "End2EndELB" }},
-    "UbuntuDirectorEIP": { "Value": { "Ref": "End2EndIPAddress1"}},
-    "UbuntuSubnetID": { "Value": { "Ref": "End2EndPublicSubnet"}},
-    "UbuntuDynamicSubnetID": { "Value": { "Ref": "End2EndPrivateSubnet"}},
-    "UbuntuAvailabilityZone": { "Value": { "Fn::GetAtt": [ "End2EndPublicSubnet", "AvailabilityZone"]}},
-    "UbuntuCIDR": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "End2EndPublic", "CIDR"]}},
-    "UbuntuGateway": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "End2EndPublic", "Gateway"]}},
-    "UbuntuDirectorStaticIP": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "End2EndPublic", "DirectorPrivate"]}},
-    "UbuntuIAMInstanceProfile": { "Value": { "Ref": "InstanceProfile"}},
-    "UbuntuBlobstoreBucketName": { "Value": { "Ref": "End2EndS3Bucket"}}
+    "SecurityGroupID": { "Value": { "Ref": "CISecurityGroup"}},
+    "ELB": { "Value": { "Ref": "End2EndELB" }},
+    "DirectorEIP": { "Value": { "Ref": "End2EndIPAddress1"}},
+    "SubnetID": { "Value": { "Ref": "End2EndPublicSubnet"}},
+    "DynamicSubnetID": { "Value": { "Ref": "End2EndPrivateSubnet"}},
+    "AvailabilityZone": { "Value": { "Fn::GetAtt": [ "End2EndPublicSubnet", "AvailabilityZone"]}},
+    "CIDR": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "End2EndPublic", "CIDR"]}},
+    "Gateway": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "End2EndPublic", "Gateway"]}},
+    "DirectorStaticIP": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "End2EndPublic", "DirectorPrivate"]}},
+    "IAMInstanceProfile": { "Value": { "Ref": "InstanceProfile"}},
+    "BlobstoreBucketName": { "Value": { "Ref": "End2EndS3Bucket"}}
   }
 }

@@ -19,6 +19,7 @@ export AWS_DEFAULT_REGION=${AWS_REGION_NAME}
 
 cmd="aws cloudformation create-stack \
     --stack-name      ${AWS_STACK_NAME} \
+    --parameters      \"TagName=${AWS_STACK_NAME}\" \
     --template-body   file:///${PWD}/pipelines/aws/assets/cloudformation-${AWS_STACK_TEMPLATE}.template.json \
     --capabilities    CAPABILITY_IAM"
 

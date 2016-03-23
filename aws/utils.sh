@@ -10,7 +10,7 @@ stack_info() {
     AWS_STACK_INFO="$(stack_data)"
   fi
 
-  local key="${AWS_STACK_PREFIX}$1"
+  local key="$1"
   echo "${AWS_STACK_INFO}" | jq -r --arg key ${key} '.Outputs[] | select(.OutputKey=="\($key)").OutputValue'
 }
 
