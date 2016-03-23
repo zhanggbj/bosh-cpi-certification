@@ -3,9 +3,9 @@
 set -e
 
 # environment
-: ${BOSH_RELEASE_URI:?}
-: ${CPI_RELEASE_URI:?}
-: ${STEMCELL_URI:?}
+: ${BOSH_RELEASE_GLOB:?}
+: ${CPI_RELEASE_GLOB:?}
+: ${STEMCELL_GLOB:?}
 : ${BOSH_DIRECTOR_USERNAME:?}
 : ${BOSH_DIRECTOR_PASSWORD:?}
 : ${AWS_ACCESS_KEY:?}
@@ -17,14 +17,12 @@ set -e
 : ${PRIVATE_KEY_DATA:?}
 
 # optional
-
 : ${USE_IAM:=false}
 
-# if the X_SHA1 variable is set, use that; else, default to empty
-# SHA1 is required for releases fetched from URL, not required for local files
-: ${BOSH_RELEASE_SHA1:=""}
-: ${CPI_RELEASE_SHA1:=""}
-: ${STEMCELL_SHA1:=""}
+# inputs
+BOSH_RELEASE_URI="file://$(echo "${BOSH_RELEASE_GLOB}")"
+CPI_RELEASE_URI="file://$(echo "${CPI_RELEASE_GLOB}")"
+STEMCELL_URI="file://$(echo "${STEMCELL_GLOB}")"
 
 # outputs
 output_dir="$(realpath director-config)"
@@ -78,17 +76,14 @@ name: bats-director
 releases:
   - name: bosh
     url: ${BOSH_RELEASE_URI}
-    sha1: ${BOSH_RELEASE_SHA1}
   - name: bosh-aws-cpi
     url: ${CPI_RELEASE_URI}
-    sha1: ${CPI_RELEASE_SHA1}
 
 resource_pools:
   - name: default
     network: private
     stemcell:
       url: ${STEMCELL_URI}
-      sha1: ${STEMCELL_SHA1}
     cloud_properties:
       ${yaml_iam_instance_profile}
       instance_type: m3.medium

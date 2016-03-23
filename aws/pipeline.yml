@@ -19,9 +19,9 @@ shared:
     file: pipelines/aws/tasks/prepare-director.yml
     config:
       params:
-          BOSH_RELEASE_URI:       file://bosh-release/release.tgz
-          CPI_RELEASE_URI:        file://cpi-release/release.tgz
-          STEMCELL_URI:           file://stemcell/stemcell.tgz
+          BOSH_RELEASE_GLOB:      bosh-release/*.tgz
+          CPI_RELEASE_GLOB:       cpi-release/*.tgz
+          STEMCELL_GLOB:          stemcell/*.tgz
           BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
           BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
           AWS_ACCESS_KEY:         {{AWS_ACCESS_KEY}}
@@ -339,15 +339,21 @@ resources:
       uri: https://github.com/cloudfoundry/bosh-acceptance-tests.git
       branch: master
 
-  - name: centos-stemcell
-    type: bosh-io-stemcell
-    source:
-      name: &centos-stemcell bosh-aws-xen-hvm-centos-7-go_agent
-
   - name: ubuntu-stemcell
-    type: bosh-io-stemcell
+    type: s3
     source:
       name: &ubuntu-stemcell bosh-aws-xen-hvm-ubuntu-trusty-go_agent
+      regexp: light-bosh-stemcell-([0-9.]+)-aws-xen-hvm-ubuntu-trusty-go_agent.tgz
+      bucket: bosh-aws-light-stemcells
+      region_name: us-east-1
+
+  - name: centos-stemcell
+    type: s3
+    source:
+      name: &centos-stemcell bosh-aws-xen-hvm-centos-7-go_agent
+      regexp: light-bosh-stemcell-([0-9.]+)-aws-xen-hvm-centos-7-go_agent.tgz
+      bucket: bosh-aws-light-stemcells
+      region_name: us-east-1
 
   - name: bosh-init
     type: s3
