@@ -4,6 +4,9 @@ image: docker:///boshcpi/cpi-certification
 
 inputs:
   - name: pipelines
+  - name: bosh-release
+  - name: cpi-release
+  - name: stemcell
 
 outputs:
   - name: director-config
@@ -12,12 +15,9 @@ run:
   path: pipelines/aws/tasks/prepare-director.sh
 
 params:
-  BOSH_RELEASE_URI:       ""
-  BOSH_RELEASE_SHA1:      ""
-  CPI_RELEASE_URI:        ""
-  CPI_RELEASE_SHA1:       ""
-  STEMCELL_URI:           ""
-  STEMCELL_SHA1:          ""
+  BOSH_RELEASE_GLOB:      ""
+  CPI_RELEASE_GLOB:       ""
+  STEMCELL_GLOB:          ""
   BOSH_DIRECTOR_USERNAME: ""
   BOSH_DIRECTOR_PASSWORD: ""
   AWS_ACCESS_KEY:         ""
