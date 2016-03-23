@@ -20,9 +20,9 @@ set -e
 : ${USE_IAM:=false}
 
 # inputs
-BOSH_RELEASE_URI="file://$(echo "${BOSH_RELEASE_GLOB}")"
-CPI_RELEASE_URI="file://$(echo "${CPI_RELEASE_GLOB}")"
-STEMCELL_URI="file://$(echo "${STEMCELL_GLOB}")"
+BOSH_RELEASE_URI="file://$(echo ${BOSH_RELEASE_GLOB})"
+CPI_RELEASE_URI="file://$(echo ${CPI_RELEASE_GLOB})"
+STEMCELL_URI="file://$(echo ${STEMCELL_GLOB})"
 
 # outputs
 output_dir="$(realpath director-config)"
