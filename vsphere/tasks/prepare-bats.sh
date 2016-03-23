@@ -52,7 +52,7 @@ EOF
 
 echo "using bosh CLI version..."
 bosh version
-bosh -n target $BAT_DIRECTOR
+bosh -n target "${director_ip}"
 BOSH_UUID="$(bosh status --uuid)"
 
 cat > "${bats_spec}" <<EOF
