@@ -77,6 +77,7 @@ shared:
 
 jobs:
   - name: end2end-us
+    serial: true
     plan:
       - aggregate:
         - {get: bosh-release,    trigger: true}
@@ -105,6 +106,7 @@ jobs:
             DEPLOYMENT_NAME: e2e-test
 
   - name: end2end-cn
+    serial: true
     plan:
       - aggregate:
         - {get: bosh-release,    trigger: true}
@@ -124,6 +126,8 @@ jobs:
 
       - do:
           - <<: *deploy-director
+            params:
+              BOSH_INIT_LOG_LEVEL: debug
 
           - <<: *run-e2e
             params:
@@ -138,6 +142,7 @@ jobs:
             DEPLOYMENT_NAME: e2e-test
 
   - name: bats-centos
+    serial: true
     plan:
       - aggregate:
         - {get: bosh-release, trigger: true}
@@ -165,6 +170,7 @@ jobs:
           <<: *teardown
 
   - name: bats-ubuntu
+    serial: true
     plan:
       - aggregate:
         - {get: bosh-release, trigger: true}
@@ -191,6 +197,7 @@ jobs:
           <<: *teardown
 
   - name: certify-centos
+    serial: true
     plan:
       - aggregate:
         - {get: bosh-release, trigger: true, passed: [bats-centos, end2end-us]}
@@ -207,6 +214,7 @@ jobs:
       - {put: receipt, params: {file: certification/*-receipt.json}}
 
   - name: certify-ubuntu
+    serial: true
     plan:
       - aggregate:
         - {get: bosh-release, trigger: true, passed: [bats-ubuntu, end2end-us]}
@@ -223,6 +231,7 @@ jobs:
       - {put: receipt, params: {file: certification/*-receipt.json}}
 
   - name: prepare-infrastructure-us
+    serial: true
     plan:
       - {get: pipelines, trigger: false}
       - aggregate:
@@ -249,6 +258,7 @@ jobs:
             AWS_REGION_NAME:    {{AWS_REGION_NAME}}
 
   - name: teardown-infrastructure-us
+    serial: true
     plan:
       - {get: pipelines, trigger: false}
       - aggregate:
@@ -275,6 +285,7 @@ jobs:
             AWS_STACK_NAME:  {{AWS_E2E_STACK_NAME}}
 
   - name: prepare-infrastructure-cn
+    serial: true
     plan:
       - {get: pipelines, trigger: false}
       - aggregate:
@@ -287,6 +298,7 @@ jobs:
             AWS_REGION_NAME:    cn-north-1
 
   - name: teardown-infrastructure-cn
+    serial: true
     plan:
       - {get: pipelines, trigger: false}
       - aggregate:
