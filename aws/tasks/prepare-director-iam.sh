@@ -151,10 +151,6 @@ jobs:
         password: ${BOSH_DIRECTOR_PASSWORD}
         port: 25777
 
-      powerdns:
-        dns:
-          recursor: 10.0.0.2
-
       blobstore:
         director: {user: director, password: director-password}
         agent: {user: agent, password: agent-password}
@@ -180,6 +176,7 @@ jobs:
         director_account: {user: ${BOSH_DIRECTOR_USERNAME}, password: ${BOSH_DIRECTOR_PASSWORD}}
 
       dns:
+        recursor: 10.0.0.2
         address: 127.0.0.1
         db: *db
 
