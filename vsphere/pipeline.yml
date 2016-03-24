@@ -57,9 +57,8 @@ shared:
     task: teardown
     tags: [vsphere-v5.1]
     file: pipelines/shared/tasks/teardown.yml
-    config:
-      params:
-        DEPLOYMENT_NAME:        certification
+    params:
+      DEPLOYMENT_NAME: certification
 
 jobs:
   - name: bats-centos
@@ -152,7 +151,8 @@ jobs:
             file: pipelines/vsphere/tasks/prepare-deployment.yml
             config:
               params:
-                RELEASE_NAME:              certification #TODO pull from secrets?
+                RELEASE_NAME:              certification
+                DEPLOYMENT_NAME:           certification
                 STEMCELL_NAME:             bosh-vsphere-esxi-ubuntu-trusty-go_agent
                 BOSH_DIRECTOR_USERNAME:    {{BOSH_DIRECTOR_USERNAME}}
                 BOSH_DIRECTOR_PASSWORD:    {{BOSH_DIRECTOR_PASSWORD}}
@@ -168,21 +168,14 @@ jobs:
                 RELEASE_NAME:              certification
 
           - <<: *prepare-director
-            config:
-              params:
-                BOSH_RELEASE_URI: file://bosh-release/release.tgz
-                CPI_RELEASE_URI:  file://cpi-release/release.tgz
-                STEMCELL_URI:     file://stemcell/stemcell.tgz
+            output_mapping: { director-config: new-director-config }
 
-          - <<: *deploy-director
-
-          - task: recreate-deployment
+          - task: test-upgrade
             tags: [vsphere-v5.1]
-            file: pipelines/vsphere/tasks/recreate-deployment.yml
-            config:
-              params:
-                BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
-                BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
+            file: pipelines/shared/tasks/test-upgrade.yml
+            output_mapping: { new-director-state: director-state }
+            params:
+              DEPLOYMENT_NAME:        certification
 
         ensure:
           do:

@@ -7,6 +7,7 @@ set -e
 : ${BOSH_VSPHERE_VCENTER_VLAN:?}
 : ${RELEASE_NAME:?}
 : ${STEMCELL_NAME:?}
+: ${DEPLOYMENT_NAME:?}
 
 source pipelines/shared/utils.sh
 source /etc/profile.d/chruby.sh
@@ -33,7 +34,7 @@ bosh login "${BOSH_DIRECTOR_USERNAME}" "${BOSH_DIRECTOR_PASSWORD}"
 
 cat > "${manifest_dir}/deployment.yml" <<EOF
 ---
-name: certification
+name: ${DEPLOYMENT_NAME}
 director_uuid: $(bosh status --uuid)
 
 releases:
