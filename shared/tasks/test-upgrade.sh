@@ -31,6 +31,7 @@ $initexe version
 echo "upgrading existing BOSH Director VM..."
 time $initexe deploy director.yml
 
+time cp ${director_config}/director.env ${output_dir}
 time cp director{.yml,-state.json} ${output_dir}
 time cp -r $HOME/.bosh_init ${output_dir}
 
