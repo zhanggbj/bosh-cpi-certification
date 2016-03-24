@@ -7,3 +7,7 @@ python-pip/get-pip.py:
   object_id: 82febf0e-21ff-4de2-8200-e8959869c36f
   sha: 4645795f303c2a8a02d9957514af8a28fd8770c2
   size: 1412744
+awscli/awscli-bundle.zip:
+  object_id: 06c65222-e3f1-42dc-9645-7425e4934401
+  sha: 9970da6d0ca86915b487bdc8ce2e11250d0c51b1
+  size: 6801325
