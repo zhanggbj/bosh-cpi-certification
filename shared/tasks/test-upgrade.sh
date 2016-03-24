@@ -25,10 +25,10 @@ initver=$(cat bosh-init/version)
 initexe="bosh-init/bosh-init-${initver}-linux-amd64"
 chmod +x ${initexe}
 
-log "using bosh-init CLI version..."
+echo "using bosh-init CLI version..."
 $initexe version
 
-log "upgrading existing BOSH Director VM..."
+echo "upgrading existing BOSH Director VM..."
 time $initexe deploy director.yml
 
 time cp director{.yml,-state.json} ${output_dir}
@@ -39,5 +39,5 @@ time bosh login ${BOSH_DIRECTOR_USERNAME} ${BOSH_DIRECTOR_PASSWORD}
 time bosh download manifest ${DEPLOYMENT_NAME} ${DEPLOYMENT_NAME}-manifest
 time bosh deployment ${DEPLOYMENT_NAME}-manifest
 
-log "recreating existing BOSH Deployment..."
+echo "recreating existing BOSH Deployment..."
 time bosh -n deploy --recreate
