@@ -23,7 +23,7 @@ export AWS_DEFAULT_REGION=${AWS_REGION_NAME}
 stemcell_path="$(realpath stemcell/*.tgz)"
 e2e_release="$(realpath pipelines/aws/assets/e2e-test-release)"
 
-: ${SUBNET_ID:=$(            stack_info "PrivateSubnetID")}
+: ${SUBNET_ID:=$(            stack_info "PublicSubnetID")}
 : ${AVAILABILITY_ZONE:=$(    stack_info "AvailabilityZone")}
 : ${DIRECTOR_IP:=$(          stack_info "DirectorEIP")}
 : ${IAM_INSTANCE_PROFILE:=$( stack_info "IAMInstanceProfile")}

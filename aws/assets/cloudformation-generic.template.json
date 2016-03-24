@@ -31,11 +31,6 @@
         "DirectorPrivate": "10.0.0.6",
         "Gateway": "10.0.0.1",
         "DNS": "10.0.0.2",
-        "NAT": "10.0.0.7"
-      },
-      "Private": {
-        "CIDR": "10.0.1.0/24",
-        "Gateway": "10.0.1.1",
         "ReservedRange": "10.0.1.2-10.0.1.9",
         "StaticRange": "10.0.1.10-10.0.1.30",
         "Static1": "10.0.1.29",
@@ -156,7 +151,7 @@
       }
     },
     "ELB": {
-      "DependsOn": [ "PrivateSubnet", "CISecurityGroup" ],
+      "DependsOn": [ "PublicSubnet", "CISecurityGroup" ],
       "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
       "Properties": {
         "Listeners": [
@@ -167,7 +162,7 @@
           }
         ],
         "SecurityGroups": [ { "Ref": "CISecurityGroup" } ],
-        "Subnets": [ { "Ref": "PrivateSubnet" } ],
+        "Subnets": [ { "Ref": "PublicSubnet" } ],
         "Tags": [ { "Key": "Name", "Value": { "Ref" : "TagName" } } ]
       }
     },
@@ -187,6 +182,7 @@
       "Properties": {
         "VpcId": { "Ref": "VPC" },
         "CidrBlock": { "Fn::FindInMap": [ "IPConfigurations", "Public", "CIDR" ] },
+        "MapPublicIpOnLaunch": true,
         "Tags": [ { "Key": "Name", "Value": {
           "Fn::Join": [ "-", [ "public", { "Ref" : "TagName" } ] ]
         } } ]
@@ -225,87 +221,6 @@
         "RouteTableId": { "Ref": "PublicRouteTable" },
         "DestinationCidrBlock": "0.0.0.0/0",
         "GatewayId": { "Ref": "InternetGateway" }
-      }
-    },
-    "NAT" : {
-      "DependsOn" : [ "PublicSubnet", "CISecurityGroup" ],
-      "Type" : "AWS::EC2::Instance",
-      "Properties" : {
-        "InstanceType" : "t2.micro",
-        "KeyName"  : { "Ref" : "KeyPairName" },
-        "SourceDestCheck" : "false",
-        "ImageId" : { "Fn::FindInMap" : [ "NatRegionMap", { "Ref" : "AWS::Region" }, "AMI" ]},
-        "NetworkInterfaces" : [{
-          "GroupSet"                 : [{ "Ref" : "CISecurityGroup" }],
-          "AssociatePublicIpAddress" : "true",
-          "PrivateIpAddress"         : { "Fn::FindInMap" : [ "IPConfigurations", "Public", "NAT" ]},
-          "DeviceIndex"              : "0",
-          "DeleteOnTermination"      : "true",
-          "SubnetId"                 : { "Ref" : "PublicSubnet" }
-        }],
-        "Tags": [ { "Key": "Name", "Value": {
-          "Fn::Join": [ "-", [ "NAT", { "Ref" : "TagName" } ] ]
-        } } ]
-      }
-    },
-    "NATIPAssignment" : {
-      "DependsOn": [ "NATEIP", "NAT" ],
-      "Type": "AWS::EC2::EIPAssociation",
-      "Properties": {
-        "EIP": { "Ref": "NATEIP" },
-        "InstanceId": { "Ref": "NAT" }
-      }
-    },
-    "NATEIP" : {
-      "DependsOn": [ "AttachGateway" ],
-      "Type" : "AWS::EC2::EIP",
-      "Properties" : { "Domain" : "vpc" }
-    },
-    "PrivateSubnet": {
-      "DependsOn": [ "VPC", "PublicSubnet" ],
-      "Type": "AWS::EC2::Subnet",
-      "Properties": {
-        "AvailabilityZone" : { "Fn::GetAtt": [ "PublicSubnet", "AvailabilityZone" ] },
-        "VpcId": { "Ref": "VPC" },
-        "CidrBlock": { "Fn::FindInMap": [ "IPConfigurations", "Private", "CIDR" ] },
-        "Tags": [ { "Key": "Name", "Value": {
-          "Fn::Join": [ "-", [ "private", { "Ref" : "TagName" } ] ]
-        } } ]
-      }
-    },
-    "PrivateSubnetRouteTableAssociation": {
-      "DependsOn": [ "PrivateSubnet", "PrivateRouteTable" ],
-      "Type": "AWS::EC2::SubnetRouteTableAssociation",
-      "Properties": {
-        "SubnetId": { "Ref": "PrivateSubnet" },
-        "RouteTableId": { "Ref": "PrivateRouteTable" }
-      }
-    },
-    "PrivateSubnetNetworkAclAssociation": {
-      "DependsOn": [ "PrivateSubnet", "NetworkAcl" ],
-      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
-      "Properties": {
-        "SubnetId": { "Ref": "PrivateSubnet" },
-        "NetworkAclId": { "Ref": "NetworkAcl" }
-      }
-    },
-    "PrivateRouteTable": {
-      "DependsOn": [ "VPC" ],
-      "Type": "AWS::EC2::RouteTable",
-      "Properties": {
-        "VpcId": { "Ref": "VPC" },
-        "Tags": [ { "Key": "Name", "Value": {
-          "Fn::Join": ["-", ["private", { "Ref" : "TagName" } ] ]
-        } } ]
-      }
-    },
-    "PrivateRoute": {
-      "DependsOn": [ "PrivateRouteTable", "NAT" ],
-      "Type": "AWS::EC2::Route",
-      "Properties": {
-        "RouteTableId": { "Ref": "PrivateRouteTable" },
-        "DestinationCidrBlock": "0.0.0.0/0",
-        "InstanceId": { "Ref": "NAT" }
       }
     },
     "RootRole": {
@@ -379,13 +294,10 @@
     "PublicCIDR": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Public", "CIDR"]}},
     "PublicGateway": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Public", "Gateway"]}},
     "DNS": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Public", "DNS"]}},
-    "PrivateGateway": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Private", "Gateway"]}},
-    "PrivateSubnetID": { "Value": { "Ref": "PrivateSubnet"}},
-    "PrivateCIDR": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Private", "CIDR"]}},
-    "ReservedRange": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Private", "ReservedRange"]}},
-    "StaticRange": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Private", "StaticRange"]}},
-    "StaticIP1": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Private", "Static1"]}},
-    "StaticIP2": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Private", "Static2"]}},
+    "ReservedRange": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Public", "ReservedRange"]}},
+    "StaticRange": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Public", "StaticRange"]}},
+    "StaticIP1": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Public", "Static1"]}},
+    "StaticIP2": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Public", "Static2"]}},
     "BlobstoreBucketName": { "Value": { "Ref": "S3Bucket"}},
     "ELB": { "Value": { "Ref": "ELB" }},
     "IAMInstanceProfile": { "Value": { "Ref": "InstanceProfile" }}
