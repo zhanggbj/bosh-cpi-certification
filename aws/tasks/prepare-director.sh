@@ -42,6 +42,7 @@ export AWS_DEFAULT_REGION=${AWS_REGION_NAME}
 : ${AVAILABILITY_ZONE:=$(    stack_info "AvailabilityZone" )}
 : ${AWS_NETWORK_CIDR:=$(     stack_info "PublicCIDR" )}
 : ${AWS_NETWORK_GATEWAY:=$(  stack_info "PublicGateway" )}
+: ${AWS_NETWORK_DNS:=$(      stack_info "DNS" )}
 : ${DIRECTOR_STATIC_IP:=$(   stack_info "DirectorStaticIP" )}
 : ${BLOBSTORE_BUCKET_NAME:=$(stack_info "BlobstoreBucketName")}
 
@@ -166,6 +167,10 @@ jobs:
         s3_region: ${AWS_REGION_NAME}
         bucket_name: ${BLOBSTORE_BUCKET_NAME}
         s3_signature_version: '4'
+
+      powerdns:
+        dns:
+          recursor: 10.0.0.2
 EOF
 if [ "${USE_IAM}" = true ]; then
   cat >> "${manifest_filename}" <<EOF

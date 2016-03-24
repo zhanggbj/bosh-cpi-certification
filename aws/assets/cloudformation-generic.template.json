@@ -30,6 +30,7 @@
         "CIDR": "10.0.0.0/24",
         "DirectorPrivate": "10.0.0.6",
         "Gateway": "10.0.0.1",
+        "DNS": "10.0.0.2",
         "NAT": "10.0.0.7"
       },
       "Private": {
@@ -377,6 +378,7 @@
     "PublicSubnetID": { "Value": { "Ref": "PublicSubnet"}},
     "PublicCIDR": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Public", "CIDR"]}},
     "PublicGateway": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Public", "Gateway"]}},
+    "DNS": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Public", "DNS"]}},
     "PrivateGateway": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Private", "Gateway"]}},
     "PrivateSubnetID": { "Value": { "Ref": "PrivateSubnet"}},
     "PrivateCIDR": { "Value": { "Fn::FindInMap": [ "IPConfigurations", "Private", "CIDR"]}},
