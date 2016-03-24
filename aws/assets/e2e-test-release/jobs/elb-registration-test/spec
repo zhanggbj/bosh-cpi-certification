@@ -3,7 +3,7 @@ name: elb-registration-test
 
 packages:
 - jq
-- python-pip
+- awscli
 
 templates:
   run.erb: bin/run
