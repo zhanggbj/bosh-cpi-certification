@@ -11,6 +11,7 @@ run:
   path: pipelines/aws/tasks/run-e2e.sh
 
 params:
+  BOSH_INIT_DEBUG_LEVEL:  info
   AWS_ACCESS_KEY:         ""
   AWS_SECRET_KEY:         ""
   AWS_REGION_NAME:        ""
