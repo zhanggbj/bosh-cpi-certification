@@ -17,42 +17,39 @@ shared:
   - &prepare-director
     task: prepare-director
     file: pipelines/aws/tasks/prepare-director.yml
-    config:
-      params:
-          BOSH_RELEASE_GLOB:      bosh-release/*.tgz
-          CPI_RELEASE_GLOB:       cpi-release/*.tgz
-          STEMCELL_GLOB:          stemcell/*.tgz
-          BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
-          BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
-          AWS_ACCESS_KEY:         {{AWS_ACCESS_KEY}}
-          AWS_SECRET_KEY:         {{AWS_SECRET_KEY}}
-          AWS_REGION_NAME:        {{AWS_REGION_NAME}}
-          PUBLIC_KEY_NAME:        {{PUBLIC_KEY_NAME}}
-          PRIVATE_KEY_DATA:       {{PRIVATE_KEY_DATA}}
-          AWS_STACK_NAME:         ""
+    params:
+        BOSH_RELEASE_GLOB:      bosh-release/*.tgz
+        CPI_RELEASE_GLOB:       cpi-release/*.tgz
+        STEMCELL_GLOB:          stemcell/*.tgz
+        BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
+        BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
+        AWS_ACCESS_KEY:         {{AWS_ACCESS_KEY}}
+        AWS_SECRET_KEY:         {{AWS_SECRET_KEY}}
+        AWS_REGION_NAME:        {{AWS_REGION_NAME}}
+        PUBLIC_KEY_NAME:        {{PUBLIC_KEY_NAME}}
+        PRIVATE_KEY_DATA:       {{PRIVATE_KEY_DATA}}
+        AWS_STACK_NAME:         ""
 
   - &deploy-director
     task: deploy-director
     file: pipelines/shared/tasks/deploy-director.yml
-    config:
-      params:
-        BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
-        BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
+    params:
+      BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
+      BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
 
   - &prepare-manual-bats
     task: prepare-manual-bats
     file: pipelines/aws/tasks/prepare-manual-bats.yml
-    config:
-      params:
-        AWS_ACCESS_KEY:         {{AWS_ACCESS_KEY}}
-        AWS_SECRET_KEY:         {{AWS_SECRET_KEY}}
-        AWS_REGION_NAME:        {{AWS_REGION_NAME}}
-        BAT_VCAP_PASSWORD:      {{BAT_VCAP_PASSWORD}}
-        PUBLIC_KEY_NAME:        {{PUBLIC_KEY_NAME}}
-        BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
-        BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
-        STEMCELL_NAME:          ""
-        AWS_STACK_NAME:         ""
+    params:
+      AWS_ACCESS_KEY:         {{AWS_ACCESS_KEY}}
+      AWS_SECRET_KEY:         {{AWS_SECRET_KEY}}
+      AWS_REGION_NAME:        {{AWS_REGION_NAME}}
+      BAT_VCAP_PASSWORD:      {{BAT_VCAP_PASSWORD}}
+      PUBLIC_KEY_NAME:        {{PUBLIC_KEY_NAME}}
+      BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
+      BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
+      STEMCELL_NAME:          ""
+      AWS_STACK_NAME:         ""
 
   - &run-bats
     task: run-bats
@@ -73,11 +70,10 @@ shared:
   - &teardown
     task: teardown
     file: pipelines/shared/tasks/teardown.yml
-    config:
-      params:
-        BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
-        BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
-        DEPLOYMENT_NAME:        certification
+    params:
+      BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
+      BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
+      DEPLOYMENT_NAME:        certification
 
 jobs:
   - name: end2end-us
@@ -152,18 +148,16 @@ jobs:
         - {get: bats,         trigger: false}
 
       - <<: *prepare-director
-        config:
-          params:
-            AWS_STACK_NAME: centos-manual-bats
+        params:
+          AWS_STACK_NAME: centos-manual-bats
 
       - do:
           - <<: *deploy-director
 
           - <<: *prepare-manual-bats
-            config:
-              params:
-                STEMCELL_NAME:  *centos-stemcell
-                AWS_STACK_NAME: centos-manual-bats
+            params:
+              STEMCELL_NAME:  *centos-stemcell
+              AWS_STACK_NAME: centos-manual-bats
 
           - <<: *run-bats
 
@@ -181,18 +175,16 @@ jobs:
         - {get: bats,         trigger: false}
 
       - <<: *prepare-director
-        config:
-          params:
-            AWS_STACK_NAME: ubuntu-manual-bats
+        params:
+          AWS_STACK_NAME: ubuntu-manual-bats
 
       - do:
           - <<: *deploy-director
 
           - <<: *prepare-manual-bats
-            config:
-              params:
-                STEMCELL_NAME:  *ubuntu-stemcell
-                AWS_STACK_NAME: ubuntu-manual-bats
+            params:
+              STEMCELL_NAME:  *ubuntu-stemcell
+              AWS_STACK_NAME: ubuntu-manual-bats
 
           - <<: *run-bats
         ensure:
@@ -208,10 +200,9 @@ jobs:
 
       - task: generate
         file: pipelines/shared/tasks/generate-receipt.yml
-        config:
-          params:
-            CPI_RELEASE_NAME: bosh-aws-cpi
-            STEMCELL_NAME:    *centos-stemcell
+        params:
+          CPI_RELEASE_NAME: bosh-aws-cpi
+          STEMCELL_NAME:    *centos-stemcell
 
       - {put: receipt, params: {file: certification/*-receipt.json}}
 
@@ -225,10 +216,9 @@ jobs:
 
       - task: generate
         file: pipelines/shared/tasks/generate-receipt.yml
-        config:
-          params:
-            CPI_RELEASE_NAME: bosh-aws-cpi
-            STEMCELL_NAME:    *ubuntu-stemcell
+        params:
+          CPI_RELEASE_NAME: bosh-aws-cpi
+          STEMCELL_NAME:    *ubuntu-stemcell
 
       - {put: receipt, params: {file: certification/*-receipt.json}}
 
@@ -238,28 +228,25 @@ jobs:
       - aggregate:
         - task: prepare-ubuntu-manual-bats-infrastructure
           file: pipelines/aws/tasks/prepare-infrastructure.yml
-          config:
-            params:
-              AWS_STACK_NAME:     ubuntu-manual-bats
-              AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
-              AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
-              AWS_REGION_NAME:    {{AWS_REGION_NAME}}
+          params:
+            AWS_STACK_NAME:     ubuntu-manual-bats
+            AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
+            AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
+            AWS_REGION_NAME:    {{AWS_REGION_NAME}}
         - task: prepare-centos-manual-bats-infrastructure
           file: pipelines/aws/tasks/prepare-infrastructure.yml
-          config:
-            params:
-              AWS_STACK_NAME:     centos-manual-bats
-              AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
-              AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
-              AWS_REGION_NAME:    {{AWS_REGION_NAME}}
+          params:
+            AWS_STACK_NAME:     centos-manual-bats
+            AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
+            AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
+            AWS_REGION_NAME:    {{AWS_REGION_NAME}}
         - task: prepare-e2e-infrastructure
           file: pipelines/aws/tasks/prepare-infrastructure.yml
-          config:
-            params:
-              AWS_STACK_NAME:     {{AWS_E2E_STACK_NAME}}
-              AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
-              AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
-              AWS_REGION_NAME:    {{AWS_REGION_NAME}}
+          params:
+            AWS_STACK_NAME:     {{AWS_E2E_STACK_NAME}}
+            AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
+            AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
+            AWS_REGION_NAME:    {{AWS_REGION_NAME}}
 
   - name: teardown-infrastructure-us
     plan:
@@ -267,28 +254,25 @@ jobs:
       - aggregate:
         - task: teardown-ubuntu-manual-bats-infrastructure
           file: pipelines/aws/tasks/teardown-infrastructure.yml
-          config:
-            params:
-              AWS_ACCESS_KEY:  {{AWS_ACCESS_KEY}}
-              AWS_SECRET_KEY:  {{AWS_SECRET_KEY}}
-              AWS_REGION_NAME: {{AWS_REGION_NAME}}
-              AWS_STACK_NAME:  ubuntu-manual-bats
+          params:
+            AWS_ACCESS_KEY:  {{AWS_ACCESS_KEY}}
+            AWS_SECRET_KEY:  {{AWS_SECRET_KEY}}
+            AWS_REGION_NAME: {{AWS_REGION_NAME}}
+            AWS_STACK_NAME:  ubuntu-manual-bats
         - task: teardown-centos-manual-bats-infrastructure
           file: pipelines/aws/tasks/teardown-infrastructure.yml
-          config:
-            params:
-              AWS_ACCESS_KEY:  {{AWS_ACCESS_KEY}}
-              AWS_SECRET_KEY:  {{AWS_SECRET_KEY}}
-              AWS_REGION_NAME: {{AWS_REGION_NAME}}
-              AWS_STACK_NAME:  centos-manual-bats
+          params:
+            AWS_ACCESS_KEY:  {{AWS_ACCESS_KEY}}
+            AWS_SECRET_KEY:  {{AWS_SECRET_KEY}}
+            AWS_REGION_NAME: {{AWS_REGION_NAME}}
+            AWS_STACK_NAME:  centos-manual-bats
         - task: teardown-e2e-infrastructure
           file: pipelines/aws/tasks/teardown-infrastructure.yml
-          config:
-            params:
-              AWS_ACCESS_KEY:  {{AWS_ACCESS_KEY}}
-              AWS_SECRET_KEY:  {{AWS_SECRET_KEY}}
-              AWS_REGION_NAME: {{AWS_REGION_NAME}}
-              AWS_STACK_NAME:  {{AWS_E2E_STACK_NAME}}
+          params:
+            AWS_ACCESS_KEY:  {{AWS_ACCESS_KEY}}
+            AWS_SECRET_KEY:  {{AWS_SECRET_KEY}}
+            AWS_REGION_NAME: {{AWS_REGION_NAME}}
+            AWS_STACK_NAME:  {{AWS_E2E_STACK_NAME}}
 
   - name: prepare-infrastructure-cn
     plan:
@@ -296,12 +280,11 @@ jobs:
       - aggregate:
         - task: prepare-e2e-infrastructure
           file: pipelines/aws/tasks/prepare-infrastructure.yml
-          config:
-            params:
-              AWS_STACK_NAME:     {{AWS_E2E_STACK_NAME}}
-              AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY__CN}}
-              AWS_SECRET_KEY:     {{AWS_SECRET_KEY__CN}}
-              AWS_REGION_NAME:    cn-north-1
+          params:
+            AWS_STACK_NAME:     {{AWS_E2E_STACK_NAME}}
+            AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY__CN}}
+            AWS_SECRET_KEY:     {{AWS_SECRET_KEY__CN}}
+            AWS_REGION_NAME:    cn-north-1
 
   - name: teardown-infrastructure-cn
     plan:
@@ -309,12 +292,11 @@ jobs:
       - aggregate:
         - task: teardown-e2e-infrastructure
           file: pipelines/aws/tasks/teardown-infrastructure.yml
-          config:
-            params:
-              AWS_STACK_NAME:  {{AWS_E2E_STACK_NAME}}
-              AWS_ACCESS_KEY:  {{AWS_ACCESS_KEY__CN}}
-              AWS_SECRET_KEY:  {{AWS_SECRET_KEY__CN}}
-              AWS_REGION_NAME: cn-north-1
+          params:
+            AWS_STACK_NAME:  {{AWS_E2E_STACK_NAME}}
+            AWS_ACCESS_KEY:  {{AWS_ACCESS_KEY__CN}}
+            AWS_SECRET_KEY:  {{AWS_SECRET_KEY__CN}}
+            AWS_REGION_NAME: cn-north-1
 
 resources:
   - name: pipelines
