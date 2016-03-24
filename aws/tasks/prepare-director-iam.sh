@@ -42,6 +42,7 @@ export AWS_DEFAULT_REGION=${AWS_REGION_NAME}
 : ${AWS_NETWORK_DNS:=$(      stack_info "DNS" )}
 : ${DIRECTOR_STATIC_IP:=$(   stack_info "DirectorStaticIP" )}
 : ${BLOBSTORE_BUCKET_NAME:=$(stack_info "BlobstoreBucketName")}
+: ${IAM_INSTANCE_PROFILE:=$(stack_info "IAMInstanceProfile")}
 
 # keys
 shared_key="shared.pem"
@@ -75,6 +76,7 @@ resource_pools:
     stemcell:
       url: ${STEMCELL_URI}
     cloud_properties:
+      iam_instance_profile: ${IAM_INSTANCE_PROFILE}
       instance_type: m3.medium
       availability_zone: ${AVAILABILITY_ZONE}
       ephemeral_disk:
@@ -160,8 +162,7 @@ jobs:
         s3_region: ${AWS_REGION_NAME}
         bucket_name: ${BLOBSTORE_BUCKET_NAME}
         s3_signature_version: '4'
-        access_key_id: ${AWS_ACCESS_KEY}
-        secret_access_key: ${AWS_SECRET_KEY}
+        credentials_source: env_or_profile
 
       director:
         address: 127.0.0.1
@@ -188,12 +189,12 @@ jobs:
         - 0.north-america.pool.ntp.org
         - 1.north-america.pool.ntp.org
 
-      aws: &aws-config
+      aws:
         default_key_name: ${PUBLIC_KEY_NAME}
         default_security_groups: ["${SECURITY_GROUP}"]
         region: "${AWS_REGION_NAME}"
-        access_key_id: ${AWS_ACCESS_KEY}
-        secret_access_key: ${AWS_SECRET_KEY}
+        credentials_source: 'env_or_profile'
+        default_iam_instance_profile: ${IAM_INSTANCE_PROFILE}
 
 cloud_provider:
   template: {name: aws_cpi, release: bosh-aws-cpi}
@@ -207,7 +208,12 @@ cloud_provider:
   mbus: "https://mbus:mbus-password@${DIRECTOR_EIP}:6868"
 
   properties:
-    aws: *aws-config
+    aws:
+      access_key_id: ${AWS_ACCESS_KEY}
+      secret_access_key: ${AWS_SECRET_KEY}
+      default_key_name: ${PUBLIC_KEY_NAME}
+      default_security_groups: ["${SECURITY_GROUP}"]
+      region: "${AWS_REGION_NAME}"
 
     # Tells CPI how agent should listen for requests
     agent: {mbus: "https://mbus:mbus-password@0.0.0.0:6868"}

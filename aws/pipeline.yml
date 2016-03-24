@@ -91,10 +91,9 @@ jobs:
         - {get: bosh-init,       trigger: false}
 
       - <<: *prepare-director
-        config:
-          params:
-            AWS_STACK_NAME:   {{AWS_E2E_STACK_NAME}}
-            USE_IAM:          true
+        file: pipelines/aws/tasks/prepare-director-iam.yml
+        params:
+          AWS_STACK_NAME:   {{AWS_E2E_STACK_NAME}}
 
       - do:
           - <<: *deploy-director
@@ -106,9 +105,8 @@ jobs:
 
         ensure:
           <<: *teardown
-          config:
-            params:
-              DEPLOYMENT_NAME: e2e-test
+          params:
+            DEPLOYMENT_NAME: e2e-test
 
   - name: end2end-cn
     plan:
@@ -121,13 +119,12 @@ jobs:
         - {get: bosh-init,       trigger: false}
 
       - <<: *prepare-director
-        config:
-          params:
-            AWS_STACK_NAME:   {{AWS_E2E_STACK_NAME}}
-            AWS_ACCESS_KEY:   {{AWS_ACCESS_KEY__CN}}
-            AWS_SECRET_KEY:   {{AWS_SECRET_KEY__CN}}
-            AWS_REGION_NAME:  cn-north-1
-            USE_IAM:          true
+        file: pipelines/aws/tasks/prepare-director-iam.yml
+        params:
+          AWS_STACK_NAME:   {{AWS_E2E_STACK_NAME}}
+          AWS_ACCESS_KEY:   {{AWS_ACCESS_KEY__CN}}
+          AWS_SECRET_KEY:   {{AWS_SECRET_KEY__CN}}
+          AWS_REGION_NAME:  cn-north-1
 
       - do:
           - <<: *deploy-director
@@ -141,9 +138,8 @@ jobs:
 
         ensure:
           <<: *teardown
-          config:
-            params:
-              DEPLOYMENT_NAME: e2e-test
+          params:
+            DEPLOYMENT_NAME: e2e-test
 
   - name: bats-centos
     plan:

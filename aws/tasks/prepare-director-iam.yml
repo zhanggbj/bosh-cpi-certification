@@ -12,7 +12,7 @@ outputs:
   - name: director-config
 
 run:
-  path: pipelines/aws/tasks/prepare-director.sh
+  path: pipelines/aws/tasks/prepare-director-iam.sh
 
 params:
   BOSH_RELEASE_GLOB:      ""
