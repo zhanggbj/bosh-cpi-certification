@@ -31,24 +31,11 @@
         "DirectorPrivate": "10.0.0.6",
         "Gateway": "10.0.0.1",
         "DNS": "10.0.0.2",
-        "ReservedRange": "10.0.1.2-10.0.1.9",
-        "StaticRange": "10.0.1.10-10.0.1.30",
-        "Static1": "10.0.1.29",
-        "Static2": "10.0.1.30"
+        "ReservedRange": "10.0.0.2-10.0.0.9",
+        "StaticRange": "10.0.0.10-10.0.0.30",
+        "Static1": "10.0.0.29",
+        "Static2": "10.0.0.30"
       }
-    },
-    "NatRegionMap" : {
-      "us-east-1"      : { "AMI" : "ami-311a1a5b" },
-      "us-west-2"      : { "AMI" : "ami-7a2bc21a" },
-      "us-west-1"      : { "AMI" : "ami-0d087a6d" },
-      "eu-west-1"      : { "AMI" : "ami-d03288a3" },
-      "eu-central-1"   : { "AMI" : "ami-42db3c2d" },
-      "ap-southeast-1" : { "AMI" : "ami-920cc7f1" },
-      "ap-northeast-2" : { "AMI" : "ami-0199506f" },
-      "ap-northeast-1" : { "AMI" : "ami-bb010ad5" },
-      "ap-southeast-2" : { "AMI" : "ami-162c0c75" },
-      "sa-east-1"      : { "AMI" : "ami-22169b4e" },
-      "cn-north-1"     : { "AMI" : "ami-53ed263e" }
     },
     "Region2Principal": {
       "us-east-1": { "EC2Principal": "ec2.amazonaws.com" },
