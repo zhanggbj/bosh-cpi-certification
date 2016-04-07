@@ -86,6 +86,11 @@ resource_pools:
     cloud_properties:
       <<: *default_cloud_properties
       elbs: [${ELB_NAME}]
+  - <<: *default_resource_pool
+    name: spot_instance_pool
+    cloud_properties:
+      <<: *default_cloud_properties
+      spot_bid_price: 0.10 # 10x the normal bid price
 
 networks:
   - name: private
@@ -117,6 +122,14 @@ jobs:
     networks:
       - name: private
         default: [dns, gateway]
+  - name: spot-instance-test
+    template: spot-instance-test
+    lifecycle: errand
+    instances: 1
+    resource_pool: spot_instance_pool
+    networks:
+      - name: private
+        default: [dns, gateway]
 
 properties:
   iam_instance_profile: ${IAM_INSTANCE_PROFILE}
@@ -132,3 +145,5 @@ time bosh -n run errand iam-instance-profile-test
 time bosh -n run errand raw-ephemeral-disk-test
 
 time bosh -n run errand elb-registration-test
+
+time bosh -n run errand spot-instance-test
