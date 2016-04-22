@@ -331,7 +331,8 @@ resources:
     type: git
     source:
       uri: https://github.com/cloudfoundry/bosh-acceptance-tests.git
-      branch: master
+      # TODO: change this back to master after bats promotion
+      branch: aws-missing-az # master
 
   - name: ubuntu-stemcell
     type: s3
