@@ -85,6 +85,7 @@ properties:
     name: ${STEMCELL_NAME}
     version: latest
   instances: 1
+  availability_zone: ${AVAILABILITY_ZONE}
   key_name:  ${PUBLIC_KEY_NAME}
   networks:
     - name: default
