@@ -17,6 +17,11 @@ ln -sf ${stemcell_dir} ${input_dir}
 ln -sf ${bosh_dir} ${input_dir}
 ln -sf ${cpi_dir} ${input_dir}
 
+if [ ! -e "${input_dir}/director-state.json" ]; then
+  echo "director-state.json does not exist, skipping..."
+  exit 0
+fi
+
 cp -r ${input_dir}/.bosh_init $HOME/
 bosh_init=$(realpath bosh-init/bosh-init-*)
 chmod +x $bosh_init
