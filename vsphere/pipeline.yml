@@ -140,6 +140,7 @@ jobs:
           CPI_RELEASE_SHA1:  f2bd2e21542cd147d360e89d064a728a89c3790f
           STEMCELL_URI:      https://bosh.io/d/stemcells/bosh-vsphere-esxi-ubuntu-trusty-go_agent?v=3143
           STEMCELL_SHA1:     222a546ccccd971a418d82aa6d3799c010164e9f
+          USE_REDIS:         true
 
       - do:
           - <<: *deploy-director

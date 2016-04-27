@@ -28,6 +28,7 @@ chruby 2.1.7
 : ${BOSH_RELEASE_SHA1:=""}
 : ${CPI_RELEASE_SHA1:=""}
 : ${STEMCELL_SHA1:=""}
+: ${USE_REDIS:=false}
 
 # outputs
 output_dir="$(realpath director-config)"
@@ -41,6 +42,11 @@ echo Using environment: \'${env_name}\'
 : ${BOSH_VSPHERE_VCENTER_CIDR:=$(    env_attr "${network1}" "vCenterCIDR" )}
 : ${BOSH_VSPHERE_VCENTER_GATEWAY:=$( env_attr "${network1}" "vCenterGateway" )}
 : ${BOSH_VSPHERE_DNS:=$(             env_attr "${metadata}" "DNS" )}
+
+redis_job=""
+if [ "${USE_REDIS}" == true ]; then
+  redis_job="- {name: redis, release: bosh}"
+fi
 
 # env file generation
 cat > "${output_dir}/director.env" <<EOF
@@ -99,6 +105,7 @@ jobs:
       - {name: health_monitor, release: bosh}
       - {name: powerdns, release: bosh}
       - {name: vsphere_cpi, release: bosh-vsphere-cpi}
+      ${redis_job}
 
     resource_pool: vms
     persistent_disk_pool: disks
@@ -118,6 +125,12 @@ jobs:
         password: postgres-password
         database: bosh
         adapter: postgres
+
+      # required for some upgrade paths
+      redis:
+        listen_addresss: 127.0.0.1
+        address: 127.0.0.1
+        password: redis-password
 
       blobstore:
         address: ${DIRECTOR_IP}
