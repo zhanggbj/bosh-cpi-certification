@@ -146,4 +146,9 @@ time bosh -n run errand raw-ephemeral-disk-test
 
 time bosh -n run errand elb-registration-test
 
-time bosh -n run errand spot-instance-test
+# spot instances do not work in China
+if [ "${AWS_REGION_NAME}" != "cn-north-1" ]; then
+  time bosh -n run errand spot-instance-test
+else
+  echo "Skipping spot instance tests for ${AWS_REGION_NAME}..."
+fi
