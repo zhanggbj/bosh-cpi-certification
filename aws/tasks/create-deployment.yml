@@ -1,0 +1,20 @@
+---
+platform: linux
+image: docker:///boshcpi/cpi-certification
+
+inputs:
+  - name: pipelines
+  - name: stemcell
+  - name: deployment-manifest
+
+run:
+  path: pipelines/aws/tasks/create-deployment.sh
+
+params:
+  AWS_ACCESS_KEY:         ""
+  AWS_SECRET_KEY:         ""
+  AWS_REGION_NAME:        ""
+  AWS_STACK_NAME:         ""
+  BOSH_DIRECTOR_PASSWORD: ""
+  BOSH_DIRECTOR_USERNAME: ""
+  RELEASE_NAME:           ""

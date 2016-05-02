@@ -15,14 +15,18 @@ run:
   path: pipelines/aws/tasks/prepare-director.sh
 
 params:
-  BOSH_RELEASE_GLOB:      ""
-  CPI_RELEASE_GLOB:       ""
-  STEMCELL_GLOB:          ""
-  BOSH_DIRECTOR_USERNAME: ""
-  BOSH_DIRECTOR_PASSWORD: ""
   AWS_ACCESS_KEY:         ""
   AWS_SECRET_KEY:         ""
   AWS_REGION_NAME:        ""
   AWS_STACK_NAME:         ""
+  BOSH_RELEASE_URI:       ""
+  BOSH_RELEASE_SHA1:      ""
+  CPI_RELEASE_URI:        ""
+  CPI_RELEASE_SHA1:       ""
+  STEMCELL_URI:           ""
+  STEMCELL_SHA1:          ""
+  BOSH_DIRECTOR_USERNAME: ""
+  BOSH_DIRECTOR_PASSWORD: ""
   PUBLIC_KEY_NAME:        ""
   PRIVATE_KEY_DATA:       ""
+  USE_REDIS:              ""

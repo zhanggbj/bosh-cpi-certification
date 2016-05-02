@@ -3,9 +3,9 @@
 set -e
 
 # environment
-: ${BOSH_RELEASE_GLOB:?}
-: ${CPI_RELEASE_GLOB:?}
-: ${STEMCELL_GLOB:?}
+: ${BOSH_RELEASE_URI:?}
+: ${CPI_RELEASE_URI:?}
+: ${STEMCELL_URI:?}
 : ${BOSH_DIRECTOR_USERNAME:?}
 : ${BOSH_DIRECTOR_PASSWORD:?}
 : ${AWS_ACCESS_KEY:?}
@@ -15,10 +15,11 @@ set -e
 : ${PUBLIC_KEY_NAME:?}
 : ${PRIVATE_KEY_DATA:?}
 
-# inputs
-BOSH_RELEASE_URI="file://$(echo ${BOSH_RELEASE_GLOB})"
-CPI_RELEASE_URI="file://$(echo ${CPI_RELEASE_GLOB})"
-STEMCELL_URI="file://$(echo ${STEMCELL_GLOB})"
+# SHA1 is required for releases fetched from URL, not required for local files
+: ${BOSH_RELEASE_SHA1:=""}
+: ${CPI_RELEASE_SHA1:=""}
+: ${STEMCELL_SHA1:=""}
+: ${USE_REDIS:=false}
 
 # outputs
 output_dir="$(realpath director-config)"
@@ -47,6 +48,11 @@ export AWS_DEFAULT_REGION=${AWS_REGION_NAME}
 shared_key="shared.pem"
 echo "${PRIVATE_KEY_DATA}" > "${output_dir}/${shared_key}"
 
+redis_job=""
+if [ "${USE_REDIS}" == true ]; then
+  redis_job="- {name: redis, release: bosh}"
+fi
+
 # env file generation
 cat > "${output_dir}/director.env" <<EOF
 #!/usr/bin/env bash
@@ -56,24 +62,25 @@ export BOSH_DIRECTOR_USERNAME=${BOSH_DIRECTOR_USERNAME}
 export BOSH_DIRECTOR_PASSWORD=${BOSH_DIRECTOR_PASSWORD}
 EOF
 
-manifest_filename="${output_dir}/director.yml"
-
 # manifest generation
-cat > "${manifest_filename}" <<EOF
+cat > "${output_dir}/director.yml" <<EOF
 ---
-name: bats-director
+name: certification-director
 
 releases:
   - name: bosh
     url: ${BOSH_RELEASE_URI}
+    sha1: ${BOSH_RELEASE_SHA1}
   - name: bosh-aws-cpi
     url: ${CPI_RELEASE_URI}
+    sha1: ${CPI_RELEASE_SHA1}
 
 resource_pools:
   - name: default
     network: private
     stemcell:
       url: ${STEMCELL_URI}
+      sha1: ${STEMCELL_SHA1}
     cloud_properties:
       instance_type: m3.medium
       availability_zone: ${AVAILABILITY_ZONE}
@@ -110,6 +117,7 @@ jobs:
       - {name: powerdns, release: bosh}
       - {name: registry, release: bosh}
       - {name: aws_cpi, release: bosh-aws-cpi}
+      ${redis_job}
 
     resource_pool: default
     persistent_disk_pool: default
