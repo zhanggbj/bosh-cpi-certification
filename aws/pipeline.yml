@@ -344,7 +344,7 @@ jobs:
             AWS_SECRET_KEY:  {{AWS_SECRET_KEY}}
             AWS_REGION_NAME: {{AWS_REGION_NAME}}
             AWS_STACK_NAME:  {{AWS_E2E_STACK_NAME}}
-        - task: teardown-e2e-infrastructure
+        - task: teardown-upgrade-infrastructure
           file: pipelines/aws/tasks/teardown-infrastructure.yml
           params:
             AWS_ACCESS_KEY:  {{AWS_ACCESS_KEY}}
