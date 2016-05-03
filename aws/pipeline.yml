@@ -227,6 +227,10 @@ jobs:
           params:
             BOSH_DIRECTOR_USERNAME:    {{BOSH_DIRECTOR_USERNAME}}
             BOSH_DIRECTOR_PASSWORD:    {{BOSH_DIRECTOR_PASSWORD}}
+            AWS_ACCESS_KEY:            {{AWS_ACCESS_KEY}}
+            AWS_SECRET_KEY:            {{AWS_SECRET_KEY}}
+            AWS_REGION_NAME:           {{AWS_REGION_NAME}}
+            AWS_STACK_NAME:            certify-upgrade
             RELEASE_NAME:              certification
             DEPLOYMENT_NAME:           certification
             STEMCELL_NAME:             bosh-aws-xen-hvm-ubuntu-trusty-go_agent
@@ -236,6 +240,10 @@ jobs:
           params:
             BOSH_DIRECTOR_USERNAME:    {{BOSH_DIRECTOR_USERNAME}}
             BOSH_DIRECTOR_PASSWORD:    {{BOSH_DIRECTOR_PASSWORD}}
+            AWS_ACCESS_KEY:            {{AWS_ACCESS_KEY}}
+            AWS_SECRET_KEY:            {{AWS_SECRET_KEY}}
+            AWS_REGION_NAME:           {{AWS_REGION_NAME}}
+            AWS_STACK_NAME:            certify-upgrade
             RELEASE_NAME:              certification
 
         - <<: *prepare-director
