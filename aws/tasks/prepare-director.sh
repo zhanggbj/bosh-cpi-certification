@@ -3,9 +3,6 @@
 set -e
 
 # environment
-: ${BOSH_RELEASE_URI:?}
-: ${CPI_RELEASE_URI:?}
-: ${STEMCELL_URI:?}
 : ${BOSH_DIRECTOR_USERNAME:?}
 : ${BOSH_DIRECTOR_PASSWORD:?}
 : ${AWS_ACCESS_KEY:?}
