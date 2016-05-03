@@ -21,9 +21,6 @@ jobs:
         file: pipelines/vcloud/tasks/prepare-director.yml
         tags: [vcloud-v5.5]
         params:
-          BOSH_RELEASE_URI:       file://bosh-release/release.tgz
-          CPI_RELEASE_URI:        file://cpi-release/release.tgz
-          STEMCELL_URI:           file://stemcell/stemcell.tgz
           VCLOUD_HOST:            {{VCLOUD_V5_5_HOST}}
           VCLOUD_USER:            {{VCLOUD_V5_5_USER}}
           VCLOUD_PASSWORD:        {{VCLOUD_V5_5_PASSWORD}}

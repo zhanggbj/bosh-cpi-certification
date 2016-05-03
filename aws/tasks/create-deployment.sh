@@ -31,6 +31,6 @@ pushd ${deployment_release}
   time bosh -n upload release #it's a failure of a precondition for the release to have been uploaded
 popd
 
-time bosh -n upload stemcell stemcell/stemcell.tgz  #it's a failure of a precondition for the stemcell to have been uploaded
+time bosh -n upload stemcell stemcell/*.tgz  #it's a failure of a precondition for the stemcell to have been uploaded
 time bosh deployment deployment-manifest/deployment.yml
 time bosh -n deploy

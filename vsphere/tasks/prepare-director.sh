@@ -19,16 +19,13 @@ chruby 2.1.7
 : ${BOSH_VSPHERE_VCENTER_VLAN:?}
 : ${BOSH_DIRECTOR_USERNAME:?}
 : ${BOSH_DIRECTOR_PASSWORD:?}
-: ${BOSH_RELEASE_URI:?}
-: ${CPI_RELEASE_URI:?}
-: ${STEMCELL_URI:?}
-
-# if the X_SHA1 variable is set, use that; else, default to empty
-# SHA1 is required for releases fetched from URL, not required for local files
-: ${BOSH_RELEASE_SHA1:=""}
-: ${CPI_RELEASE_SHA1:=""}
-: ${STEMCELL_SHA1:=""}
 : ${USE_REDIS:=false}
+
+# inputs
+# paths will be resolved in a separate task so use relative paths
+BOSH_RELEASE_URI="file://$(echo bosh-release/*.tgz)"
+CPI_RELEASE_URI="file://$(echo cpi-release/*.tgz)"
+STEMCELL_URI="file://$(echo stemcell/*.tgz)"
 
 # outputs
 output_dir="$(realpath director-config)"
@@ -64,17 +61,14 @@ name: certification-director
 releases:
   - name: bosh
     url: ${BOSH_RELEASE_URI}
-    sha1: ${BOSH_RELEASE_SHA1}
   - name: bosh-vsphere-cpi
     url: ${CPI_RELEASE_URI}
-    sha1: ${CPI_RELEASE_SHA1}
 
 resource_pools:
   - name: vms
     network: private
     stemcell:
       url: ${STEMCELL_URI}
-      sha1: ${STEMCELL_SHA1}
     cloud_properties:
       cpu: 2
       ram: 4_096

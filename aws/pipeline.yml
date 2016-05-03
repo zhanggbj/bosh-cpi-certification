@@ -19,9 +19,6 @@ shared:
     task: prepare-director
     file: pipelines/aws/tasks/prepare-director.yml
     params:
-        BOSH_RELEASE_URI:       file://bosh-release/release.tgz
-        CPI_RELEASE_URI:        file://cpi-release/release.tgz
-        STEMCELL_URI:           file://stemcell/stemcell.tgz
         BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
         BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
         AWS_ACCESS_KEY:         {{AWS_ACCESS_KEY}}
@@ -201,26 +198,31 @@ jobs:
     serial: true
     plan:
       - aggregate:
-        - {get: bosh-release,    trigger: true}
-        - {get: cpi-release,     trigger: true}
-        - {get: stemcell,        trigger: true, resource: ubuntu-stemcell}
-        - {get: pipelines,       trigger: false}
-        - {get: bosh-init,       trigger: false}
-        - {get: centos-stemcell, trigger: false} # pass-through
+        - {get: bosh-release,     trigger: true}
+        - {get: cpi-release,      trigger: true}
+        - {get: stemcell,         trigger: true, resource: ubuntu-stemcell}
+        - {get: pipelines,        trigger: false}
+        - {get: bosh-init,        trigger: false}
+        - {get: centos-stemcell,  trigger: false} # pass-through
+        - {get: old-stemcell,     trigger: false}
+        - {get: old-bosh-release, trigger: false}
+        - {get: old-cpi-release,  trigger: false}
 
       - <<: *prepare-director
+        input_mapping:
+          stemcell:     old-stemcell
+          bosh-release: old-bosh-release
+          cpi-release:  old-cpi-release
         params:
           AWS_STACK_NAME:    certify-upgrade
-          BOSH_RELEASE_URI:  https://bosh.cloudfoundry.org/d/github.com/cloudfoundry/bosh?v=229
-          BOSH_RELEASE_SHA1: caad7d5353a76f81550868c54c6e0b441b378864
-          CPI_RELEASE_URI:   https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-aws-cpi-release?v=36
-          CPI_RELEASE_SHA1:  db2a6c6cdd5ff9f77bf083e10118fa72e1f5e181
-          STEMCELL_URI:      https://bosh.io/d/stemcells/bosh-aws-xen-hvm-ubuntu-trusty-go_agent?v=3143
-          STEMCELL_SHA1:     55340cfea16f30c1d1756e4f1cfae20efba02853
           USE_REDIS:         true
 
       - do:
         - <<: *deploy-director
+          input_mapping:
+            stemcell:     old-stemcell
+            bosh-release: old-bosh-release
+            cpi-release:  old-cpi-release
 
         - task: prepare-deployment
           file: pipelines/aws/tasks/prepare-deployment.yml
@@ -237,6 +239,8 @@ jobs:
 
         - task: create-deployment
           file: pipelines/aws/tasks/create-deployment.yml
+          input_mapping:
+            stemcell:                  old-stemcell
           params:
             BOSH_DIRECTOR_USERNAME:    {{BOSH_DIRECTOR_USERNAME}}
             BOSH_DIRECTOR_PASSWORD:    {{BOSH_DIRECTOR_PASSWORD}}
@@ -440,4 +444,26 @@ resources:
       secret_access_key: {{certification__bucket_secret_key}}
       bucket: {{certification__bucket}}
       regexp: .*-receipt\.json
+      region_name: us-east-1
+
+  # upgrade resources
+  - name: old-bosh-release
+    type: s3
+    source:
+      bucket: bosh-cpi-certification-fixtures
+      regexp: bosh-(229).tgz
+      region_name: us-east-1
+
+  - name: old-cpi-release
+    type: s3
+    source:
+      bucket: bosh-cpi-certification-fixtures
+      regexp: bosh-aws-cpi-release-(36).tgz
+      region_name: us-east-1
+
+  - name: old-stemcell
+    type: s3
+    source:
+      bucket: bosh-cpi-certification-fixtures
+      regexp: light-bosh-stemcell-(3143)-aws-xen-hvm-ubuntu-trusty-go_agent.tgz
       region_name: us-east-1
