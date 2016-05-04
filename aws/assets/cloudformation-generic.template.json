@@ -243,7 +243,9 @@
                   "ec2:CreateSnapshot",
                   "ec2:CreateTags",
                   "ec2:RunInstances",
-                  "ec2:TerminateInstances"
+                  "ec2:TerminateInstances",
+                  "ec2:RequestSpotInstances",
+                  "ec2:CancelSpotInstanceRequests"
                 ],
                 "Effect": "Allow",
                 "Resource": "*"
