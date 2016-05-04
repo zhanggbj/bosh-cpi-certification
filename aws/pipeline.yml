@@ -81,6 +81,7 @@ jobs:
         - {get: bosh-release,    trigger: true}
         - {get: cpi-release,     trigger: true}
         - {get: stemcell,        trigger: true, resource: ubuntu-stemcell}
+        - {get: after-midnight,  trigger: true}
         - {get: centos-stemcell, trigger: false} # pass-thru to certification jobs
         - {get: pipelines,       trigger: false}
         - {get: bosh-init,       trigger: false}
@@ -110,6 +111,7 @@ jobs:
         - {get: bosh-release,    trigger: true}
         - {get: cpi-release,     trigger: true}
         - {get: stemcell,        trigger: true, resource: ubuntu-stemcell}
+        - {get: after-midnight,  trigger: true}
         - {get: centos-stemcell, trigger: false} # pass-thru to certification jobs
         - {get: pipelines,       trigger: false}
         - {get: bosh-init,       trigger: false}
@@ -143,12 +145,13 @@ jobs:
     serial: true
     plan:
       - aggregate:
-        - {get: bosh-release, trigger: true}
-        - {get: cpi-release,  trigger: true}
-        - {get: stemcell,     trigger: true, resource: centos-stemcell}
-        - {get: pipelines,    trigger: false}
-        - {get: bosh-init,    trigger: false}
-        - {get: bats,         trigger: false}
+        - {get: bosh-release,   trigger: true}
+        - {get: cpi-release,    trigger: true}
+        - {get: stemcell,       trigger: true, resource: centos-stemcell}
+        - {get: after-midnight, trigger: true}
+        - {get: pipelines,      trigger: false}
+        - {get: bosh-init,      trigger: false}
+        - {get: bats,           trigger: false}
 
       - <<: *prepare-director
         params:
@@ -171,12 +174,13 @@ jobs:
     serial: true
     plan:
       - aggregate:
-        - {get: bosh-release, trigger: true}
-        - {get: cpi-release,  trigger: true}
-        - {get: stemcell,     trigger: true, resource: ubuntu-stemcell}
-        - {get: pipelines,    trigger: false}
-        - {get: bosh-init,    trigger: false}
-        - {get: bats,         trigger: false}
+        - {get: bosh-release,   trigger: true}
+        - {get: cpi-release,    trigger: true}
+        - {get: stemcell,       trigger: true, resource: ubuntu-stemcell}
+        - {get: after-midnight, trigger: true}
+        - {get: pipelines,      trigger: false}
+        - {get: bosh-init,      trigger: false}
+        - {get: bats,           trigger: false}
 
       - <<: *prepare-director
         params:
@@ -201,6 +205,7 @@ jobs:
         - {get: bosh-release,     trigger: true}
         - {get: cpi-release,      trigger: true}
         - {get: stemcell,         trigger: true, resource: ubuntu-stemcell}
+        - {get: after-midnight,   trigger: true}
         - {get: pipelines,        trigger: false}
         - {get: bosh-init,        trigger: false}
         - {get: centos-stemcell,  trigger: false} # pass-through
@@ -393,6 +398,12 @@ jobs:
             AWS_REGION_NAME: cn-north-1
 
 resources:
+  - name: after-midnight
+    type: time
+    source:
+      start: 12:00 AM -0700
+      stop: 2:00 AM -0700
+
   - name: pipelines
     type: git
     source:

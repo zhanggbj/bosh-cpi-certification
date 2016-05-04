@@ -13,6 +13,7 @@ jobs:
         - {get: cpi-release,      tags: [vcloud-v5.5], trigger: true}
         - {get: bosh-release,     tags: [vcloud-v5.5], trigger: true}
         - {get: stemcell,         tags: [vcloud-v5.5], trigger: true}
+        - {get: after-midnight,   tags: [vcloud-v5.5], trigger: true}
         - {get: pipelines,        tags: [vcloud-v5.5], trigger: false}
         - {get: bats,             tags: [vcloud-v5.5], trigger: false}
         - {get: bosh-init,        tags: [vcloud-v5.5], trigger: false}
@@ -85,6 +86,12 @@ jobs:
       - {put: receipt, tags: [vcloud-v5.5], params: {file: certification/*-receipt.json}}
 
 resources:
+  - name: after-midnight
+    type: time
+    source:
+      start: 12:00 AM -0700
+      stop: 2:00 AM -0700
+
   - name: pipelines
     type: git
     source:

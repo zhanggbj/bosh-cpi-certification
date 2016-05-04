@@ -60,12 +60,13 @@ jobs:
     serial: true
     plan:
       - aggregate:
-        - {get: bosh-release, tags: [vsphere-v5.1], trigger: true}
-        - {get: cpi-release,  tags: [vsphere-v5.1], trigger: true}
-        - {get: stemcell,     tags: [vsphere-v5.1], trigger: true, resource: centos-stemcell}
-        - {get: pipelines,    tags: [vsphere-v5.1], trigger: false}
-        - {get: bosh-init,    tags: [vsphere-v5.1], trigger: false}
-        - {get: bats,         tags: [vsphere-v5.1], trigger: false}
+        - {get: bosh-release,   tags: [vsphere-v5.1], trigger: true}
+        - {get: cpi-release,    tags: [vsphere-v5.1], trigger: true}
+        - {get: stemcell,       tags: [vsphere-v5.1], trigger: true, resource: centos-stemcell}
+        - {get: after-midnight, tags: [vsphere-v5.1], trigger: true}
+        - {get: pipelines,      tags: [vsphere-v5.1], trigger: false}
+        - {get: bosh-init,      tags: [vsphere-v5.1], trigger: false}
+        - {get: bats,           tags: [vsphere-v5.1], trigger: false}
 
       - {put: environment, tags: [vsphere-v5.1], params: {acquire: true}}
 
@@ -90,12 +91,13 @@ jobs:
     serial: true
     plan:
       - aggregate:
-        - {get: bosh-release, tags: [vsphere-v5.1], trigger: true}
-        - {get: cpi-release,  tags: [vsphere-v5.1], trigger: true}
-        - {get: stemcell,     tags: [vsphere-v5.1], trigger: true, resource: ubuntu-stemcell}
-        - {get: pipelines,    tags: [vsphere-v5.1], trigger: false}
-        - {get: bosh-init,    tags: [vsphere-v5.1], trigger: false}
-        - {get: bats,         tags: [vsphere-v5.1], trigger: false}
+        - {get: bosh-release,   tags: [vsphere-v5.1], trigger: true}
+        - {get: cpi-release,    tags: [vsphere-v5.1], trigger: true}
+        - {get: stemcell,       tags: [vsphere-v5.1], trigger: true, resource: ubuntu-stemcell}
+        - {get: after-midnight, tags: [vsphere-v5.1], trigger: true}
+        - {get: pipelines,      tags: [vsphere-v5.1], trigger: false}
+        - {get: bosh-init,      tags: [vsphere-v5.1], trigger: false}
+        - {get: bats,           tags: [vsphere-v5.1], trigger: false}
 
       - {put: environment, tags: [vsphere-v5.1], params: {acquire: true}}
 
@@ -123,6 +125,7 @@ jobs:
         - {get: bosh-release,     tags: [vsphere-v5.1], trigger: true}
         - {get: cpi-release,      tags: [vsphere-v5.1], trigger: true}
         - {get: stemcell,         tags: [vsphere-v5.1], trigger: true, resource: ubuntu-stemcell}
+        - {get: after-midnight,   tags: [vsphere-v5.1], trigger: true}
         - {get: pipelines,        tags: [vsphere-v5.1], trigger: false}
         - {get: bosh-init,        tags: [vsphere-v5.1], trigger: false}
         - {get: centos-stemcell,  tags: [vsphere-v5.1], trigger: false} # pass-through
@@ -220,6 +223,12 @@ jobs:
       - {put: receipt, tags: [vsphere-v5.1], params: {file: certification/*-receipt.json}}
 
 resources:
+  - name: after-midnight
+    type: time
+    source:
+      start: 12:00 AM -0700
+      stop: 2:00 AM -0700
+
   - name: pipelines
     type: git
     source:
