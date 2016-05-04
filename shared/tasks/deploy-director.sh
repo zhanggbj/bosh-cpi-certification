@@ -13,12 +13,14 @@ cpi_dir=$(realpath cpi-release/)
 
 # outputs
 output_dir=$(realpath director-state/)
-cp ./director-config/* ${output_dir}
+cp ${input_dir}/* ${output_dir}
 
 # deployment manifest references releases and stemcells relative to itself...make it true
-ln -s ${stemcell_dir} ${output_dir}
-ln -s ${bosh_dir} ${output_dir}
-ln -s ${cpi_dir} ${output_dir}
+# these resources are also used in the teardown step
+mkdir -p ${output_dir}/{stemcell,bosh-release,cpi-release}
+cp ${stemcell_dir}/*.tgz ${output_dir}/stemcell/
+cp ${bosh_dir}/*.tgz ${output_dir}/bosh-release/
+cp ${cpi_dir}/*.tgz ${output_dir}/cpi-release/
 
 function finish {
   echo "Final state of director deployment:"
@@ -27,7 +29,6 @@ function finish {
   echo "=========================================="
 
   cp -r $HOME/.bosh_init ${output_dir}
-  rm ${output_dir}/{stemcell,bosh-release,cpi-release}
 }
 trap finish EXIT
 

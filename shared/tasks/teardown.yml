@@ -6,9 +6,6 @@ inputs:
   - name: pipelines
   - name: director-state
   - name: bosh-init
-  - name: bosh-release
-  - name: cpi-release
-  - name: stemcell
 
 params:
   BOSH_INIT_LOG_LEVEL:    info

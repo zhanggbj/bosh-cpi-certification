@@ -8,14 +8,6 @@ chruby 2.1.7
 
 # inputs
 input_dir=$(realpath director-state/)
-stemcell_dir=$(realpath stemcell/)
-bosh_dir=$(realpath bosh-release/)
-cpi_dir=$(realpath cpi-release/)
-
-# deployment manifest references releases and stemcells relative to itself...make it true
-ln -sf ${stemcell_dir} ${input_dir}
-ln -sf ${bosh_dir} ${input_dir}
-ln -sf ${cpi_dir} ${input_dir}
 
 if [ ! -e "${input_dir}/director-state.json" ]; then
   echo "director-state.json does not exist, skipping..."
