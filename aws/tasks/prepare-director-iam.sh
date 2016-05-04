@@ -3,9 +3,6 @@
 set -e
 
 # environment
-: ${BOSH_RELEASE_GLOB:?}
-: ${CPI_RELEASE_GLOB:?}
-: ${STEMCELL_GLOB:?}
 : ${BOSH_DIRECTOR_USERNAME:?}
 : ${BOSH_DIRECTOR_PASSWORD:?}
 : ${AWS_ACCESS_KEY:?}
@@ -16,9 +13,9 @@ set -e
 : ${PRIVATE_KEY_DATA:?}
 
 # inputs
-BOSH_RELEASE_URI="file://$(echo ${BOSH_RELEASE_GLOB})"
-CPI_RELEASE_URI="file://$(echo ${CPI_RELEASE_GLOB})"
-STEMCELL_URI="file://$(echo ${STEMCELL_GLOB})"
+BOSH_RELEASE_URI="file://$(echo bosh-release/*.tgz)"
+CPI_RELEASE_URI="file://$(echo cpi-release/*.tgz)"
+STEMCELL_URI="file://$(echo stemcell/*.tgz)"
 
 # outputs
 output_dir="$(realpath director-config)"

@@ -252,6 +252,9 @@ jobs:
 
         - <<: *prepare-director
           output_mapping: { director-config: new-director-config }
+          params:
+            AWS_STACK_NAME:    certify-upgrade
+            USE_REDIS:         false
 
         - task: test-upgrade
           file: pipelines/shared/tasks/test-upgrade.yml
