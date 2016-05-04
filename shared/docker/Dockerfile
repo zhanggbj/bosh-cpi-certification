@@ -6,9 +6,15 @@ ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 
 RUN apt-get update; apt-get -y upgrade; apt-get clean
-RUN apt-get install -y git curl wget tar make; apt-get clean
+RUN apt-get install -y git curl wget tar make unzip; apt-get clean
 RUN apt-get install -y realpath; apt-get clean
-RUN apt-get install -y python python-pip jq; apt-get clean; pip install awscli;
+RUN apt-get install -y python3 jq; apt-get clean;
+
+# aws CLI
+RUN curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && \
+    unzip awscli-bundle.zip && \
+    python3 ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws && \
+    rm -rf ./awscli-bundle awscli-bundle.zip
 
 # chruby
 RUN mkdir /tmp/chruby && \

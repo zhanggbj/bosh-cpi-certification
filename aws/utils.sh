@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -o pipefail
+
 stack_data() {
   echo "$(aws cloudformation describe-stacks)" | \
   jq --arg stack_name ${AWS_STACK_NAME} '.Stacks[] | select(.StackName=="\($stack_name)")'
