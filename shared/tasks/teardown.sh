@@ -14,7 +14,10 @@ if [ ! -e "${input_dir}/director-state.json" ]; then
   exit 0
 fi
 
-cp -r ${input_dir}/.bosh_init $HOME/
+if [ -d "${input_dir}/.bosh_init" ]; then
+  # reuse compiled packages
+  cp -r ${input_dir}/.bosh_init $HOME/
+fi
 bosh_init=$(realpath bosh-init/bosh-init-*)
 chmod +x $bosh_init
 

@@ -22,8 +22,8 @@ source ${existing_director_config}/director.env
 : ${BOSH_DIRECTOR_USERNAME:?}
 : ${BOSH_DIRECTOR_PASSWORD:?}
 
-cp ${existing_director_config}/* ${output_dir}
-cp ${existing_director_state}/* ${output_dir}
+cp -r ${existing_director_config}/* ${output_dir}
+cp -r ${existing_director_state}/* ${output_dir}
 
 # deployment manifest references releases and stemcells relative to itself...make it true
 # these resources are also used in the teardown step
