@@ -169,7 +169,6 @@ jobs:
               RELEASE_NAME:              certification
 
           - <<: *prepare-director
-            output_mapping: { director-config: new-director-config }
 
           - task: test-upgrade
             tags: [vsphere-v5.1]

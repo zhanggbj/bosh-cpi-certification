@@ -251,7 +251,6 @@ jobs:
             RELEASE_NAME:              certification
 
         - <<: *prepare-director
-          output_mapping: { director-config: new-director-config }
           params:
             AWS_STACK_NAME:    certify-upgrade
             USE_REDIS:         false

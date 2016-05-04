@@ -4,7 +4,7 @@ image: docker:///boshcpi/cpi-certification
 
 inputs:
   - name: pipelines
-  - name: new-director-config
+  - name: director-config
   - name: director-state
   - name: bosh-init
   - name: bosh-release
