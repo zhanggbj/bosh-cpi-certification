@@ -9,10 +9,8 @@ groups:
       - test-upgrade
       - certify-centos
       - certify-ubuntu
-      - prepare-infrastructure-us
-      - teardown-infrastructure-us
-      - prepare-infrastructure-cn
-      - teardown-infrastructure-cn
+      - recreate-infrastructure-us
+      - recreate-infrastructure-cn
 
 shared:
   - &prepare-director
@@ -303,99 +301,52 @@ jobs:
 
       - {put: receipt, params: {file: certification/*-receipt.json}}
 
-  - name: prepare-infrastructure-us
+  - name: recreate-infrastructure-us
     serial: true
     plan:
       - {get: pipelines, trigger: false}
       - aggregate:
         - task: prepare-ubuntu-manual-bats-infrastructure
-          file: pipelines/aws/tasks/prepare-infrastructure.yml
+          file: pipelines/aws/tasks/recreate-infrastructure.yml
           params:
             AWS_STACK_NAME:     ubuntu-manual-bats
             AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
             AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
             AWS_REGION_NAME:    {{AWS_REGION_NAME}}
         - task: prepare-centos-manual-bats-infrastructure
-          file: pipelines/aws/tasks/prepare-infrastructure.yml
+          file: pipelines/aws/tasks/recreate-infrastructure.yml
           params:
             AWS_STACK_NAME:     centos-manual-bats
             AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
             AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
             AWS_REGION_NAME:    {{AWS_REGION_NAME}}
         - task: prepare-e2e-infrastructure
-          file: pipelines/aws/tasks/prepare-infrastructure.yml
+          file: pipelines/aws/tasks/recreate-infrastructure.yml
           params:
             AWS_STACK_NAME:     {{AWS_E2E_STACK_NAME}}
             AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
             AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
             AWS_REGION_NAME:    {{AWS_REGION_NAME}}
         - task: prepare-upgrade-infrastructure
-          file: pipelines/aws/tasks/prepare-infrastructure.yml
+          file: pipelines/aws/tasks/recreate-infrastructure.yml
           params:
             AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
             AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
             AWS_REGION_NAME:    {{AWS_REGION_NAME}}
             AWS_STACK_NAME:     certify-upgrade
 
-  - name: teardown-infrastructure-us
-    serial: true
-    plan:
-      - {get: pipelines, trigger: false}
-      - aggregate:
-        - task: teardown-ubuntu-manual-bats-infrastructure
-          file: pipelines/aws/tasks/teardown-infrastructure.yml
-          params:
-            AWS_ACCESS_KEY:  {{AWS_ACCESS_KEY}}
-            AWS_SECRET_KEY:  {{AWS_SECRET_KEY}}
-            AWS_REGION_NAME: {{AWS_REGION_NAME}}
-            AWS_STACK_NAME:  ubuntu-manual-bats
-        - task: teardown-centos-manual-bats-infrastructure
-          file: pipelines/aws/tasks/teardown-infrastructure.yml
-          params:
-            AWS_ACCESS_KEY:  {{AWS_ACCESS_KEY}}
-            AWS_SECRET_KEY:  {{AWS_SECRET_KEY}}
-            AWS_REGION_NAME: {{AWS_REGION_NAME}}
-            AWS_STACK_NAME:  centos-manual-bats
-        - task: teardown-e2e-infrastructure
-          file: pipelines/aws/tasks/teardown-infrastructure.yml
-          params:
-            AWS_ACCESS_KEY:  {{AWS_ACCESS_KEY}}
-            AWS_SECRET_KEY:  {{AWS_SECRET_KEY}}
-            AWS_REGION_NAME: {{AWS_REGION_NAME}}
-            AWS_STACK_NAME:  {{AWS_E2E_STACK_NAME}}
-        - task: teardown-upgrade-infrastructure
-          file: pipelines/aws/tasks/teardown-infrastructure.yml
-          params:
-            AWS_ACCESS_KEY:  {{AWS_ACCESS_KEY}}
-            AWS_SECRET_KEY:  {{AWS_SECRET_KEY}}
-            AWS_REGION_NAME: {{AWS_REGION_NAME}}
-            AWS_STACK_NAME:  certify-upgrade
-
-  - name: prepare-infrastructure-cn
+  - name: recreate-infrastructure-cn
     serial: true
     plan:
       - {get: pipelines, trigger: false}
       - aggregate:
         - task: prepare-e2e-infrastructure
-          file: pipelines/aws/tasks/prepare-infrastructure.yml
+          file: pipelines/aws/tasks/recreate-infrastructure.yml
           params:
             AWS_STACK_NAME:     {{AWS_E2E_STACK_NAME}}
             AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY__CN}}
             AWS_SECRET_KEY:     {{AWS_SECRET_KEY__CN}}
             AWS_REGION_NAME:    cn-north-1
-
-  - name: teardown-infrastructure-cn
-    serial: true
-    plan:
-      - {get: pipelines, trigger: false}
-      - aggregate:
-        - task: teardown-e2e-infrastructure
-          file: pipelines/aws/tasks/teardown-infrastructure.yml
-          params:
-            AWS_STACK_NAME:  {{AWS_E2E_STACK_NAME}}
-            AWS_ACCESS_KEY:  {{AWS_ACCESS_KEY__CN}}
-            AWS_SECRET_KEY:  {{AWS_SECRET_KEY__CN}}
-            AWS_REGION_NAME: cn-north-1
 
 resources:
   - name: after-midnight

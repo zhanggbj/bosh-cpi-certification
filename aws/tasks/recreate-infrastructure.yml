@@ -6,7 +6,7 @@ inputs:
   - name: pipelines
 
 run:
-  path: pipelines/aws/tasks/teardown-infrastructure.sh
+  path: pipelines/aws/tasks/recreate-infrastructure.sh
 
 params:
   AWS_ACCESS_KEY:  ""
