@@ -8,7 +8,11 @@ ENV LC_ALL en_US.UTF-8
 RUN apt-get update; apt-get -y upgrade; apt-get clean
 RUN apt-get install -y git curl wget tar make unzip; apt-get clean
 RUN apt-get install -y realpath; apt-get clean
-RUN apt-get install -y python3 jq; apt-get clean;
+RUN apt-get install -y python3; apt-get clean;
+
+# jq
+RUN curl -L -o "/usr/local/bin/jq" "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64" && \
+    chmod +x "/usr/local/bin/jq"
 
 # aws CLI
 RUN curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && \
