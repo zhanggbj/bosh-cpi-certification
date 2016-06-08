@@ -38,7 +38,7 @@ export BAT_DNS_HOST=${BATS_DIRECTOR_IP}
 export BAT_INFRASTRUCTURE=vcloud
 export BAT_NETWORKING=manual
 export BAT_VCAP_PASSWORD=${BAT_VCAP_PASSWORD}
-export BAT_RSPEC_FLAGS="--tag ~vip_networking --tag ~dynamic_networking --tag ~root_partition --tag ~raw_ephemeral_storage"
+export BAT_RSPEC_FLAGS="--tag ~vip_networking --tag ~dynamic_networking --tag ~root_partition --tag ~raw_ephemeral_storage --tag ~multiple_manual_networks"
 export BAT_DIRECTOR_USER="${BOSH_DIRECTOR_USERNAME}"
 export BAT_DIRECTOR_PASSWORD="${BOSH_DIRECTOR_PASSWORD}"
 EOF
