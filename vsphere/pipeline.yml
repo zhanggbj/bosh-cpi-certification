@@ -13,7 +13,7 @@ shared:
     task: prepare-director
     tags: [vsphere-v5.1]
     file: pipelines/vsphere/tasks/prepare-director.yml
-    params:
+    params: &prepare-director-params
       BOSH_DIRECTOR_USERNAME:                 {{BOSH_DIRECTOR_USERNAME}}
       BOSH_DIRECTOR_PASSWORD:                 {{BOSH_DIRECTOR_PASSWORD}}
       BOSH_VSPHERE_VCENTER:                   {{VCENTER_IP}}
@@ -37,11 +37,10 @@ shared:
     task: prepare-bats
     tags: [vsphere-v5.1]
     file: pipelines/vsphere/tasks/prepare-bats.yml
-    params:
+    params: &prepare-bats-params
       BAT_VCAP_PASSWORD:      {{BAT_VCAP_PASSWORD}}
       BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
       BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
-      STEMCELL_NAME:          ""
 
   - &run-bats
     task: run-bats
@@ -77,6 +76,7 @@ jobs:
 
           - <<: *prepare-bats
             params:
+              <<: *prepare-bats-params
               STEMCELL_NAME: bosh-vsphere-esxi-centos-7-go_agent
 
           - <<: *run-bats
@@ -108,6 +108,7 @@ jobs:
 
           - <<: *prepare-bats
             params:
+              <<: *prepare-bats-params
               STEMCELL_NAME: bosh-vsphere-esxi-ubuntu-trusty-go_agent
 
           - <<: *run-bats
@@ -141,6 +142,7 @@ jobs:
           bosh-release: old-bosh-release
           cpi-release:  old-cpi-release
         params:
+          <<: *prepare-director-params
           USE_REDIS:         true
 
       - do:
