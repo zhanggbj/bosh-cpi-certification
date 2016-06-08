@@ -16,27 +16,27 @@ shared:
   - &prepare-director
     task: prepare-director
     file: pipelines/aws/tasks/prepare-director.yml
-    params:
-        BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
-        BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
-        AWS_ACCESS_KEY:         {{AWS_ACCESS_KEY}}
-        AWS_SECRET_KEY:         {{AWS_SECRET_KEY}}
-        AWS_REGION_NAME:        {{AWS_REGION_NAME}}
-        PUBLIC_KEY_NAME:        {{PUBLIC_KEY_NAME}}
-        PRIVATE_KEY_DATA:       {{PRIVATE_KEY_DATA}}
-        AWS_STACK_NAME:         ""
+    params: &prepare-director-params
+      BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
+      BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
+      AWS_ACCESS_KEY:         {{AWS_ACCESS_KEY}}
+      AWS_SECRET_KEY:         {{AWS_SECRET_KEY}}
+      AWS_REGION_NAME:        {{AWS_REGION_NAME}}
+      PUBLIC_KEY_NAME:        {{PUBLIC_KEY_NAME}}
+      PRIVATE_KEY_DATA:       {{PRIVATE_KEY_DATA}}
+      AWS_STACK_NAME:         ""
 
   - &deploy-director
     task: deploy-director
     file: pipelines/shared/tasks/deploy-director.yml
-    params:
+    params: &deploy-director-params
       BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
       BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
 
   - &prepare-manual-bats
     task: prepare-manual-bats
     file: pipelines/aws/tasks/prepare-manual-bats.yml
-    params:
+    params: &prepare-manual-bats-params
       AWS_ACCESS_KEY:         {{AWS_ACCESS_KEY}}
       AWS_SECRET_KEY:         {{AWS_SECRET_KEY}}
       AWS_REGION_NAME:        {{AWS_REGION_NAME}}
@@ -54,7 +54,7 @@ shared:
   - &run-e2e
     task: run-e2e
     file: pipelines/aws/tasks/run-e2e.yml
-    params:
+    params: &run-e2e-params
       AWS_ACCESS_KEY:         {{AWS_ACCESS_KEY}}
       AWS_SECRET_KEY:         {{AWS_SECRET_KEY}}
       AWS_REGION_NAME:        {{AWS_REGION_NAME}}
@@ -66,7 +66,7 @@ shared:
   - &teardown
     task: teardown
     file: pipelines/shared/tasks/teardown.yml
-    params:
+    params: &teardown-params
       BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
       BOSH_DIRECTOR_PASSWORD: {{BOSH_DIRECTOR_PASSWORD}}
       DEPLOYMENT_NAME:        certification
@@ -87,6 +87,7 @@ jobs:
       - <<: *prepare-director
         file: pipelines/aws/tasks/prepare-director-iam.yml
         params:
+          <<: *prepare-director-params
           AWS_STACK_NAME:   {{AWS_E2E_STACK_NAME}}
 
       - do:
@@ -94,12 +95,14 @@ jobs:
 
           - <<: *run-e2e
             params:
+              <<: *run-e2e-params
               STEMCELL_NAME:    *ubuntu-stemcell
               AWS_STACK_NAME:   {{AWS_E2E_STACK_NAME}}
 
         ensure:
           <<: *teardown
           params:
+            <<: *teardown-params
             DEPLOYMENT_NAME: e2e-test
 
   - name: end2end-cn
@@ -117,6 +120,7 @@ jobs:
       - <<: *prepare-director
         file: pipelines/aws/tasks/prepare-director-iam.yml
         params:
+          <<: *prepare-director-params
           AWS_STACK_NAME:   {{AWS_E2E_STACK_NAME}}
           AWS_ACCESS_KEY:   {{AWS_ACCESS_KEY__CN}}
           AWS_SECRET_KEY:   {{AWS_SECRET_KEY__CN}}
@@ -124,11 +128,10 @@ jobs:
 
       - do:
           - <<: *deploy-director
-            params:
-              BOSH_INIT_LOG_LEVEL: debug
 
           - <<: *run-e2e
             params:
+              <<: *run-e2e-params
               AWS_ACCESS_KEY:   {{AWS_ACCESS_KEY__CN}}
               AWS_SECRET_KEY:   {{AWS_SECRET_KEY__CN}}
               AWS_REGION_NAME:  cn-north-1
@@ -137,6 +140,7 @@ jobs:
         ensure:
           <<: *teardown
           params:
+            <<: *teardown-params
             DEPLOYMENT_NAME: e2e-test
 
   - name: bats-centos
@@ -153,6 +157,7 @@ jobs:
 
       - <<: *prepare-director
         params:
+          <<: *prepare-director-params
           AWS_STACK_NAME: centos-manual-bats
 
       - do:
@@ -160,6 +165,7 @@ jobs:
 
           - <<: *prepare-manual-bats
             params:
+              <<: *prepare-manual-bats-params
               STEMCELL_NAME:  *centos-stemcell
               AWS_STACK_NAME: centos-manual-bats
 
@@ -182,6 +188,7 @@ jobs:
 
       - <<: *prepare-director
         params:
+          <<: *prepare-director-params
           AWS_STACK_NAME: ubuntu-manual-bats
 
       - do:
@@ -189,6 +196,7 @@ jobs:
 
           - <<: *prepare-manual-bats
             params:
+              <<: *prepare-manual-bats-params
               STEMCELL_NAME:  *ubuntu-stemcell
               AWS_STACK_NAME: ubuntu-manual-bats
 
@@ -217,6 +225,7 @@ jobs:
           bosh-release: old-bosh-release
           cpi-release:  old-cpi-release
         params:
+          <<: *prepare-director-params
           AWS_STACK_NAME:    certify-upgrade
           USE_REDIS:         true
 
@@ -255,6 +264,7 @@ jobs:
 
         - <<: *prepare-director
           params:
+            <<: *prepare-director-params
             AWS_STACK_NAME:    certify-upgrade
             USE_REDIS:         false
 
@@ -375,8 +385,7 @@ resources:
     type: git
     source:
       uri: https://github.com/cloudfoundry/bosh-acceptance-tests.git
-      # TODO: change this back to master after bats promotion #118516887
-      branch: aws-missing-az # master
+      branch: master
 
   - name: ubuntu-stemcell
     type: s3
