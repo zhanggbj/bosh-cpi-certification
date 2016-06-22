@@ -416,7 +416,7 @@ resources:
       access_key_id: {{certification__bucket_access_key}}
       secret_access_key: {{certification__bucket_secret_key}}
       bucket: {{certification__bucket}}
-      regexp: .*-receipt\.json
+      regexp: .*-(\d+)-receipt\.json
       region_name: us-east-1
 
   # upgrade resources
