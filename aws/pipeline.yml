@@ -82,13 +82,13 @@ jobs:
     serial: true
     plan:
       - aggregate:
-        - {get: bosh-release,    trigger: true}
-        - {get: cpi-release,     trigger: true}
-        - {get: stemcell,        trigger: true, resource: ubuntu-stemcell}
-        - {get: after-midnight,  trigger: true}
-        - {get: centos-stemcell, trigger: false} # pass-thru to certification jobs
-        - {get: pipelines,       trigger: false}
-        - {get: bosh-init,       trigger: false}
+        - {get: bosh-release,    trigger: true, tags: [ bosh-cpi-1 ]}
+        - {get: cpi-release,     trigger: true, tags: [ bosh-cpi-1 ]}
+        - {get: stemcell,        trigger: true, resource: ubuntu-stemcell, tags: [ bosh-cpi-1 ]}
+        - {get: after-midnight,  trigger: true, tags: [ bosh-cpi-1 ]}
+        - {get: centos-stemcell, trigger: false, tags: [ bosh-cpi-1 ]} # pass-thru to certification jobs
+        - {get: pipelines,       trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: bosh-init,       trigger: false, tags: [ bosh-cpi-1 ]}
 
       - <<: *prepare-director
         file: pipelines/aws/tasks/prepare-director-iam.yml
@@ -115,13 +115,13 @@ jobs:
     serial: true
     plan:
       - aggregate:
-        - {get: bosh-release,    trigger: true}
-        - {get: cpi-release,     trigger: true}
-        - {get: stemcell,        trigger: true, resource: ubuntu-stemcell}
-        - {get: after-midnight,  trigger: true}
-        - {get: centos-stemcell, trigger: false} # pass-thru to certification jobs
-        - {get: pipelines,       trigger: false}
-        - {get: bosh-init,       trigger: false}
+        - {get: bosh-release,    trigger: true, tags: [ bosh-cpi-1 ]}
+        - {get: cpi-release,     trigger: true, tags: [ bosh-cpi-1 ]}
+        - {get: stemcell,        trigger: true, resource: ubuntu-stemcell, tags: [ bosh-cpi-1 ]}
+        - {get: after-midnight,  trigger: true, tags: [ bosh-cpi-1 ]}
+        - {get: centos-stemcell, trigger: false, tags: [ bosh-cpi-1 ]} # pass-thru to certification jobs
+        - {get: pipelines,       trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: bosh-init,       trigger: false, tags: [ bosh-cpi-1 ]}
 
       - <<: *prepare-director
         file: pipelines/aws/tasks/prepare-director-iam.yml
@@ -153,13 +153,13 @@ jobs:
     serial: true
     plan:
       - aggregate:
-        - {get: bosh-release,   trigger: true}
-        - {get: cpi-release,    trigger: true}
-        - {get: stemcell,       trigger: true, resource: centos-stemcell}
-        - {get: after-midnight, trigger: true}
-        - {get: pipelines,      trigger: false}
-        - {get: bosh-init,      trigger: false}
-        - {get: bats,           trigger: false}
+        - {get: bosh-release,   trigger: true, tags: [ bosh-cpi-1 ]}
+        - {get: cpi-release,    trigger: true, tags: [ bosh-cpi-1 ]}
+        - {get: stemcell,       trigger: true, resource: centos-stemcell, tags: [ bosh-cpi-1 ]}
+        - {get: after-midnight, trigger: true, tags: [ bosh-cpi-1 ]}
+        - {get: pipelines,      trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: bosh-init,      trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: bats,           trigger: false, tags: [ bosh-cpi-1 ]}
 
       - <<: *prepare-director
         params:
@@ -184,13 +184,13 @@ jobs:
     serial: true
     plan:
       - aggregate:
-        - {get: bosh-release,   trigger: true}
-        - {get: cpi-release,    trigger: true}
-        - {get: stemcell,       trigger: true, resource: ubuntu-stemcell}
-        - {get: after-midnight, trigger: true}
-        - {get: pipelines,      trigger: false}
-        - {get: bosh-init,      trigger: false}
-        - {get: bats,           trigger: false}
+        - {get: bosh-release,   trigger: true, tags: [ bosh-cpi-1 ]}
+        - {get: cpi-release,    trigger: true, tags: [ bosh-cpi-1 ]}
+        - {get: stemcell,       trigger: true, resource: ubuntu-stemcell, tags: [ bosh-cpi-1 ]}
+        - {get: after-midnight, trigger: true, tags: [ bosh-cpi-1 ]}
+        - {get: pipelines,      trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: bosh-init,      trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: bats,           trigger: false, tags: [ bosh-cpi-1 ]}
 
       - <<: *prepare-director
         params:
@@ -214,16 +214,16 @@ jobs:
     serial: true
     plan:
       - aggregate:
-        - {get: bosh-release,     trigger: true}
-        - {get: cpi-release,      trigger: true}
-        - {get: stemcell,         trigger: true, resource: ubuntu-stemcell}
-        - {get: after-midnight,   trigger: true}
-        - {get: pipelines,        trigger: false}
-        - {get: bosh-init,        trigger: false}
-        - {get: centos-stemcell,  trigger: false} # pass-through
-        - {get: old-stemcell,     trigger: false}
-        - {get: old-bosh-release, trigger: false}
-        - {get: old-cpi-release,  trigger: false}
+        - {get: bosh-release,     trigger: true, tags: [ bosh-cpi-1 ]}
+        - {get: cpi-release,      trigger: true, tags: [ bosh-cpi-1 ]}
+        - {get: stemcell,         trigger: true, resource: ubuntu-stemcell, tags: [ bosh-cpi-1 ]}
+        - {get: after-midnight,   trigger: true, tags: [ bosh-cpi-1 ]}
+        - {get: pipelines,        trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: bosh-init,        trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: centos-stemcell,  trigger: false, tags: [ bosh-cpi-1 ]} # pass-through
+        - {get: old-stemcell,     trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: old-bosh-release, trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: old-cpi-release,  trigger: false, tags: [ bosh-cpi-1 ]}
 
       - <<: *prepare-director
         input_mapping:
@@ -292,8 +292,8 @@ jobs:
       - aggregate:
         - {get: bosh-release, trigger: true, passed: [bats-centos, end2end-us]}
         - {get: cpi-release,  trigger: true, passed: [bats-centos, end2end-us]}
-        - {get: stemcell,     trigger: true, passed: [bats-centos, end2end-us, test-upgrade], resource: centos-stemcell}
-        - {get: pipelines,    trigger: false}
+        - {get: stemcell,     trigger: true, passed: [bats-centos, end2end-us, test-upgrade], resource: centos-stemcell, tags: [ bosh-cpi-1 ]}
+        - {get: pipelines,    trigger: false, tags: [ bosh-cpi-1 ]}
 
       - task: generate
         tags: [ bosh-cpi-1 ]
@@ -310,8 +310,8 @@ jobs:
       - aggregate:
         - {get: bosh-release, trigger: true, passed: [bats-ubuntu, end2end-us]}
         - {get: cpi-release,  trigger: true, passed: [bats-ubuntu, end2end-us]}
-        - {get: stemcell,     trigger: true, passed: [bats-ubuntu, end2end-us, test-upgrade], resource: ubuntu-stemcell}
-        - {get: pipelines,    trigger: false}
+        - {get: stemcell,     trigger: true, passed: [bats-ubuntu, end2end-us, test-upgrade], resource: ubuntu-stemcell, tags: [ bosh-cpi-1 ]}
+        - {get: pipelines,    trigger: false, tags: [ bosh-cpi-1 ]}
 
       - task: generate
         tags: [ bosh-cpi-1 ]
@@ -325,7 +325,7 @@ jobs:
   - name: recreate-infrastructure-us
     serial: true
     plan:
-      - {get: pipelines, trigger: false}
+      - {get: pipelines, trigger: false, tags: [ bosh-cpi-1 ]}
       - aggregate:
         - task: prepare-ubuntu-manual-bats-infrastructure
           tags: [ bosh-cpi-1 ]
@@ -363,7 +363,7 @@ jobs:
   - name: recreate-infrastructure-cn
     serial: true
     plan:
-      - {get: pipelines, trigger: false}
+      - {get: pipelines, trigger: false, tags: [ bosh-cpi-1 ]}
       - aggregate:
         - task: prepare-e2e-infrastructure
           tags: [ bosh-cpi-1 ]
