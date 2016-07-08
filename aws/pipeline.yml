@@ -88,7 +88,7 @@ jobs:
         - {get: after-midnight,  trigger: true, tags: [ bosh-cpi-1 ]}
         - {get: centos-stemcell, trigger: false, tags: [ bosh-cpi-1 ]} # pass-thru to certification jobs
         - {get: pipelines,       trigger: false, tags: [ bosh-cpi-1 ]}
-        - {get: bosh-init,       trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: bosh-init,       resource: bosh-init-tmp, trigger: false, tags: [ bosh-cpi-1 ]}
 
       - <<: *prepare-director
         file: pipelines/aws/tasks/prepare-director-iam.yml
@@ -121,7 +121,7 @@ jobs:
         - {get: after-midnight,  trigger: true, tags: [ bosh-cpi-1 ]}
         - {get: centos-stemcell, trigger: false, tags: [ bosh-cpi-1 ]} # pass-thru to certification jobs
         - {get: pipelines,       trigger: false, tags: [ bosh-cpi-1 ]}
-        - {get: bosh-init,       trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: bosh-init,       resource: bosh-init-tmp, trigger: false, tags: [ bosh-cpi-1 ]}
 
       - <<: *prepare-director
         file: pipelines/aws/tasks/prepare-director-iam.yml
@@ -158,7 +158,7 @@ jobs:
         - {get: stemcell,       trigger: true, resource: centos-stemcell, tags: [ bosh-cpi-1 ]}
         - {get: after-midnight, trigger: true, tags: [ bosh-cpi-1 ]}
         - {get: pipelines,      trigger: false, tags: [ bosh-cpi-1 ]}
-        - {get: bosh-init,      trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: bosh-init,      resource: bosh-init-tmp, trigger: false, tags: [ bosh-cpi-1 ]}
         - {get: bats,           trigger: false, tags: [ bosh-cpi-1 ]}
 
       - <<: *prepare-director
@@ -189,7 +189,7 @@ jobs:
         - {get: stemcell,       trigger: true, resource: ubuntu-stemcell, tags: [ bosh-cpi-1 ]}
         - {get: after-midnight, trigger: true, tags: [ bosh-cpi-1 ]}
         - {get: pipelines,      trigger: false, tags: [ bosh-cpi-1 ]}
-        - {get: bosh-init,      trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: bosh-init,      resource: bosh-init-tmp, trigger: false, tags: [ bosh-cpi-1 ]}
         - {get: bats,           trigger: false, tags: [ bosh-cpi-1 ]}
 
       - <<: *prepare-director
@@ -219,7 +219,7 @@ jobs:
         - {get: stemcell,         trigger: true, resource: ubuntu-stemcell, tags: [ bosh-cpi-1 ]}
         - {get: after-midnight,   trigger: true, tags: [ bosh-cpi-1 ]}
         - {get: pipelines,        trigger: false, tags: [ bosh-cpi-1 ]}
-        - {get: bosh-init,        trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: bosh-init,        resource: bosh-init-tmp, trigger: false, tags: [ bosh-cpi-1 ]}
         - {get: centos-stemcell,  trigger: false, tags: [ bosh-cpi-1 ]} # pass-through
         - {get: old-stemcell,     trigger: false, tags: [ bosh-cpi-1 ]}
         - {get: old-bosh-release, trigger: false, tags: [ bosh-cpi-1 ]}
@@ -419,11 +419,13 @@ resources:
       bucket: bosh-aws-light-stemcells
       region_name: us-east-1
 
-  - name: bosh-init
+  - name: bosh-init-tmp
     type: s3
     source:
       regexp: bosh-init-([0-9.]+)-linux-amd64
-      bucket: bosh-init-artifacts
+      # TODO: switch back to offical bosh-init binaries once TLS timeout PR is merged #125962671
+      # bucket: bosh-init-artifacts
+      bucket: bosh-init-tmp-fix
       region_name: us-east-1
 
   - name: receipt
