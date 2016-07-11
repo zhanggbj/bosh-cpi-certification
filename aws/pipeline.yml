@@ -15,7 +15,6 @@ groups:
 shared:
   - &prepare-director
     task: prepare-director
-    tags: [ bosh-cpi-1 ]
     file: pipelines/aws/tasks/prepare-director.yml
     params: &prepare-director-params
       BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
@@ -29,7 +28,6 @@ shared:
 
   - &deploy-director
     task: deploy-director
-    tags: [ bosh-cpi-1 ]
     file: pipelines/shared/tasks/deploy-director.yml
     params: &deploy-director-params
       BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
@@ -37,7 +35,6 @@ shared:
 
   - &prepare-manual-bats
     task: prepare-manual-bats
-    tags: [ bosh-cpi-1 ]
     file: pipelines/aws/tasks/prepare-manual-bats.yml
     params: &prepare-manual-bats-params
       AWS_ACCESS_KEY:         {{AWS_ACCESS_KEY}}
@@ -52,12 +49,10 @@ shared:
 
   - &run-bats
     task: run-bats
-    tags: [ bosh-cpi-1 ]
     file: pipelines/shared/tasks/run-bats.yml
 
   - &run-e2e
     task: run-e2e
-    tags: [ bosh-cpi-1 ]
     file: pipelines/aws/tasks/run-e2e.yml
     params: &run-e2e-params
       AWS_ACCESS_KEY:         {{AWS_ACCESS_KEY}}
@@ -70,7 +65,6 @@ shared:
 
   - &teardown
     task: teardown
-    tags: [ bosh-cpi-1 ]
     file: pipelines/shared/tasks/teardown.yml
     params: &teardown-params
       BOSH_DIRECTOR_USERNAME: {{BOSH_DIRECTOR_USERNAME}}
@@ -82,13 +76,13 @@ jobs:
     serial: true
     plan:
       - aggregate:
-        - {get: bosh-release,    trigger: true, tags: [ bosh-cpi-1 ]}
-        - {get: cpi-release,     trigger: true, tags: [ bosh-cpi-1 ]}
-        - {get: stemcell,        trigger: true, resource: ubuntu-stemcell, tags: [ bosh-cpi-1 ]}
-        - {get: after-midnight,  trigger: true, tags: [ bosh-cpi-1 ]}
-        - {get: centos-stemcell, trigger: false, tags: [ bosh-cpi-1 ]} # pass-thru to certification jobs
-        - {get: pipelines,       trigger: false, tags: [ bosh-cpi-1 ]}
-        - {get: bosh-init,       resource: bosh-init-tmp, trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: bosh-release,    trigger: true}
+        - {get: cpi-release,     trigger: true}
+        - {get: stemcell,        trigger: true, resource: ubuntu-stemcell}
+        - {get: after-midnight,  trigger: true}
+        - {get: centos-stemcell, trigger: false} # pass-thru to certification jobs
+        - {get: pipelines,       trigger: false}
+        - {get: bosh-init,       resource: bosh-init-tmp, trigger: false}
 
       - <<: *prepare-director
         file: pipelines/aws/tasks/prepare-director-iam.yml
@@ -115,13 +109,13 @@ jobs:
     serial: true
     plan:
       - aggregate:
-        - {get: bosh-release,    trigger: true, tags: [ bosh-cpi-1 ]}
-        - {get: cpi-release,     trigger: true, tags: [ bosh-cpi-1 ]}
-        - {get: stemcell,        trigger: true, resource: ubuntu-stemcell, tags: [ bosh-cpi-1 ]}
-        - {get: after-midnight,  trigger: true, tags: [ bosh-cpi-1 ]}
-        - {get: centos-stemcell, trigger: false, tags: [ bosh-cpi-1 ]} # pass-thru to certification jobs
-        - {get: pipelines,       trigger: false, tags: [ bosh-cpi-1 ]}
-        - {get: bosh-init,       resource: bosh-init-tmp, trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: bosh-release,    trigger: true}
+        - {get: cpi-release,     trigger: true}
+        - {get: stemcell,        trigger: true, resource: ubuntu-stemcell}
+        - {get: after-midnight,  trigger: true}
+        - {get: centos-stemcell, trigger: false} # pass-thru to certification jobs
+        - {get: pipelines,       trigger: false}
+        - {get: bosh-init,       resource: bosh-init-tmp, trigger: false}
 
       - <<: *prepare-director
         file: pipelines/aws/tasks/prepare-director-iam.yml
@@ -153,13 +147,13 @@ jobs:
     serial: true
     plan:
       - aggregate:
-        - {get: bosh-release,   trigger: true, tags: [ bosh-cpi-1 ]}
-        - {get: cpi-release,    trigger: true, tags: [ bosh-cpi-1 ]}
-        - {get: stemcell,       trigger: true, resource: centos-stemcell, tags: [ bosh-cpi-1 ]}
-        - {get: after-midnight, trigger: true, tags: [ bosh-cpi-1 ]}
-        - {get: pipelines,      trigger: false, tags: [ bosh-cpi-1 ]}
-        - {get: bosh-init,      resource: bosh-init-tmp, trigger: false, tags: [ bosh-cpi-1 ]}
-        - {get: bats,           trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: bosh-release,   trigger: true}
+        - {get: cpi-release,    trigger: true}
+        - {get: stemcell,       trigger: true, resource: centos-stemcell}
+        - {get: after-midnight, trigger: true}
+        - {get: pipelines,      trigger: false}
+        - {get: bosh-init,      resource: bosh-init-tmp, trigger: false}
+        - {get: bats,           trigger: false}
 
       - <<: *prepare-director
         params:
@@ -184,13 +178,13 @@ jobs:
     serial: true
     plan:
       - aggregate:
-        - {get: bosh-release,   trigger: true, tags: [ bosh-cpi-1 ]}
-        - {get: cpi-release,    trigger: true, tags: [ bosh-cpi-1 ]}
-        - {get: stemcell,       trigger: true, resource: ubuntu-stemcell, tags: [ bosh-cpi-1 ]}
-        - {get: after-midnight, trigger: true, tags: [ bosh-cpi-1 ]}
-        - {get: pipelines,      trigger: false, tags: [ bosh-cpi-1 ]}
-        - {get: bosh-init,      resource: bosh-init-tmp, trigger: false, tags: [ bosh-cpi-1 ]}
-        - {get: bats,           trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: bosh-release,   trigger: true}
+        - {get: cpi-release,    trigger: true}
+        - {get: stemcell,       trigger: true, resource: ubuntu-stemcell}
+        - {get: after-midnight, trigger: true}
+        - {get: pipelines,      trigger: false}
+        - {get: bosh-init,      resource: bosh-init-tmp, trigger: false}
+        - {get: bats,           trigger: false}
 
       - <<: *prepare-director
         params:
@@ -214,16 +208,16 @@ jobs:
     serial: true
     plan:
       - aggregate:
-        - {get: bosh-release,     trigger: true, tags: [ bosh-cpi-1 ]}
-        - {get: cpi-release,      trigger: true, tags: [ bosh-cpi-1 ]}
-        - {get: stemcell,         trigger: true, resource: ubuntu-stemcell, tags: [ bosh-cpi-1 ]}
-        - {get: after-midnight,   trigger: true, tags: [ bosh-cpi-1 ]}
-        - {get: pipelines,        trigger: false, tags: [ bosh-cpi-1 ]}
-        - {get: bosh-init,        resource: bosh-init-tmp, trigger: false, tags: [ bosh-cpi-1 ]}
-        - {get: centos-stemcell,  trigger: false, tags: [ bosh-cpi-1 ]} # pass-through
-        - {get: old-stemcell,     trigger: false, tags: [ bosh-cpi-1 ]}
-        - {get: old-bosh-release, trigger: false, tags: [ bosh-cpi-1 ]}
-        - {get: old-cpi-release,  trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: bosh-release,     trigger: true}
+        - {get: cpi-release,      trigger: true}
+        - {get: stemcell,         trigger: true, resource: ubuntu-stemcell}
+        - {get: after-midnight,   trigger: true}
+        - {get: pipelines,        trigger: false}
+        - {get: bosh-init,        resource: bosh-init-tmp, trigger: false}
+        - {get: centos-stemcell,  trigger: false} # pass-through
+        - {get: old-stemcell,     trigger: false}
+        - {get: old-bosh-release, trigger: false}
+        - {get: old-cpi-release,  trigger: false}
 
       - <<: *prepare-director
         input_mapping:
@@ -243,7 +237,6 @@ jobs:
             cpi-release:  old-cpi-release
 
         - task: prepare-deployment
-          tags: [ bosh-cpi-1 ]
           file: pipelines/aws/tasks/prepare-deployment.yml
           params:
             BOSH_DIRECTOR_USERNAME:    {{BOSH_DIRECTOR_USERNAME}}
@@ -257,7 +250,6 @@ jobs:
             STEMCELL_NAME:             bosh-aws-xen-hvm-ubuntu-trusty-go_agent
 
         - task: create-deployment
-          tags: [ bosh-cpi-1 ]
           file: pipelines/aws/tasks/create-deployment.yml
           input_mapping:
             stemcell:                  old-stemcell
@@ -277,7 +269,6 @@ jobs:
             USE_REDIS:         false
 
         - task: test-upgrade
-          tags: [ bosh-cpi-1 ]
           file: pipelines/shared/tasks/test-upgrade.yml
           output_mapping: { new-director-state: director-state }
           params:
@@ -292,11 +283,10 @@ jobs:
       - aggregate:
         - {get: bosh-release, trigger: true, passed: [bats-centos, end2end-us]}
         - {get: cpi-release,  trigger: true, passed: [bats-centos, end2end-us]}
-        - {get: stemcell,     trigger: true, passed: [bats-centos, end2end-us, test-upgrade], resource: centos-stemcell, tags: [ bosh-cpi-1 ]}
-        - {get: pipelines,    trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: stemcell,     trigger: true, passed: [bats-centos, end2end-us, test-upgrade], resource: centos-stemcell}
+        - {get: pipelines,    trigger: false}
 
       - task: generate
-        tags: [ bosh-cpi-1 ]
         file: pipelines/shared/tasks/generate-receipt.yml
         params:
           CPI_RELEASE_NAME: bosh-aws-cpi
@@ -310,11 +300,10 @@ jobs:
       - aggregate:
         - {get: bosh-release, trigger: true, passed: [bats-ubuntu, end2end-us]}
         - {get: cpi-release,  trigger: true, passed: [bats-ubuntu, end2end-us]}
-        - {get: stemcell,     trigger: true, passed: [bats-ubuntu, end2end-us, test-upgrade], resource: ubuntu-stemcell, tags: [ bosh-cpi-1 ]}
-        - {get: pipelines,    trigger: false, tags: [ bosh-cpi-1 ]}
+        - {get: stemcell,     trigger: true, passed: [bats-ubuntu, end2end-us, test-upgrade], resource: ubuntu-stemcell}
+        - {get: pipelines,    trigger: false}
 
       - task: generate
-        tags: [ bosh-cpi-1 ]
         file: pipelines/shared/tasks/generate-receipt.yml
         params:
           CPI_RELEASE_NAME: bosh-aws-cpi
@@ -325,10 +314,9 @@ jobs:
   - name: recreate-infrastructure-us
     serial: true
     plan:
-      - {get: pipelines, trigger: false, tags: [ bosh-cpi-1 ]}
+      - {get: pipelines, trigger: false}
       - aggregate:
         - task: prepare-ubuntu-manual-bats-infrastructure
-          tags: [ bosh-cpi-1 ]
           file: pipelines/aws/tasks/recreate-infrastructure.yml
           params:
             AWS_STACK_NAME:     ubuntu-manual-bats
@@ -336,7 +324,6 @@ jobs:
             AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
             AWS_REGION_NAME:    {{AWS_REGION_NAME}}
         - task: prepare-centos-manual-bats-infrastructure
-          tags: [ bosh-cpi-1 ]
           file: pipelines/aws/tasks/recreate-infrastructure.yml
           params:
             AWS_STACK_NAME:     centos-manual-bats
@@ -344,7 +331,6 @@ jobs:
             AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
             AWS_REGION_NAME:    {{AWS_REGION_NAME}}
         - task: prepare-e2e-infrastructure
-          tags: [ bosh-cpi-1 ]
           file: pipelines/aws/tasks/recreate-infrastructure.yml
           params:
             AWS_STACK_NAME:     {{AWS_E2E_STACK_NAME}}
@@ -352,7 +338,6 @@ jobs:
             AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
             AWS_REGION_NAME:    {{AWS_REGION_NAME}}
         - task: prepare-upgrade-infrastructure
-          tags: [ bosh-cpi-1 ]
           file: pipelines/aws/tasks/recreate-infrastructure.yml
           params:
             AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
@@ -363,10 +348,9 @@ jobs:
   - name: recreate-infrastructure-cn
     serial: true
     plan:
-      - {get: pipelines, trigger: false, tags: [ bosh-cpi-1 ]}
+      - {get: pipelines, trigger: false}
       - aggregate:
         - task: prepare-e2e-infrastructure
-          tags: [ bosh-cpi-1 ]
           file: pipelines/aws/tasks/recreate-infrastructure.yml
           params:
             AWS_STACK_NAME:     {{AWS_E2E_STACK_NAME}}
