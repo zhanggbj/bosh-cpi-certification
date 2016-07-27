@@ -82,7 +82,7 @@ jobs:
         - {get: after-midnight,  trigger: true}
         - {get: centos-stemcell, trigger: false} # pass-thru to certification jobs
         - {get: pipelines,       trigger: false}
-        - {get: bosh-init,       resource: bosh-init-tmp, trigger: false}
+        - {get: bosh-init,       trigger: false}
 
       - <<: *prepare-director
         file: pipelines/aws/tasks/prepare-director-iam.yml
@@ -115,7 +115,7 @@ jobs:
         - {get: after-midnight,  trigger: true}
         - {get: centos-stemcell, trigger: false} # pass-thru to certification jobs
         - {get: pipelines,       trigger: false}
-        - {get: bosh-init,       resource: bosh-init-tmp, trigger: false}
+        - {get: bosh-init,       trigger: false}
 
       - <<: *prepare-director
         file: pipelines/aws/tasks/prepare-director-iam.yml
@@ -152,7 +152,7 @@ jobs:
         - {get: stemcell,       trigger: true, resource: centos-stemcell}
         - {get: after-midnight, trigger: true}
         - {get: pipelines,      trigger: false}
-        - {get: bosh-init,      resource: bosh-init-tmp, trigger: false}
+        - {get: bosh-init,      trigger: false}
         - {get: bats,           trigger: false}
 
       - <<: *prepare-director
@@ -183,7 +183,7 @@ jobs:
         - {get: stemcell,       trigger: true, resource: ubuntu-stemcell}
         - {get: after-midnight, trigger: true}
         - {get: pipelines,      trigger: false}
-        - {get: bosh-init,      resource: bosh-init-tmp, trigger: false}
+        - {get: bosh-init,      trigger: false}
         - {get: bats,           trigger: false}
 
       - <<: *prepare-director
@@ -213,7 +213,7 @@ jobs:
         - {get: stemcell,         trigger: true, resource: ubuntu-stemcell}
         - {get: after-midnight,   trigger: true}
         - {get: pipelines,        trigger: false}
-        - {get: bosh-init,        resource: bosh-init-tmp, trigger: false}
+        - {get: bosh-init,        trigger: false}
         - {get: centos-stemcell,  trigger: false} # pass-through
         - {get: old-stemcell,     trigger: false}
         - {get: old-bosh-release, trigger: false}
@@ -403,13 +403,11 @@ resources:
       bucket: bosh-aws-light-stemcells
       region_name: us-east-1
 
-  - name: bosh-init-tmp
+  - name: bosh-init
     type: s3
     source:
       regexp: bosh-init-([0-9.]+)-linux-amd64
-      # TODO: switch back to offical bosh-init binaries once TLS timeout PR is merged #125962671
-      # bucket: bosh-init-artifacts
-      bucket: bosh-init-tmp-fix
+      bucket: bosh-init-artifacts
       region_name: us-east-1
 
   - name: receipt
