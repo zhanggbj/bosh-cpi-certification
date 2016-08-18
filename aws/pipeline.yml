@@ -109,13 +109,13 @@ jobs:
     serial: true
     plan:
       - aggregate:
-        - {get: bosh-release,    trigger: true, tags: [aws-cn]}
-        - {get: cpi-release,     trigger: true, tags: [aws-cn]}
-        - {get: stemcell,        trigger: true, resource: ubuntu-stemcell, tags: [aws-cn]}
-        - {get: after-midnight,  trigger: true, tags: [aws-cn]}
-        - {get: centos-stemcell, trigger: false, tags: [aws-cn]} # pass-thru to certification jobs
-        - {get: pipelines,       trigger: false, tags: [aws-cn]}
-        - {get: bosh-init,       trigger: false, tags: [aws-cn]}
+        - {get: bosh-release,    trigger: true,  attempts: 5, tags: [aws-cn]}
+        - {get: cpi-release,     trigger: true,  attempts: 5, tags: [aws-cn]}
+        - {get: stemcell,        trigger: true,  attempts: 5, resource: ubuntu-stemcell, tags: [aws-cn]}
+        - {get: after-midnight,  trigger: true,  attempts: 5, tags: [aws-cn]}
+        - {get: centos-stemcell, trigger: false, attempts: 5, tags: [aws-cn]} # pass-thru to certification jobs
+        - {get: pipelines,       trigger: false, attempts: 5, tags: [aws-cn]}
+        - {get: bosh-init,       trigger: false, attempts: 5, tags: [aws-cn]}
 
       - <<: *prepare-director
         tags: [aws-cn]
