@@ -22,7 +22,7 @@ cp ${stemcell_dir}/*.tgz ${output_dir}/stemcell/
 cp ${bosh_dir}/*.tgz ${output_dir}/bosh-release/
 cp ${cpi_dir}/*.tgz ${output_dir}/cpi-release/
 
-logfile=$(mktemp /tmp/bosh-init-log.XXXXXX)
+logfile=$(mktemp /tmp/bosh-cli-log.XXXXXX)
 
 function finish {
   echo "Final state of director deployment:"
@@ -30,28 +30,32 @@ function finish {
   cat "${output_dir}/director-state.json"
   echo "=========================================="
 
-  cp -r $HOME/.bosh_init ${output_dir}
+  cp -r $HOME/.bosh ${output_dir}
   rm -rf $logfile
 }
 trap finish EXIT
 
-bosh_init=$(realpath bosh-init/bosh-init-*)
-chmod +x $bosh_init
+bosh_cli=$(realpath bosh-cli/bosh-cli-*)
+chmod +x $bosh_cli
 
-echo "using bosh-init CLI version..."
-$bosh_init version
+echo "using bosh-cli CLI version..."
+
+# `bosh --version` mistakenly returns 1 https://github.com/cloudfoundry/bosh-init/issues/94
+set +e
+$bosh_cli --version
+set -e
 
 pushd ${output_dir} > /dev/null
   echo "deploying BOSH..."
 
   set +e
-  BOSH_INIT_LOG_PATH=$logfile BOSH_INIT_LOG_LEVEL=DEBUG $bosh_init deploy ./director.yml
-  bosh_init_exit_code="$?"
+  BOSH_INIT_LOG_PATH=$logfile BOSH_INIT_LOG_LEVEL=DEBUG $bosh_cli create-env ./director.yml
+  bosh_cli_exit_code="$?"
   set -e
 
-  if [ ${bosh_init_exit_code} != 0 ]; then
-    echo "bosh-init deploy failed!" >&2
+  if [ ${bosh_cli_exit_code} != 0 ]; then
+    echo "bosh-cli deploy failed!" >&2
     cat $logfile >&2
-    exit ${bosh_init_exit_code}
+    exit ${bosh_cli_exit_code}
   fi
 popd > /dev/null
