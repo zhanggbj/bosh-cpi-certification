@@ -2,14 +2,13 @@
 
 set -e
 
-source /etc/profile.d/chruby.sh
-chruby 2.1.7
-
 # inputs
 input_dir=$(realpath director-config/)
 stemcell_dir=$(realpath stemcell/)
 bosh_dir=$(realpath bosh-release/)
 cpi_dir=$(realpath cpi-release/)
+bosh_cli=$(realpath bosh-cli/bosh-cli-*)
+chmod +x $bosh_cli
 
 # outputs
 output_dir=$(realpath director-state/)
@@ -35,21 +34,11 @@ function finish {
 }
 trap finish EXIT
 
-bosh_cli=$(realpath bosh-cli/bosh-cli-*)
-chmod +x $bosh_cli
-
-echo "using bosh-cli CLI version..."
-
-# `bosh --version` mistakenly returns 1 https://github.com/cloudfoundry/bosh-init/issues/94
-set +e
-$bosh_cli --version
-set -e
-
 pushd ${output_dir} > /dev/null
   echo "deploying BOSH..."
 
   set +e
-  BOSH_INIT_LOG_PATH=$logfile BOSH_INIT_LOG_LEVEL=DEBUG $bosh_cli create-env ./director.yml
+  BOSH_LOG_PATH=$logfile BOSH_LOG_LEVEL=DEBUG $bosh_cli create-env ./director.yml
   bosh_cli_exit_code="$?"
   set -e
 

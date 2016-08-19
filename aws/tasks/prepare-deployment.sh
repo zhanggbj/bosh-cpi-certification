@@ -14,12 +14,14 @@ set -e
 
 source pipelines/shared/utils.sh
 source pipelines/aws/utils.sh
-source /etc/profile.d/chruby.sh
-chruby 2.1.7
 
 export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY}
 export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY}
 export AWS_DEFAULT_REGION=${AWS_REGION_NAME}
+
+# inputs
+bosh_cli=$(realpath bosh-cli/bosh-cli-*)
+chmod +x $bosh_cli
 
 # configuration
 : ${DIRECTOR_IP:=$(          stack_info "DirectorEIP" )}
@@ -29,13 +31,12 @@ export AWS_DEFAULT_REGION=${AWS_REGION_NAME}
 # outputs
 manifest_dir="$(realpath deployment-manifest)"
 
-bosh -n target ${DIRECTOR_IP}
-bosh login "${BOSH_DIRECTOR_USERNAME}" "${BOSH_DIRECTOR_PASSWORD}"
+time $bosh_cli -n env ${DIRECTOR_IP//./-}.sslip.io
+time $bosh_cli -n login --user=${BOSH_DIRECTOR_USERNAME} --password=${BOSH_DIRECTOR_PASSWORD}
 
 cat > "${manifest_dir}/deployment.yml" <<EOF
 ---
 name: ${DEPLOYMENT_NAME}
-director_uuid: $(bosh status --uuid)
 
 releases:
   - name: ${RELEASE_NAME}

@@ -6,6 +6,7 @@ image_resource:
 
 inputs:
   - name: pipelines
+  - name: bats
 
 outputs:
   - name: bats-config

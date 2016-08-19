@@ -17,6 +17,7 @@ bats_spec="${output_dir}/bats-config.yml"
 bats_env="${output_dir}/bats.env"
 
 # inputs
+bats_dir=$(realpath bats)
 metadata=$(cat environment/metadata)
 network1=$(env_attr "${metadata}" "network1")
 network2=$(env_attr "${metadata}" "network2")
@@ -50,10 +51,12 @@ export BAT_DIRECTOR_USER="${BOSH_DIRECTOR_USERNAME}"
 export BAT_DIRECTOR_PASSWORD="${BOSH_DIRECTOR_PASSWORD}"
 EOF
 
-echo "using bosh CLI version..."
-bosh version
-bosh -n target "${director_ip}"
-BOSH_UUID="$(bosh status --uuid)"
+pushd "${bats_dir}" > /dev/null
+  ./write_gemfile
+  bundle install
+  bundle exec bosh -n target "${director_ip}"
+  BOSH_UUID="$(bundle exec bosh status --uuid)"
+popd > /dev/null
 
 cat > "${bats_spec}" <<EOF
 ---

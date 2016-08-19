@@ -5,9 +5,10 @@ image_resource:
   source: {repository: boshcpi/cpi-certification}
 
 inputs:
+  - name: bosh-cli
+  - name: deployment-manifest
   - name: pipelines
   - name: stemcell
-  - name: deployment-manifest
 
 run:
   path: pipelines/aws/tasks/create-deployment.sh

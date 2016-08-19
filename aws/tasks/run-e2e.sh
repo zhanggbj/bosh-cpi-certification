@@ -12,9 +12,6 @@ source pipelines/aws/utils.sh
 : ${AWS_STACK_NAME:?}
 : ${STEMCELL_NAME:?}
 
-source /etc/profile.d/chruby.sh
-chruby 2.1.2
-
 export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY}
 export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY}
 export AWS_DEFAULT_REGION=${AWS_REGION_NAME}
@@ -22,6 +19,8 @@ export AWS_DEFAULT_REGION=${AWS_REGION_NAME}
 # inputs
 stemcell_path="$(realpath stemcell/*.tgz)"
 e2e_release="$(realpath pipelines/aws/assets/e2e-test-release)"
+bosh_cli=$(realpath bosh-cli/bosh-cli-*)
+chmod +x $bosh_cli
 
 : ${SUBNET_ID:=$(            stack_info "PublicSubnetID")}
 : ${AVAILABILITY_ZONE:=$(    stack_info "AvailabilityZone")}
@@ -29,24 +28,22 @@ e2e_release="$(realpath pipelines/aws/assets/e2e-test-release)"
 : ${IAM_INSTANCE_PROFILE:=$( stack_info "IAMInstanceProfile")}
 : ${ELB_NAME:=$(             stack_info "ELB")}
 
-bosh -n target "${DIRECTOR_IP}"
-bosh -n login "${BOSH_DIRECTOR_USERNAME}" "${BOSH_DIRECTOR_PASSWORD}"
-bosh_uuid="$(bosh status --uuid)"
+time $bosh_cli -n env ${DIRECTOR_IP//./-}.sslip.io
+time $bosh_cli -n login --user=${BOSH_DIRECTOR_USERNAME} --password=${BOSH_DIRECTOR_PASSWORD}
 
 e2e_deployment_name=e2e-test
 e2e_release_version=1.0.0
 pushd ${e2e_release}
-  time bosh -n create release --force --name ${e2e_deployment_name} --version ${e2e_release_version}
-  time bosh -n upload release --skip-if-exists
+  time $bosh_cli -n create-release --force --name ${e2e_deployment_name} --version ${e2e_release_version}
+  time $bosh_cli -n upload-release
 popd
 
-time bosh -n upload stemcell "${stemcell_path}" --skip-if-exists
+time $bosh_cli -n upload-stemcell "${stemcell_path}"
 
 e2e_manifest_filename=e2e-manifest.yml
 cat > "${e2e_manifest_filename}" <<EOF
 ---
 name: ${e2e_deployment_name}
-director_uuid: ${bosh_uuid}
 
 releases:
   - name: ${e2e_deployment_name}
@@ -137,18 +134,17 @@ properties:
   aws_region: ${AWS_REGION_NAME}
 EOF
 
-bosh -n deployment "${e2e_manifest_filename}"
-time bosh -n deploy
+time $bosh_cli -n deploy -d deployment "${e2e_manifest_filename}"
 
-time bosh -n run errand iam-instance-profile-test
+time $bosh_cli -n run-errand -d deployment iam-instance-profile-test
 
-time bosh -n run errand raw-ephemeral-disk-test
+time $bosh_cli -n run-errand -d deployment raw-ephemeral-disk-test
 
-time bosh -n run errand elb-registration-test
+time $bosh_cli -n run-errand -d deployment elb-registration-test
 
 # spot instances do not work in China
 if [ "${AWS_REGION_NAME}" != "cn-north-1" ]; then
-  time bosh -n run errand spot-instance-test
+  time $bosh_cli -n run-errand -d deployment spot-instance-test
 else
   echo "Skipping spot instance tests for ${AWS_REGION_NAME}..."
 fi

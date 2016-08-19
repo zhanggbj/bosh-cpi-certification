@@ -30,3 +30,4 @@ params:
   BATS_DIRECTOR_IP:       ""
   BOSH_DIRECTOR_USERNAME: ""
   BOSH_DIRECTOR_PASSWORD: ""
+  SSLIP_IO_KEY:           ""

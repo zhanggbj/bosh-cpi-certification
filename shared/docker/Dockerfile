@@ -39,11 +39,11 @@ RUN mkdir /tmp/ruby-install && \
 # ruby
 RUN ruby-install ruby 2.1.7
 
-# Bundler and BOSH CLI
+# Bundler
 RUN /bin/bash -l -c "                            \
   source /etc/profile.d/chruby.sh ;              \
   chruby 2.1.7 ;                                 \
-  gem install bundler bosh_cli --no-ri --no-rdoc \
+  gem install bundler --no-ri --no-rdoc          \
 "
 
 # certification tool

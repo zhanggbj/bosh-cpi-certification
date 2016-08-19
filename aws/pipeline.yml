@@ -24,6 +24,7 @@ shared:
       AWS_REGION_NAME:        {{AWS_REGION_NAME}}
       PUBLIC_KEY_NAME:        {{PUBLIC_KEY_NAME}}
       PRIVATE_KEY_DATA:       {{PRIVATE_KEY_DATA}}
+      SSLIP_IO_KEY:           {{sslip_io_key}}
       AWS_STACK_NAME:         ""
 
   - &deploy-director
@@ -82,7 +83,7 @@ jobs:
         - {get: after-midnight,  trigger: true}
         - {get: centos-stemcell, trigger: false} # pass-thru to certification jobs
         - {get: pipelines,       trigger: false}
-        - {get: bosh-init,       trigger: false}
+        - {get: bosh-cli,        trigger: false}
 
       - <<: *prepare-director
         file: pipelines/aws/tasks/prepare-director-iam.yml
@@ -115,7 +116,7 @@ jobs:
         - {get: after-midnight,  trigger: true,  attempts: 5, tags: [aws-cn]}
         - {get: centos-stemcell, trigger: false, attempts: 5, tags: [aws-cn]} # pass-thru to certification jobs
         - {get: pipelines,       trigger: false, attempts: 5, tags: [aws-cn]}
-        - {get: bosh-init,       trigger: false, attempts: 5, tags: [aws-cn]}
+        - {get: bosh-cli,        trigger: false, attempts: 5, tags: [aws-cn]}
 
       - <<: *prepare-director
         tags: [aws-cn]
@@ -156,7 +157,7 @@ jobs:
         - {get: stemcell,       trigger: true, resource: centos-stemcell}
         - {get: after-midnight, trigger: true}
         - {get: pipelines,      trigger: false}
-        - {get: bosh-init,      trigger: false}
+        - {get: bosh-cli,       trigger: false}
         - {get: bats,           trigger: false}
 
       - <<: *prepare-director
@@ -187,7 +188,7 @@ jobs:
         - {get: stemcell,       trigger: true, resource: ubuntu-stemcell}
         - {get: after-midnight, trigger: true}
         - {get: pipelines,      trigger: false}
-        - {get: bosh-init,      trigger: false}
+        - {get: bosh-cli,       trigger: false}
         - {get: bats,           trigger: false}
 
       - <<: *prepare-director
@@ -217,7 +218,7 @@ jobs:
         - {get: stemcell,         trigger: true, resource: ubuntu-stemcell}
         - {get: after-midnight,   trigger: true}
         - {get: pipelines,        trigger: false}
-        - {get: bosh-init,        trigger: false}
+        - {get: bosh-cli,         trigger: false}
         - {get: centos-stemcell,  trigger: false} # pass-through
         - {get: old-stemcell,     trigger: false}
         - {get: old-bosh-release, trigger: false}
@@ -407,11 +408,11 @@ resources:
       bucket: bosh-aws-light-stemcells
       region_name: us-east-1
 
-  - name: bosh-init
+  - name: bosh-cli
     type: s3
     source:
-      regexp: bosh-init-([0-9.]+)-linux-amd64
-      bucket: bosh-init-artifacts
+      regexp: bosh-cli-([0-9.]+)-linux-amd64
+      bucket: bosh-cli-artifacts
       region_name: us-east-1
 
   - name: receipt

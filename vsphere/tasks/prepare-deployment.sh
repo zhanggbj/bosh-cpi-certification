@@ -10,8 +10,10 @@ set -e
 : ${DEPLOYMENT_NAME:?}
 
 source pipelines/shared/utils.sh
-source /etc/profile.d/chruby.sh
-chruby 2.1.7
+
+# inputs
+bosh_cli=$(realpath bosh-cli/bosh-cli-*)
+chmod +x $bosh_cli
 
 # outputs
 manifest_dir="$(realpath deployment-manifest)"
@@ -29,13 +31,12 @@ echo Using environment: \'${env_name}\'
 : ${RESERVED_RANGE:=$(               env_attr "${network1}" "reservedRange" )}
 : ${STATIC_RANGE:=$(                 env_attr "${network1}" "staticRange" )}
 
-bosh -n target ${DIRECTOR_IP}
-bosh login "${BOSH_DIRECTOR_USERNAME}" "${BOSH_DIRECTOR_PASSWORD}"
+time $bosh_cli -n env ${DIRECTOR_IP//./-}.sslip.io
+time $bosh_cli -n login --user=${BOSH_DIRECTOR_USERNAME} --password=${BOSH_DIRECTOR_PASSWORD}
 
 cat > "${manifest_dir}/deployment.yml" <<EOF
 ---
 name: ${DEPLOYMENT_NAME}
-director_uuid: $(bosh status --uuid)
 
 releases:
   - name: ${RELEASE_NAME}

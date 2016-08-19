@@ -20,15 +20,20 @@ set -e
 source /etc/profile.d/chruby.sh
 chruby 2.1.7
 
+# inputs
+bats_dir=$(realpath bats)
+
 # outputs
 output_dir=$(realpath bats-config)
 bats_spec="${output_dir}/bats-config.yml"
 bats_env="${output_dir}/bats.env"
 
-echo "using bosh CLI version..."
-bosh version
-bosh -n target $BATS_DIRECTOR_IP
-bosh_uuid="$(bosh status --uuid)"
+pushd "${bats_dir}" > /dev/null
+  ./write_gemfile
+  bundle install
+  bundle exec bosh -n target "${BATS_DIRECTOR_IP}"
+  bosh_uuid="$(bundle exec bosh status --uuid)"
+popd > /dev/null
 
 cat > "${bats_env}" <<EOF
 #!/usr/bin/env bash

@@ -5,6 +5,7 @@ image_resource:
   source: {repository: boshcpi/cpi-certification}
 
 inputs:
+  - name: bosh-cli
   - name: pipelines
 
 outputs:

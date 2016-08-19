@@ -19,6 +19,6 @@ run:
   path: pipelines/shared/tasks/deploy-director.sh
 
 params:
-  BOSH_INIT_LOG_LEVEL:    info
+  BOSH_LOG_LEVEL:         info
   BOSH_DIRECTOR_USERNAME: ""
   BOSH_DIRECTOR_PASSWORD: ""

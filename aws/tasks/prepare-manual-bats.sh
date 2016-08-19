@@ -42,6 +42,7 @@ export AWS_DEFAULT_REGION=${AWS_REGION_NAME}
 
 # inputs
 director_config=$(realpath director-config)
+bats_dir=$(realpath bats)
 
 # outputs
 output_dir=$(realpath bats-config)
@@ -67,10 +68,12 @@ export BAT_DIRECTOR_USER="${BOSH_DIRECTOR_USERNAME}"
 export BAT_DIRECTOR_PASSWORD="${BOSH_DIRECTOR_PASSWORD}"
 EOF
 
-echo "using bosh CLI version..."
-bosh version
-bosh -n target ${DIRECTOR_EIP}
-BOSH_UUID="$(bosh status --uuid)"
+pushd "${bats_dir}" > /dev/null
+  ./write_gemfile
+  bundle install
+  bundle exec bosh -n target "${DIRECTOR_EIP}"
+  BOSH_UUID="$(bundle exec bosh status --uuid)"
+popd > /dev/null
 
 # BATs spec generation
 cat > "${bats_spec}" <<EOF
