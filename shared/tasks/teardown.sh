@@ -3,6 +3,8 @@
 set -e
 
 source pipelines/shared/utils.sh
+source /etc/profile.d/chruby.sh
+chruby 2.1.7
 
 # inputs
 input_dir=$(realpath director-state/)
