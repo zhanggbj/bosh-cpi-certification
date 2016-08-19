@@ -41,13 +41,31 @@ popd
 time $bosh_cli -n upload-stemcell "${stemcell_path}"
 
 e2e_manifest_filename=e2e-manifest.yml
-cat > "${e2e_manifest_filename}" <<EOF
----
-name: ${e2e_deployment_name}
+e2e_cloud_config_filename=e2e-cloud-config.yml
 
-releases:
-  - name: ${e2e_deployment_name}
-    version: latest
+cat > "${e2e_cloud_config_filename}" <<EOF
+networks:
+  - name: private
+    type: dynamic
+    cloud_properties: {subnet: ${SUBNET_ID}}
+
+vm_types:
+  - name: default
+    cloud_properties: &default_cloud_properties
+      instance_type: m3.medium
+      availability_zone: ${AVAILABILITY_ZONE}
+  - name: raw_ephemeral_pool
+    cloud_properties:
+      <<: *default_cloud_properties
+      raw_instance_storage: true
+  - name: elb_registration_pool
+    cloud_properties:
+      <<: *default_cloud_properties
+      elbs: [${ELB_NAME}]
+  - name: spot_instance_pool
+    cloud_properties:
+      <<: *default_cloud_properties
+      spot_bid_price: 0.10 # 10x the normal bid price
 
 compilation:
   reuse_compilation_vms: true
@@ -57,82 +75,85 @@ compilation:
     instance_type: m3.medium
     availability_zone: ${AVAILABILITY_ZONE}
 
+properties:
+  iam_instance_profile: ${IAM_INSTANCE_PROFILE}
+  load_balancer_name: ${ELB_NAME}
+  aws_region: ${AWS_REGION_NAME}
+EOF
+
+
+cat > "${e2e_manifest_filename}" <<EOF
+---
+name: ${e2e_deployment_name}
+
+releases:
+  - name: ${e2e_deployment_name}
+    version: latest
+
 update:
   canaries: 1
   canary_watch_time: 30000-240000
   update_watch_time: 30000-600000
   max_in_flight: 3
 
-resource_pools:
-  - &default_resource_pool
-    name: default
-    stemcell:
-      name: ${STEMCELL_NAME}
-      version: latest
-    network: private
-    cloud_properties: &default_cloud_properties
-      instance_type: m3.medium
-      availability_zone: ${AVAILABILITY_ZONE}
-  - <<: *default_resource_pool
-    name: raw_ephemeral_pool
-    cloud_properties:
-      <<: *default_cloud_properties
-      raw_instance_storage: true
-  - <<: *default_resource_pool
-    name: elb_registration_pool
-    cloud_properties:
-      <<: *default_cloud_properties
-      elbs: [${ELB_NAME}]
-  - <<: *default_resource_pool
-    name: spot_instance_pool
-    cloud_properties:
-      <<: *default_cloud_properties
-      spot_bid_price: 0.10 # 10x the normal bid price
+stemcells:
+  - alias: stemcell
+    name: ${STEMCELL_NAME}
+    version: latest
 
-networks:
-  - name: private
-    type: dynamic
-    cloud_properties: {subnet: ${SUBNET_ID}}
-
-jobs:
+instance_groups:
   - name: iam-instance-profile-test
-    template: iam-instance-profile-test
+    jobs:
+    - name: iam-instance-profile-test
+      release: ${e2e_deployment_name}
+      properties: {}
+    stemcell: stemcell
     lifecycle: errand
     instances: 1
-    resource_pool: default
+    vm_type: default
     networks:
       - name: private
         default: [dns, gateway]
   - name: raw-ephemeral-disk-test
-    template: raw-ephemeral-disk-test
+    jobs:
+      - name: raw-ephemeral-disk-test
+        release: ${e2e_deployment_name}
+        properties: {}
+    stemcell: stemcell
     lifecycle: errand
     instances: 1
-    resource_pool: raw_ephemeral_pool
+    vm_type: raw_ephemeral_pool
     networks:
       - name: private
         default: [dns, gateway]
   - name: elb-registration-test
-    template: elb-registration-test
+    jobs:
+      - name: elb-registration-test
+        release: ${e2e_deployment_name}
+        properties: {}
+    stemcell: stemcell
     lifecycle: errand
     instances: 1
-    resource_pool: elb_registration_pool
+    vm_type: elb_registration_pool
     networks:
       - name: private
         default: [dns, gateway]
   - name: spot-instance-test
-    template: spot-instance-test
+    jobs:
+      - name: spot-instance-test
+        release: ${e2e_deployment_name}
+        properties: {}
+    stemcell: stemcell
     lifecycle: errand
     instances: 1
-    resource_pool: spot_instance_pool
+    vm_type: spot_instance_pool
     networks:
       - name: private
         default: [dns, gateway]
 
-properties:
-  iam_instance_profile: ${IAM_INSTANCE_PROFILE}
-  load_balancer_name: ${ELB_NAME}
-  aws_region: ${AWS_REGION_NAME}
 EOF
+
+time $bosh_cli -n update-cloud-config "${e2e_cloud_config_filename}"
 
 time $bosh_cli -n deploy -d deployment "${e2e_manifest_filename}"
 
