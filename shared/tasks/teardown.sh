@@ -35,7 +35,7 @@ pushd ${input_dir} > /dev/null
     time $bosh_cli -n login --user=${BOSH_DIRECTOR_USERNAME} --password=${BOSH_DIRECTOR_PASSWORD}
 
     if [ -n "${DEPLOYMENT_NAME}" ]; then
-      time $bosh_cli -n delete-deployment ${DEPLOYMENT_NAME} --force
+      time $bosh_cli -n delete-deployment -d ${DEPLOYMENT_NAME} --force
     fi
     time $bosh_cli -n clean-up --all
   set -e
