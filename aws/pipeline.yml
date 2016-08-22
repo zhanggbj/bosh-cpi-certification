@@ -221,8 +221,8 @@ jobs:
         - {get: bosh-cli,         trigger: false}
         - {get: centos-stemcell,  trigger: false} # pass-through
         - {get: old-stemcell,     trigger: false}
-        - {get: old-bosh-release, trigger: false}
-        - {get: old-cpi-release,  trigger: false}
+        - {get: old-bosh-release, trigger: false, version: {version: 232}, resource: bosh-release}
+        - {get: old-cpi-release,  trigger: false, version: {version: 36},  resource: cpi-release}
 
       - <<: *prepare-director
         input_mapping:
@@ -426,23 +426,10 @@ resources:
       region_name: us-east-1
 
   # upgrade resources
-  - name: old-bosh-release
-    type: s3
-    source:
-      bucket: bosh-cpi-certification-fixtures
-      regexp: bosh-(229).tgz
-      region_name: us-east-1
-
-  - name: old-cpi-release
-    type: s3
-    source:
-      bucket: bosh-cpi-certification-fixtures
-      regexp: bosh-aws-cpi-release-(36).tgz
-      region_name: us-east-1
 
   - name: old-stemcell
     type: s3
     source:
       bucket: bosh-cpi-certification-fixtures
-      regexp: light-bosh-stemcell-(3143)-aws-xen-hvm-ubuntu-trusty-go_agent.tgz
+      regexp: light-bosh-stemcell-(3146.11)-aws-xen-hvm-ubuntu-trusty-go_agent.tgz
       region_name: us-east-1
