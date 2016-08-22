@@ -159,17 +159,17 @@ EOF
 
 time $bosh_cli -n update-cloud-config "${e2e_cloud_config_filename}"
 
-time $bosh_cli -n deploy -d deployment "${e2e_manifest_filename}"
+time $bosh_cli -n deploy -d ${e2e_deployment_name} "${e2e_manifest_filename}"
 
-time $bosh_cli -n run-errand -d deployment iam-instance-profile-test
+time $bosh_cli -n run-errand -d ${e2e_deployment_name} iam-instance-profile-test
 
-time $bosh_cli -n run-errand -d deployment raw-ephemeral-disk-test
+time $bosh_cli -n run-errand -d ${e2e_deployment_name} raw-ephemeral-disk-test
 
-time $bosh_cli -n run-errand -d deployment elb-registration-test
+time $bosh_cli -n run-errand -d ${e2e_deployment_name} elb-registration-test
 
 # spot instances do not work in China
 if [ "${AWS_REGION_NAME}" != "cn-north-1" ]; then
-  time $bosh_cli -n run-errand -d deployment spot-instance-test
+  time $bosh_cli -n run-errand -d ${e2e_deployment_name} spot-instance-test
 else
   echo "Skipping spot instance tests for ${AWS_REGION_NAME}..."
 fi
