@@ -33,7 +33,11 @@ time $bosh_cli -n login --user=${BOSH_DIRECTOR_USERNAME} --password=${BOSH_DIREC
 
 e2e_deployment_name=e2e-test
 e2e_release_version=1.0.0
-pushd ${e2e_release}
+
+# TODO: remove `cp` line once this story has been accepted: https://www.pivotaltracker.com/story/show/128789021
+e2e_release_home="$HOME/${e2e_release##*/}"
+cp -r ${e2e_release} ${e2e_release_home}
+pushd ${e2e_release_home}
   time $bosh_cli -n create-release --force --name ${e2e_deployment_name} --version ${e2e_release_version}
   time $bosh_cli -n upload-release
 popd
