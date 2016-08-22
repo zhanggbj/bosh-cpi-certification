@@ -21,3 +21,4 @@ params:
   BOSH_DIRECTOR_PASSWORD: ""
   BOSH_DIRECTOR_USERNAME: ""
   RELEASE_NAME:           ""
+  DEPLOYMENT_NAME:        ""

@@ -173,6 +173,7 @@ jobs:
               BOSH_DIRECTOR_USERNAME:    {{BOSH_DIRECTOR_USERNAME}}
               BOSH_DIRECTOR_PASSWORD:    {{BOSH_DIRECTOR_PASSWORD}}
               RELEASE_NAME:              certification
+              DEPLOYMENT_NAME:           certification
 
           - <<: *prepare-director
 

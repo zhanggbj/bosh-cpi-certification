@@ -8,6 +8,7 @@ source pipelines/aws/utils.sh
 : ${BOSH_DIRECTOR_USERNAME:?}
 : ${BOSH_DIRECTOR_PASSWORD:?}
 : ${RELEASE_NAME:?}
+: ${DEPLOYMENT_NAME:?}
 : ${AWS_ACCESS_KEY:?}
 : ${AWS_SECRET_KEY:?}
 : ${AWS_REGION_NAME:?}
@@ -36,4 +37,4 @@ pushd ${deployment_release}
 popd
 
 time $bosh_cli -n upload-stemcell ${stemcell_dir}/*.tgz
-time $bosh_cli -n deploy -d deployment ${manifest_dir}/deployment.yml
+time $bosh_cli -n deploy -d ${DEPLOYMENT_NAME} ${manifest_dir}/deployment.yml

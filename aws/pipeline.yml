@@ -266,6 +266,7 @@ jobs:
             AWS_REGION_NAME:           {{AWS_REGION_NAME}}
             AWS_STACK_NAME:            certify-upgrade
             RELEASE_NAME:              certification
+            DEPLOYMENT_NAME:           certification
 
         - <<: *prepare-director
           params:

@@ -7,6 +7,7 @@ source pipelines/shared/utils.sh
 : ${BOSH_DIRECTOR_USERNAME:?}
 : ${BOSH_DIRECTOR_PASSWORD:?}
 : ${RELEASE_NAME:?}
+: ${DEPLOYMENT_NAME:?}
 
 # inputs
 env_name=$(cat environment/name)
@@ -30,4 +31,4 @@ pushd ${deployment_release}
 popd
 
 time $bosh_cli -n upload-stemcell ${stemcell_dir}/*.tgz
-time $bosh_cli -n deploy -d deployment ${manifest_dir}/deployment.yml
+time $bosh_cli -n deploy -d ${DEPLOYMENT_NAME} ${manifest_dir}/deployment.yml
