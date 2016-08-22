@@ -78,11 +78,6 @@ compilation:
   cloud_properties:
     instance_type: m3.medium
     availability_zone: ${AVAILABILITY_ZONE}
-
-properties:
-  iam_instance_profile: ${IAM_INSTANCE_PROFILE}
-  load_balancer_name: ${ELB_NAME}
-  aws_region: ${AWS_REGION_NAME}
 EOF
 
 
@@ -155,6 +150,10 @@ instance_groups:
       - name: private
         default: [dns, gateway]
 
+properties:
+  iam_instance_profile: ${IAM_INSTANCE_PROFILE}
+  load_balancer_name: ${ELB_NAME}
+  aws_region: ${AWS_REGION_NAME}
 EOF
 
 time $bosh_cli -n update-cloud-config "${e2e_cloud_config_filename}"
