@@ -105,7 +105,8 @@ instance_groups:
     jobs:
     - name: iam-instance-profile-test
       release: ${e2e_deployment_name}
-      properties: {}
+      properties:
+        iam_instance_profile: ${IAM_INSTANCE_PROFILE}
     stemcell: stemcell
     lifecycle: errand
     instances: 1
@@ -129,7 +130,9 @@ instance_groups:
     jobs:
       - name: elb-registration-test
         release: ${e2e_deployment_name}
-        properties: {}
+        properties:
+          load_balancer_name: ${ELB_NAME}
+          aws_region: ${AWS_REGION_NAME}
     stemcell: stemcell
     lifecycle: errand
     instances: 1
@@ -141,7 +144,8 @@ instance_groups:
     jobs:
       - name: spot-instance-test
         release: ${e2e_deployment_name}
-        properties: {}
+        properties:
+          aws_region: ${AWS_REGION_NAME}
     stemcell: stemcell
     lifecycle: errand
     instances: 1
@@ -149,11 +153,6 @@ instance_groups:
     networks:
       - name: private
         default: [dns, gateway]
-
-properties:
-  iam_instance_profile: ${IAM_INSTANCE_PROFILE}
-  load_balancer_name: ${ELB_NAME}
-  aws_region: ${AWS_REGION_NAME}
 EOF
 
 time $bosh_cli -n update-cloud-config "${e2e_cloud_config_filename}"
