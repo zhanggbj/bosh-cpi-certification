@@ -6,12 +6,12 @@ image_resource:
 
 inputs:
   - name: pipelines
-  - name: director-config
-  - name: director-state
   - name: bosh-release
   - name: cpi-release
   - name: stemcell
   - name: bosh-cli
+  - name: new-director-config
+  - name: old-director-state
 
 outputs:
   - name: new-director-state

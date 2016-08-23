@@ -8,8 +8,8 @@ chruby 2.1.7
 : ${DEPLOYMENT_NAME:?}
 
 # inputs
-existing_director_config=$(realpath director-config/)
-existing_director_state=$(realpath director-state/)
+old_director_state=$(realpath old-director-state/)
+new_director_config=$(realpath new-director-config/)
 stemcell_dir=$(realpath stemcell/)
 bosh_dir=$(realpath bosh-release/)
 cpi_dir=$(realpath cpi-release/)
@@ -19,13 +19,13 @@ chmod +x $bosh_cli
 # outputs
 output_dir=$(realpath new-director-state/)
 
-source ${existing_director_config}/director.env
+source ${new_director_config}/director.env
 : ${BOSH_DIRECTOR_IP:?}
 : ${BOSH_DIRECTOR_USERNAME:?}
 : ${BOSH_DIRECTOR_PASSWORD:?}
 
-cp -r ${existing_director_config}/* ${output_dir}
-cp -r ${existing_director_state}/* ${output_dir}
+cp -r ${new_director_config}/* ${output_dir}
+cp -r ${old_director_state}/*-state.json ${output_dir}
 
 # deployment manifest references releases and stemcells relative to itself...make it true
 # these resources are also used in the teardown step

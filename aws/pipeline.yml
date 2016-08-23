@@ -276,7 +276,11 @@ jobs:
 
         - task: test-upgrade
           file: pipelines/shared/tasks/test-upgrade.yml
-          output_mapping: { new-director-state: director-state }
+          input_mapping:
+            old-director-state: director-state
+            new-director-config: director-config
+          output_mapping:
+            new-director-state: director-state
           params:
             DEPLOYMENT_NAME:        certification
 
