@@ -368,6 +368,14 @@ jobs:
             AWS_SECRET_KEY:     {{AWS_SECRET_KEY__CN}}
             AWS_REGION_NAME:    cn-north-1
 
+# FIXME: revert to `s3` resource when PR has been merged
+# https://www.pivotaltracker.com/story/show/129711651
+resource_types:
+  - name: s3-pr
+    type: docker-image
+    source:
+      repository: ljfranklin/s3-resource-pr
+
 resources:
   - name: after-midnight
     type: time
@@ -398,7 +406,7 @@ resources:
       branch: master
 
   - name: ubuntu-stemcell
-    type: s3
+    type: s3-pr
     source:
       name: &ubuntu-stemcell bosh-aws-xen-hvm-ubuntu-trusty-go_agent
       regexp: light-bosh-stemcell-([0-9.]+)-aws-xen-hvm-ubuntu-trusty-go_agent.tgz
@@ -406,7 +414,7 @@ resources:
       region_name: us-east-1
 
   - name: centos-stemcell
-    type: s3
+    type: s3-pr
     source:
       name: &centos-stemcell bosh-aws-xen-hvm-centos-7-go_agent
       regexp: light-bosh-stemcell-([0-9.]+)-aws-xen-hvm-centos-7-go_agent.tgz
@@ -414,21 +422,22 @@ resources:
       region_name: us-east-1
 
   - name: old-stemcell
-    type: s3
+    type: s3-pr
     source:
       bucket: bosh-cpi-certification-fixtures
       regexp: light-bosh-stemcell-(3213)-aws-xen-hvm-ubuntu-trusty-go_agent.tgz
       region_name: us-east-1
 
   - name: bosh-cli
-    type: s3
+    type: s3-pr
     source:
       regexp: bosh-cli-([0-9.]+)-linux-amd64
+      cloudfront_url: https://dulfnruy35dwq.cloudfront.net
       bucket: bosh-cli-artifacts
       region_name: us-east-1
 
   - name: receipt
-    type: s3
+    type: s3-pr
     source:
       access_key_id: {{certification__bucket_access_key}}
       secret_access_key: {{certification__bucket_secret_key}}
