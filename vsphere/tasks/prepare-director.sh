@@ -12,7 +12,7 @@ source pipelines/shared/utils.sh
 : ${BOSH_VSPHERE_VCENTER_CLUSTER:?}
 : ${BOSH_VSPHERE_VCENTER_VM_FOLDER:?}
 : ${BOSH_VSPHERE_VCENTER_TEMPLATE_FOLDER:?}
-: ${BOSH_VSPHERE_VCENTER_DATASTORE_PATTERN:?}
+: ${BOSH_VSPHERE_VCENTER_DATASTORE:?}
 : ${BOSH_VSPHERE_VCENTER_DISK_PATH:?}
 : ${BOSH_VSPHERE_VCENTER_VLAN:?}
 : ${BOSH_DIRECTOR_USERNAME:?}
@@ -76,6 +76,8 @@ resource_pools:
 disk_pools:
   - name: disks
     disk_size: 20_000
+    cloud_properties:
+      datastores: [${BOSH_VSPHERE_VCENTER_DATASTORE}]
 
 networks:
   - name: private
@@ -263,8 +265,8 @@ jobs:
           - name: ${BOSH_VSPHERE_VCENTER_DC}
             vm_folder: ${BOSH_VSPHERE_VCENTER_VM_FOLDER}
             template_folder: ${BOSH_VSPHERE_VCENTER_TEMPLATE_FOLDER}
-            datastore_pattern: ${BOSH_VSPHERE_VCENTER_DATASTORE_PATTERN}
-            persistent_datastore_pattern: ${BOSH_VSPHERE_VCENTER_DATASTORE_PATTERN}
+            datastore_pattern: ${BOSH_VSPHERE_VCENTER_DATASTORE}
+            persistent_datastore_pattern: ${BOSH_VSPHERE_VCENTER_DATASTORE}
             disk_path: ${BOSH_VSPHERE_VCENTER_DISK_PATH}
             clusters: [${BOSH_VSPHERE_VCENTER_CLUSTER}]
 
