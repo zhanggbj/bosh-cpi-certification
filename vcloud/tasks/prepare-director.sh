@@ -13,8 +13,8 @@ set -e
 : ${NETWORK_CIDR:?}
 : ${NETWORK_GATEWAY:?}
 : ${BATS_DIRECTOR_IP:?}
-: ${BOSH_DIRECTOR_USERNAME:?}
-: ${BOSH_DIRECTOR_PASSWORD:?}
+: ${BOSH_USER:?}
+: ${BOSH_PASSWORD:?}
 : ${SSLIP_IO_KEY:?}
 
 # inputs
@@ -31,8 +31,8 @@ cat > "${output_dir}/director.env" <<EOF
 #!/usr/bin/env bash
 
 export BOSH_DIRECTOR_IP=${BATS_DIRECTOR_IP}
-export BOSH_DIRECTOR_USERNAME=${BOSH_DIRECTOR_USERNAME}
-export BOSH_DIRECTOR_PASSWORD=${BOSH_DIRECTOR_PASSWORD}
+export BOSH_USER=${BOSH_USER}
+export BOSH_PASSWORD=${BOSH_PASSWORD}
 EOF
 
 cat > "${output_dir}/director.yml" <<EOF

@@ -2,8 +2,8 @@
 
 set -e
 
-: ${BOSH_DIRECTOR_PASSWORD:?}
-: ${BOSH_DIRECTOR_USERNAME:?}
+: ${BOSH_PASSWORD:?}
+: ${BOSH_USER:?}
 : ${BOSH_VSPHERE_VCENTER_VLAN:?}
 : ${RELEASE_NAME:?}
 : ${STEMCELL_NAME:?}
@@ -32,7 +32,6 @@ echo Using environment: \'${env_name}\'
 : ${STATIC_RANGE:=$(                 env_attr "${network1}" "staticRange" )}
 
 time $bosh_cli -n env ${DIRECTOR_IP//./-}.sslip.io
-time $bosh_cli -n login --user=${BOSH_DIRECTOR_USERNAME} --password=${BOSH_DIRECTOR_PASSWORD}
 
 cat > "${manifest_dir}/deployment.yml" <<EOF
 ---

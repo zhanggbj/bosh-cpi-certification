@@ -20,5 +20,5 @@ run:
 
 params:
   BOSH_LOG_LEVEL:         info
-  BOSH_DIRECTOR_USERNAME: ""
-  BOSH_DIRECTOR_PASSWORD: ""
+  BOSH_USER: ""
+  BOSH_PASSWORD: ""

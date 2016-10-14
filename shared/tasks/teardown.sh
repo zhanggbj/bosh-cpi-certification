@@ -25,14 +25,13 @@ pushd ${input_dir} > /dev/null
   # configuration
   source director.env
   : ${BOSH_DIRECTOR_IP:?}
-  : ${BOSH_DIRECTOR_USERNAME:?}
-  : ${BOSH_DIRECTOR_PASSWORD:?}
+  : ${BOSH_USER:?}
+  : ${BOSH_PASSWORD:?}
 
   # Don't exit on failure to target the BOSH director
   set +e
     # teardown deployments against BOSH Director
     time $bosh_cli -n env ${BOSH_DIRECTOR_IP//./-}.sslip.io
-    time $bosh_cli -n login --user=${BOSH_DIRECTOR_USERNAME} --password=${BOSH_DIRECTOR_PASSWORD}
 
     if [ -n "${DEPLOYMENT_NAME}" ]; then
       time $bosh_cli -n delete-deployment -d ${DEPLOYMENT_NAME} --force

@@ -5,8 +5,8 @@ set -e -x
 source pipelines/shared/utils.sh
 source pipelines/aws/utils.sh
 
-: ${BOSH_DIRECTOR_USERNAME:?}
-: ${BOSH_DIRECTOR_PASSWORD:?}
+: ${BOSH_USER:?}
+: ${BOSH_PASSWORD:?}
 : ${RELEASE_NAME:?}
 : ${DEPLOYMENT_NAME:?}
 : ${AWS_ACCESS_KEY:?}
@@ -29,7 +29,6 @@ chmod +x $bosh_cli
 : ${DIRECTOR_IP:=$( stack_info "DirectorEIP" )}
 
 time $bosh_cli -n env ${DIRECTOR_IP//./-}.sslip.io
-time $bosh_cli -n login --user=${BOSH_DIRECTOR_USERNAME} --password=${BOSH_DIRECTOR_PASSWORD}
 
 pushd ${deployment_release}
   time $bosh_cli -n create-release --force --name ${RELEASE_NAME}

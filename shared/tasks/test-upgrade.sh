@@ -21,8 +21,8 @@ output_dir=$(realpath new-director-state/)
 
 source ${new_director_config}/director.env
 : ${BOSH_DIRECTOR_IP:?}
-: ${BOSH_DIRECTOR_USERNAME:?}
-: ${BOSH_DIRECTOR_PASSWORD:?}
+: ${BOSH_USER:?}
+: ${BOSH_PASSWORD:?}
 
 cp -r ${new_director_config}/* ${output_dir}
 cp -r ${old_director_state}/*-state.json ${output_dir}
@@ -50,7 +50,6 @@ pushd ${output_dir} > /dev/null
 popd > /dev/null
 
 time $bosh_cli -n env ${BOSH_DIRECTOR_IP//./-}.sslip.io
-time $bosh_cli -n login --user=${BOSH_DIRECTOR_USERNAME} --password=${BOSH_DIRECTOR_PASSWORD}
 
 echo "recreating existing BOSH Deployment..."
 time $bosh_cli -n -d ${DEPLOYMENT_NAME} recreate

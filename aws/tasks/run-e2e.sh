@@ -7,8 +7,8 @@ source pipelines/aws/utils.sh
 : ${AWS_ACCESS_KEY:?}
 : ${AWS_SECRET_KEY:?}
 : ${AWS_REGION_NAME:?}
-: ${BOSH_DIRECTOR_USERNAME:?}
-: ${BOSH_DIRECTOR_PASSWORD:?}
+: ${BOSH_USER:?}
+: ${BOSH_PASSWORD:?}
 : ${AWS_STACK_NAME:?}
 : ${STEMCELL_NAME:?}
 
@@ -29,7 +29,6 @@ chmod +x $bosh_cli
 : ${ELB_NAME:=$(             stack_info "ELB")}
 
 time $bosh_cli -n env ${DIRECTOR_IP//./-}.sslip.io
-time $bosh_cli -n login --user=${BOSH_DIRECTOR_USERNAME} --password=${BOSH_DIRECTOR_PASSWORD}
 
 e2e_deployment_name=e2e-test
 e2e_release_version=1.0.0

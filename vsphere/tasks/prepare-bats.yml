@@ -19,4 +19,4 @@ params:
   STEMCELL_NAME:          ""
   BAT_VCAP_PASSWORD:      ""
   BOSH_DIRECTOR_USER:     ""
-  BOSH_DIRECTOR_PASSWORD: ""
+  BOSH_PASSWORD: ""

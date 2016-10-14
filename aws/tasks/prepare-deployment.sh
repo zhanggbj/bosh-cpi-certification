@@ -2,8 +2,8 @@
 
 set -e
 
-: ${BOSH_DIRECTOR_PASSWORD:?}
-: ${BOSH_DIRECTOR_USERNAME:?}
+: ${BOSH_PASSWORD:?}
+: ${BOSH_USER:?}
 : ${RELEASE_NAME:?}
 : ${STEMCELL_NAME:?}
 : ${DEPLOYMENT_NAME:?}
@@ -32,7 +32,6 @@ chmod +x $bosh_cli
 manifest_dir="$(realpath deployment-manifest)"
 
 time $bosh_cli -n env ${DIRECTOR_IP//./-}.sslip.io
-time $bosh_cli -n login --user=${BOSH_DIRECTOR_USERNAME} --password=${BOSH_DIRECTOR_PASSWORD}
 
 cat > "${manifest_dir}/deployment.yml" <<EOF
 ---

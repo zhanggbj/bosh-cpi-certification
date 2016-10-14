@@ -15,8 +15,8 @@ source pipelines/shared/utils.sh
 : ${BOSH_VSPHERE_VCENTER_DATASTORE:?}
 : ${BOSH_VSPHERE_VCENTER_DISK_PATH:?}
 : ${BOSH_VSPHERE_VCENTER_VLAN:?}
-: ${BOSH_DIRECTOR_USERNAME:?}
-: ${BOSH_DIRECTOR_PASSWORD:?}
+: ${BOSH_USER:?}
+: ${BOSH_PASSWORD:?}
 : ${USE_REDIS:=false}
 : ${SSLIP_IO_KEY:?}
 
@@ -49,8 +49,8 @@ cat > "${output_dir}/director.env" <<EOF
 #!/usr/bin/env bash
 
 export BOSH_DIRECTOR_IP=${DIRECTOR_IP}
-export BOSH_DIRECTOR_USERNAME=${BOSH_DIRECTOR_USERNAME}
-export BOSH_DIRECTOR_PASSWORD=${BOSH_DIRECTOR_PASSWORD}
+export BOSH_USER=${BOSH_USER}
+export BOSH_PASSWORD=${BOSH_PASSWORD}
 EOF
 
 cat > "${output_dir}/director.yml" <<EOF
@@ -143,7 +143,7 @@ jobs:
           provider: local
           local:
             users:
-              - {name: ${BOSH_DIRECTOR_USERNAME}, password: ${BOSH_DIRECTOR_PASSWORD}}
+              - {name: ${BOSH_USER}, password: ${BOSH_PASSWORD}}
         ssl:
           key: "$(sed 's/$/\\n/g' <<< "${SSLIP_IO_KEY}" | tr -d '\n')"
           cert: |
@@ -248,7 +248,7 @@ jobs:
 
       hm:
         http: {user: hm, password: hm-password}
-        director_account: {user: ${BOSH_DIRECTOR_USERNAME}, password: ${BOSH_DIRECTOR_PASSWORD}}
+        director_account: {user: ${BOSH_USER}, password: ${BOSH_PASSWORD}}
         resurrector_enabled: true
 
       agent: {mbus: "nats://nats:nats-password@${DIRECTOR_IP}:4222"}

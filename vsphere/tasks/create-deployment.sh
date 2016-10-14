@@ -4,8 +4,8 @@ set -e -x
 
 source pipelines/shared/utils.sh
 
-: ${BOSH_DIRECTOR_USERNAME:?}
-: ${BOSH_DIRECTOR_PASSWORD:?}
+: ${BOSH_USER:?}
+: ${BOSH_PASSWORD:?}
 : ${RELEASE_NAME:?}
 : ${DEPLOYMENT_NAME:?}
 
@@ -23,7 +23,6 @@ echo "Using environment: \'${env_name}\'"
 : ${DIRECTOR_IP:=$(env_attr "${metadata}" "directorIP" )}
 
 time $bosh_cli -n env ${DIRECTOR_IP//./-}.sslip.io
-time $bosh_cli -n login --user=${BOSH_DIRECTOR_USERNAME} --password=${BOSH_DIRECTOR_PASSWORD}
 
 pushd ${deployment_release}
   time $bosh_cli -n create-release --force --name ${RELEASE_NAME}

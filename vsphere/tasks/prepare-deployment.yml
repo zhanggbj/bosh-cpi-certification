@@ -16,8 +16,8 @@ run:
   path: pipelines/vsphere/tasks/prepare-deployment.sh
 
 params:
-  BOSH_DIRECTOR_USERNAME:                 ""
-  BOSH_DIRECTOR_PASSWORD:                 ""
+  BOSH_USER:                 ""
+  BOSH_PASSWORD:                 ""
   BOSH_VSPHERE_VCENTER_VLAN:              ""
   RELEASE_NAME:                           ""
   STEMCELL_NAME:                          ""
