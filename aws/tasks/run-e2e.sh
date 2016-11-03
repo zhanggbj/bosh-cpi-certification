@@ -28,7 +28,7 @@ chmod +x $bosh_cli
 : ${IAM_INSTANCE_PROFILE:=$( stack_info "IAMInstanceProfile")}
 : ${ELB_NAME:=$(             stack_info "ELB")}
 
-time $bosh_cli -n env ${DIRECTOR_IP//./-}.sslip.io
+export BOSH_ENVIRONMENT="${DIRECTOR_IP//./-}.sslip.io"
 
 e2e_deployment_name=e2e-test
 e2e_release_version=1.0.0

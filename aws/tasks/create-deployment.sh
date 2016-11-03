@@ -28,7 +28,7 @@ chmod +x $bosh_cli
 # configuration
 : ${DIRECTOR_IP:=$( stack_info "DirectorEIP" )}
 
-time $bosh_cli -n env ${DIRECTOR_IP//./-}.sslip.io
+export BOSH_ENVIRONMENT="${DIRECTOR_IP//./-}.sslip.io"
 
 pushd ${deployment_release}
   time $bosh_cli -n create-release --force --name ${RELEASE_NAME}
