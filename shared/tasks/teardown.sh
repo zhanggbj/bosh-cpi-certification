@@ -24,15 +24,13 @@ fi
 pushd ${input_dir} > /dev/null
   # configuration
   source director.env
-  : ${BOSH_DIRECTOR_IP:?}
+  : ${BOSH_ENVIRONMENT:?}
   : ${BOSH_USER:?}
   : ${BOSH_PASSWORD:?}
 
-  # Don't exit on failure to target the BOSH director
+  # Don't exit on failure to delete existing deployment
   set +e
     # teardown deployments against BOSH Director
-    time $bosh_cli -n env ${BOSH_DIRECTOR_IP//./-}.sslip.io
-
     if [ -n "${DEPLOYMENT_NAME}" ]; then
       time $bosh_cli -n delete-deployment -d ${DEPLOYMENT_NAME} --force
     fi

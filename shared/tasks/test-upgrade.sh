@@ -20,7 +20,7 @@ chmod +x $bosh_cli
 output_dir=$(realpath new-director-state/)
 
 source ${new_director_config}/director.env
-: ${BOSH_DIRECTOR_IP:?}
+: ${BOSH_ENVIRONMENT:?}
 : ${BOSH_USER:?}
 : ${BOSH_PASSWORD:?}
 
@@ -48,8 +48,6 @@ echo "upgrading existing BOSH Director VM..."
 pushd ${output_dir} > /dev/null
   time ${bosh_cli} create-env director.yml
 popd > /dev/null
-
-time $bosh_cli -n env ${BOSH_DIRECTOR_IP//./-}.sslip.io
 
 echo "recreating existing BOSH Deployment..."
 time $bosh_cli -n -d ${DEPLOYMENT_NAME} recreate

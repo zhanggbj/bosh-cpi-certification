@@ -48,7 +48,7 @@ fi
 cat > "${output_dir}/director.env" <<EOF
 #!/usr/bin/env bash
 
-export BOSH_DIRECTOR_IP=${DIRECTOR_IP}
+export BOSH_ENVIRONMENT="${DIRECTOR_IP//./-}.sslip.io"
 export BOSH_USER=${BOSH_USER}
 export BOSH_PASSWORD=${BOSH_PASSWORD}
 EOF

@@ -30,7 +30,7 @@ output_dir="$(realpath director-config)"
 cat > "${output_dir}/director.env" <<EOF
 #!/usr/bin/env bash
 
-export BOSH_DIRECTOR_IP=${BATS_DIRECTOR_IP}
+export BOSH_ENVIRONMENT="${BATS_DIRECTOR_IP//./-}.sslip.io"
 export BOSH_USER=${BOSH_USER}
 export BOSH_PASSWORD=${BOSH_PASSWORD}
 EOF

@@ -22,7 +22,7 @@ chmod +x $bosh_cli
 echo "Using environment: \'${env_name}\'"
 : ${DIRECTOR_IP:=$(env_attr "${metadata}" "directorIP" )}
 
-time $bosh_cli -n env ${DIRECTOR_IP//./-}.sslip.io
+export BOSH_ENVIRONMENT="${DIRECTOR_IP//./-}.sslip.io"
 
 pushd ${deployment_release}
   time $bosh_cli -n create-release --force --name ${RELEASE_NAME}
