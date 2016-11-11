@@ -77,11 +77,15 @@ jobs:
       - aggregate:
         - {get: bosh-release,    trigger: true}
         - {get: cpi-release,     trigger: true}
-        - {get: stemcell,        trigger: true, resource: ubuntu-stemcell}
         - {get: after-midnight,  trigger: true}
         - {get: centos-stemcell, trigger: false} # pass-thru to certification jobs
         - {get: pipelines,       trigger: false}
         - {get: bosh-cli,        trigger: false}
+        - get: stemcell
+          resource: ubuntu-stemcell
+          trigger: true
+          params:
+            preserve_filename: true
 
       - <<: *prepare-director
         file: pipelines/aws/tasks/prepare-director-iam.yml
@@ -110,11 +114,15 @@ jobs:
       - aggregate:
         - {get: bosh-release,   trigger: true}
         - {get: cpi-release,    trigger: true}
-        - {get: stemcell,       trigger: true, resource: centos-stemcell}
         - {get: after-midnight, trigger: true}
         - {get: pipelines,      trigger: false}
         - {get: bosh-cli,       trigger: false}
         - {get: bats,           trigger: false}
+        - get: stemcell
+          resource: centos-stemcell
+          trigger: true
+          params:
+            preserve_filename: true
 
       - <<: *prepare-director
         params:
@@ -141,11 +149,15 @@ jobs:
       - aggregate:
         - {get: bosh-release,   trigger: true}
         - {get: cpi-release,    trigger: true}
-        - {get: stemcell,       trigger: true, resource: ubuntu-stemcell}
         - {get: after-midnight, trigger: true}
         - {get: pipelines,      trigger: false}
         - {get: bosh-cli,       trigger: false}
         - {get: bats,           trigger: false}
+        - get: stemcell
+          resource: ubuntu-stemcell
+          trigger: true
+          params:
+            preserve_filename: true
 
       - <<: *prepare-director
         params:
@@ -171,14 +183,24 @@ jobs:
       - aggregate:
         - {get: bosh-release,     trigger: true}
         - {get: cpi-release,      trigger: true}
-        - {get: stemcell,         trigger: true, resource: ubuntu-stemcell}
         - {get: after-midnight,   trigger: true}
         - {get: pipelines,        trigger: false}
         - {get: bosh-cli,         trigger: false}
         - {get: centos-stemcell,  trigger: false} # pass-through
-        - {get: old-stemcell,     trigger: false}
         - {get: old-bosh-release, trigger: false, version: {version: "255.4"}, resource: bosh-release}
         - {get: old-cpi-release,  trigger: false, version: {version: "36"},  resource: cpi-release}
+        - get: stemcell
+          resource: ubuntu-stemcell
+          trigger: true
+          params:
+            preserve_filename: true
+        - get: old-stemcell
+          resource: ubuntu-stemcell
+          trigger: false
+          version:
+            version: "3213"
+          params:
+            preserve_filename: true
 
       - <<: *prepare-director
         input_mapping:
@@ -341,27 +363,14 @@ resources:
       branch: master
 
   - name: ubuntu-stemcell
-    type: s3
+    type: bosh-io-stemcell
     source:
       name: &ubuntu-stemcell bosh-aws-xen-hvm-ubuntu-trusty-go_agent
-      regexp: light-bosh-stemcell-([0-9.]+)-aws-xen-hvm-ubuntu-trusty-go_agent.tgz
-      bucket: bosh-aws-light-stemcells
-      region_name: us-east-1
 
   - name: centos-stemcell
-    type: s3
+    type: bosh-io-stemcell
     source:
       name: &centos-stemcell bosh-aws-xen-hvm-centos-7-go_agent
-      regexp: light-bosh-stemcell-([0-9.]+)-aws-xen-hvm-centos-7-go_agent.tgz
-      bucket: bosh-aws-light-stemcells
-      region_name: us-east-1
-
-  - name: old-stemcell
-    type: s3
-    source:
-      bucket: bosh-cpi-certification-fixtures
-      regexp: light-bosh-stemcell-(3213)-aws-xen-hvm-ubuntu-trusty-go_agent.tgz
-      region_name: us-east-1
 
   - name: bosh-cli
     type: s3
