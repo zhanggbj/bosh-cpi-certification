@@ -198,7 +198,7 @@ jobs:
           resource: ubuntu-stemcell
           trigger: false
           version:
-            version: "3213"
+            version: "3232.15"
           params:
             preserve_filename: true
 
