@@ -5,12 +5,10 @@ groups:
       - bats-centos
       - bats-ubuntu
       - end2end-us
-      - end2end-cn
       - test-upgrade
       - certify-centos
       - certify-ubuntu
       - recreate-infrastructure-us
-      - recreate-infrastructure-cn
 
 shared:
   - &prepare-director
@@ -102,48 +100,6 @@ jobs:
 
         ensure:
           <<: *teardown
-          params:
-            <<: *teardown-params
-            DEPLOYMENT_NAME: e2e-test
-
-  - name: end2end-cn
-    serial: true
-    plan:
-      - aggregate:
-        - {get: bosh-release,    trigger: true,  attempts: 5, tags: [aws-cn]}
-        - {get: cpi-release,     trigger: true,  attempts: 5, tags: [aws-cn]}
-        - {get: stemcell,        trigger: true,  attempts: 5, resource: ubuntu-stemcell, tags: [aws-cn]}
-        - {get: after-midnight,  trigger: true,  attempts: 5, tags: [aws-cn]}
-        - {get: centos-stemcell, trigger: false, attempts: 5, tags: [aws-cn]} # pass-thru to certification jobs
-        - {get: pipelines,       trigger: false, attempts: 5, tags: [aws-cn]}
-        - {get: bosh-cli,        trigger: false, attempts: 5, tags: [aws-cn]}
-
-      - <<: *prepare-director
-        tags: [aws-cn]
-        file: pipelines/aws/tasks/prepare-director-iam.yml
-        params:
-          <<: *prepare-director-params
-          AWS_STACK_NAME:   {{AWS_E2E_STACK_NAME}}
-          AWS_ACCESS_KEY:   {{AWS_ACCESS_KEY__CN}}
-          AWS_SECRET_KEY:   {{AWS_SECRET_KEY__CN}}
-          AWS_REGION_NAME:  cn-north-1
-
-      - do:
-          - <<: *deploy-director
-            tags: [aws-cn]
-
-          - <<: *run-e2e
-            tags: [aws-cn]
-            params:
-              <<: *run-e2e-params
-              AWS_ACCESS_KEY:   {{AWS_ACCESS_KEY__CN}}
-              AWS_SECRET_KEY:   {{AWS_SECRET_KEY__CN}}
-              AWS_REGION_NAME:  cn-north-1
-              STEMCELL_NAME:    *ubuntu-stemcell
-
-        ensure:
-          <<: *teardown
-          tags: [aws-cn]
           params:
             <<: *teardown-params
             DEPLOYMENT_NAME: e2e-test
@@ -354,19 +310,6 @@ jobs:
             AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
             AWS_REGION_NAME:    {{AWS_REGION_NAME}}
             AWS_STACK_NAME:     certify-upgrade
-
-  - name: recreate-infrastructure-cn
-    serial: true
-    plan:
-      - {get: pipelines, trigger: false}
-      - aggregate:
-        - task: prepare-e2e-infrastructure
-          file: pipelines/aws/tasks/recreate-infrastructure.yml
-          params:
-            AWS_STACK_NAME:     {{AWS_E2E_STACK_NAME}}
-            AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY__CN}}
-            AWS_SECRET_KEY:     {{AWS_SECRET_KEY__CN}}
-            AWS_REGION_NAME:    cn-north-1
 
 resources:
   - name: after-midnight
