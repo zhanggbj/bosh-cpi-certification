@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e -x
+set -e
 
 source pipelines/shared/utils.sh
 source pipelines/aws/utils.sh
