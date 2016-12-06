@@ -116,6 +116,11 @@ jobs:
         db: *db
         cpi_job: vcloud_cpi
         max_threads: 10
+        user_management:
+          provider: local
+          local:
+            users:
+              - {name: ${BOSH_USER}, password: ${BOSH_PASSWORD}}
         ssl:
           key: "$(sed 's/$/\\n/g' <<< "${SSLIP_IO_KEY}" | tr -d '\n')"
           cert: |
