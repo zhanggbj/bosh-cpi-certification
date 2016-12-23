@@ -15,11 +15,15 @@ source pipelines/shared/utils.sh
 : ${BOSH_VSPHERE_VCENTER_DATASTORE:?}
 : ${BOSH_VSPHERE_VCENTER_DISK_PATH:?}
 : ${BOSH_VSPHERE_VCENTER_VLAN:?}
-: ${BOSH_USER:?}
-: ${BOSH_PASSWORD:?}
+: ${BOSH_CLIENT:=$BOSH_USER}
+: ${BOSH_CLIENT_SECRET:=$BOSH_PASSWORD}
 : ${USE_REDIS:=false}
 : ${SSLIP_IO_KEY:?}
 
+: ${BOSH_CLIENT:?}
+: ${BOSH_CLIENT_SECRET:?}
+unset BOSH_USER
+unset BOSH_PASSWORD
 # inputs
 # paths will be resolved in a separate task so use relative paths
 BOSH_RELEASE_URI="file://$(echo bosh-release/*.tgz)"
@@ -49,8 +53,8 @@ cat > "${output_dir}/director.env" <<EOF
 #!/usr/bin/env bash
 
 export BOSH_ENVIRONMENT="${DIRECTOR_IP//./-}.sslip.io"
-export BOSH_USER=${BOSH_USER}
-export BOSH_PASSWORD=${BOSH_PASSWORD}
+export BOSH_CLIENT=${BOSH_CLIENT}
+export BOSH_CLIENT_SECRET=${BOSH_CLIENT_SECRET}
 EOF
 
 cat > "${output_dir}/director.yml" <<EOF
@@ -143,7 +147,7 @@ jobs:
           provider: local
           local:
             users:
-              - {name: ${BOSH_USER}, password: ${BOSH_PASSWORD}}
+              - {name: ${BOSH_CLIENT}, password: ${BOSH_CLIENT_SECRET}}
         ssl:
           key: "$(sed 's/$/\\n/g' <<< "${SSLIP_IO_KEY}" | tr -d '\n')"
           cert: |
@@ -248,7 +252,7 @@ jobs:
 
       hm:
         http: {user: hm, password: hm-password}
-        director_account: {user: ${BOSH_USER}, password: ${BOSH_PASSWORD}}
+        director_account: {user: ${BOSH_CLIENT}, password: ${BOSH_CLIENT_SECRET}}
         resurrector_enabled: true
 
       agent: {mbus: "nats://nats:nats-password@${DIRECTOR_IP}:4222"}
