@@ -15,15 +15,11 @@ source pipelines/shared/utils.sh
 : ${BOSH_VSPHERE_VCENTER_DATASTORE:?}
 : ${BOSH_VSPHERE_VCENTER_DISK_PATH:?}
 : ${BOSH_VSPHERE_VCENTER_VLAN:?}
-: ${BOSH_CLIENT:=$BOSH_USER}
-: ${BOSH_CLIENT_SECRET:=$BOSH_PASSWORD}
+: ${BOSH_CLIENT:?}
+: ${BOSH_CLIENT_SECRET:?}
 : ${USE_REDIS:=false}
 : ${SSLIP_IO_KEY:?}
 
-: ${BOSH_CLIENT:?}
-: ${BOSH_CLIENT_SECRET:?}
-unset BOSH_USER
-unset BOSH_PASSWORD
 # inputs
 # paths will be resolved in a separate task so use relative paths
 BOSH_RELEASE_URI="file://$(echo bosh-release/*.tgz)"
@@ -116,6 +112,7 @@ jobs:
       nats:
         address: 127.0.0.1
         user: nats
+
         password: nats-password
 
       postgres: &db
