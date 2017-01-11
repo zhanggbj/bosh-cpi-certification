@@ -46,6 +46,7 @@ time $bosh_cli -n upload-stemcell "${stemcell_path}"
 e2e_manifest_filename=e2e-manifest.yml
 e2e_cloud_config_filename=e2e-cloud-config.yml
 
+# these VM's are expected to have `director` role for them to succeed
 cat > "${e2e_cloud_config_filename}" <<EOF
 networks:
   - name: private
@@ -105,7 +106,7 @@ instance_groups:
     - name: iam-instance-profile-test
       release: ${e2e_deployment_name}
       properties:
-        iam_instance_profile: ${IAM_INSTANCE_PROFILE}
+        expected_iam_instance_profile: ${IAM_INSTANCE_PROFILE}
     stemcell: stemcell
     lifecycle: errand
     instances: 1
