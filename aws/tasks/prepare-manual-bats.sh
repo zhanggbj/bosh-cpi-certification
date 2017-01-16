@@ -9,8 +9,8 @@ set -e
 : ${AWS_REGION_NAME:?}
 : ${AWS_STACK_NAME:?}
 : ${BAT_VCAP_PASSWORD:?}
-: ${BOSH_USER:?}
-: ${BOSH_PASSWORD:?}
+: ${BOSH_CLIENT:?}
+: ${BOSH_CLIENT_SECRET:?}
 : ${PUBLIC_KEY_NAME:?}
 : ${STEMCELL_NAME:?}
 
@@ -64,8 +64,8 @@ export BAT_SECURITY_GROUP_NAME=${SECURITY_GROUP}
 export BAT_VCAP_PASSWORD=${BAT_VCAP_PASSWORD}
 export BAT_VCAP_PRIVATE_KEY="bats-config/shared.pem"
 export BAT_RSPEC_FLAGS="--tag ~multiple_manual_networks --tag ~root_partition"
-export BAT_DIRECTOR_USER="${BOSH_USER}"
-export BAT_DIRECTOR_PASSWORD="${BOSH_PASSWORD}"
+export BAT_DIRECTOR_USER="${BOSH_CLIENT}"
+export BAT_DIRECTOR_PASSWORD="${BOSH_CLIENT_SECRET}"
 EOF
 
 pushd "${bats_dir}" > /dev/null

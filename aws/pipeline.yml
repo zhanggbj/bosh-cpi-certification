@@ -15,36 +15,36 @@ shared:
     task: prepare-director
     file: pipelines/aws/tasks/prepare-director.yml
     params: &prepare-director-params
-      BOSH_USER:        {{BOSH_USER}}
-      BOSH_PASSWORD:    {{BOSH_PASSWORD}}
-      AWS_ACCESS_KEY:   {{AWS_ACCESS_KEY}}
-      AWS_SECRET_KEY:   {{AWS_SECRET_KEY}}
-      AWS_REGION_NAME:  {{AWS_REGION_NAME}}
-      PUBLIC_KEY_NAME:  {{PUBLIC_KEY_NAME}}
-      PRIVATE_KEY_DATA: {{PRIVATE_KEY_DATA}}
-      SSLIP_IO_KEY:     {{sslip_io_key}}
-      AWS_STACK_NAME:   ""
+      BOSH_CLIENT:        {{BOSH_CLIENT}}
+      BOSH_CLIENT_SECRET: {{BOSH_CLIENT_SECRET}}
+      AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
+      AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
+      AWS_REGION_NAME:    {{AWS_REGION_NAME}}
+      PUBLIC_KEY_NAME:    {{PUBLIC_KEY_NAME}}
+      PRIVATE_KEY_DATA:   {{PRIVATE_KEY_DATA}}
+      SSLIP_IO_KEY:       {{sslip_io_key}}
+      AWS_STACK_NAME:     ""
 
   - &deploy-director
     task: deploy-director
     file: pipelines/shared/tasks/deploy-director.yml
     params: &deploy-director-params
-      BOSH_USER: {{BOSH_USER}}
-      BOSH_PASSWORD: {{BOSH_PASSWORD}}
+      BOSH_CLIENT: {{BOSH_CLIENT}}
+      BOSH_CLIENT_SECRET: {{BOSH_CLIENT_SECRET}}
 
   - &prepare-manual-bats
     task: prepare-manual-bats
     file: pipelines/aws/tasks/prepare-manual-bats.yml
     params: &prepare-manual-bats-params
-      AWS_ACCESS_KEY:         {{AWS_ACCESS_KEY}}
-      AWS_SECRET_KEY:         {{AWS_SECRET_KEY}}
-      AWS_REGION_NAME:        {{AWS_REGION_NAME}}
-      BAT_VCAP_PASSWORD:      {{BAT_VCAP_PASSWORD}}
-      PUBLIC_KEY_NAME:        {{PUBLIC_KEY_NAME}}
-      BOSH_USER:              {{BOSH_USER}}
-      BOSH_PASSWORD:          {{BOSH_PASSWORD}}
-      STEMCELL_NAME:          ""
-      AWS_STACK_NAME:         ""
+      AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
+      AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
+      AWS_REGION_NAME:    {{AWS_REGION_NAME}}
+      BAT_VCAP_PASSWORD:  {{BAT_VCAP_PASSWORD}}
+      PUBLIC_KEY_NAME:    {{PUBLIC_KEY_NAME}}
+      BOSH_CLIENT:        {{BOSH_CLIENT}}
+      BOSH_CLIENT_SECRET: {{BOSH_CLIENT_SECRET}}
+      STEMCELL_NAME:      ""
+      AWS_STACK_NAME:     ""
 
   - &run-bats
     task: run-bats
@@ -54,21 +54,21 @@ shared:
     task: run-e2e
     file: pipelines/aws/tasks/run-e2e.yml
     params: &run-e2e-params
-      AWS_ACCESS_KEY:         {{AWS_ACCESS_KEY}}
-      AWS_SECRET_KEY:         {{AWS_SECRET_KEY}}
-      AWS_REGION_NAME:        {{AWS_REGION_NAME}}
-      BOSH_USER:              {{BOSH_USER}}
-      BOSH_PASSWORD:          {{BOSH_PASSWORD}}
-      AWS_STACK_NAME:         {{AWS_E2E_STACK_NAME}}
-      STEMCELL_NAME:          ""
+      AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
+      AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
+      AWS_REGION_NAME:    {{AWS_REGION_NAME}}
+      BOSH_CLIENT:        {{BOSH_CLIENT}}
+      BOSH_CLIENT_SECRET: {{BOSH_CLIENT_SECRET}}
+      AWS_STACK_NAME:     {{AWS_E2E_STACK_NAME}}
+      STEMCELL_NAME:      ""
 
   - &teardown
     task: teardown
     file: pipelines/shared/tasks/teardown.yml
     params: &teardown-params
-      BOSH_USER:              {{BOSH_USER}}
-      BOSH_PASSWORD:          {{BOSH_PASSWORD}}
-      DEPLOYMENT_NAME:        certification
+      BOSH_CLIENT:        {{BOSH_CLIENT}}
+      BOSH_CLIENT_SECRET: {{BOSH_CLIENT_SECRET}}
+      DEPLOYMENT_NAME:    certification
 
 jobs:
   - name: end2end-us
@@ -222,29 +222,29 @@ jobs:
         - task: prepare-deployment
           file: pipelines/aws/tasks/prepare-deployment.yml
           params:
-            BOSH_USER:                 {{BOSH_USER}}
-            BOSH_PASSWORD:             {{BOSH_PASSWORD}}
-            AWS_ACCESS_KEY:            {{AWS_ACCESS_KEY}}
-            AWS_SECRET_KEY:            {{AWS_SECRET_KEY}}
-            AWS_REGION_NAME:           {{AWS_REGION_NAME}}
-            AWS_STACK_NAME:            certify-upgrade
-            RELEASE_NAME:              certification
-            DEPLOYMENT_NAME:           certification
-            STEMCELL_NAME:             bosh-aws-xen-hvm-ubuntu-trusty-go_agent
+            BOSH_CLIENT:        {{BOSH_CLIENT}}
+            BOSH_CLIENT_SECRET: {{BOSH_CLIENT_SECRET}}
+            AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
+            AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
+            AWS_REGION_NAME:    {{AWS_REGION_NAME}}
+            AWS_STACK_NAME:     certify-upgrade
+            RELEASE_NAME:       certification
+            DEPLOYMENT_NAME:    certification
+            STEMCELL_NAME:      bosh-aws-xen-hvm-ubuntu-trusty-go_agent
 
         - task: create-deployment
           file: pipelines/aws/tasks/create-deployment.yml
           input_mapping:
-            stemcell:                  old-stemcell
+            stemcell:           old-stemcell
           params:
-            BOSH_USER:                 {{BOSH_USER}}
-            BOSH_PASSWORD:             {{BOSH_PASSWORD}}
-            AWS_ACCESS_KEY:            {{AWS_ACCESS_KEY}}
-            AWS_SECRET_KEY:            {{AWS_SECRET_KEY}}
-            AWS_REGION_NAME:           {{AWS_REGION_NAME}}
-            AWS_STACK_NAME:            certify-upgrade
-            RELEASE_NAME:              certification
-            DEPLOYMENT_NAME:           certification
+            BOSH_CLIENT:        {{BOSH_CLIENT}}
+            BOSH_CLIENT_SECRET: {{BOSH_CLIENT_SECRET}}
+            AWS_ACCESS_KEY:     {{AWS_ACCESS_KEY}}
+            AWS_SECRET_KEY:     {{AWS_SECRET_KEY}}
+            AWS_REGION_NAME:    {{AWS_REGION_NAME}}
+            AWS_STACK_NAME:     certify-upgrade
+            RELEASE_NAME:       certification
+            DEPLOYMENT_NAME:    certification
 
         - <<: *prepare-director
           params:
@@ -255,12 +255,12 @@ jobs:
         - task: test-upgrade
           file: pipelines/shared/tasks/test-upgrade.yml
           input_mapping:
-            old-director-state: director-state
+            old-director-state:  director-state
             new-director-config: director-config
           output_mapping:
-            new-director-state: director-state
+            new-director-state:  director-state
           params:
-            DEPLOYMENT_NAME:        certification
+            DEPLOYMENT_NAME:     certification
 
         ensure:
           <<: *teardown

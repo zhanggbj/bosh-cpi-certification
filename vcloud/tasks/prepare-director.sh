@@ -13,8 +13,8 @@ set -e
 : ${NETWORK_CIDR:?}
 : ${NETWORK_GATEWAY:?}
 : ${BATS_DIRECTOR_IP:?}
-: ${BOSH_USER:?}
-: ${BOSH_PASSWORD:?}
+: ${BOSH_CLIENT:?}
+: ${BOSH_CLIENT_SECRET:?}
 : ${SSLIP_IO_KEY:?}
 
 # inputs
@@ -31,8 +31,8 @@ cat > "${output_dir}/director.env" <<EOF
 #!/usr/bin/env bash
 
 export BOSH_ENVIRONMENT="${BATS_DIRECTOR_IP//./-}.sslip.io"
-export BOSH_USER=${BOSH_USER}
-export BOSH_PASSWORD=${BOSH_PASSWORD}
+export BOSH_CLIENT=${BOSH_CLIENT}
+export BOSH_CLIENT_SECRET=${BOSH_CLIENT_SECRET}
 EOF
 
 cat > "${output_dir}/director.yml" <<EOF
@@ -116,6 +116,11 @@ jobs:
         db: *db
         cpi_job: vcloud_cpi
         max_threads: 10
+        user_management:
+          provider: local
+          local:
+            users:
+              - {name: ${BOSH_CLIENT}, password: ${BOSH_CLIENT_SECRET}}
         ssl:
           key: "$(sed 's/$/\\n/g' <<< "${SSLIP_IO_KEY}" | tr -d '\n')"
           cert: |

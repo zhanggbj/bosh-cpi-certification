@@ -8,5 +8,5 @@ templates:
   run.erb: bin/run
 
 properties:
-  iam_instance_profile:
+  expected_iam_instance_profile:
     description: The IAM Instance Profile to be verified
